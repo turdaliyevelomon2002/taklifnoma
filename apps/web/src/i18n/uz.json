@@ -1,0 +1,476 @@
+{
+  "app": {
+    "name": "Taklifnoma",
+    "loading": "Yuklanmoqda…"
+  },
+  "home": {
+    "title": "Onlayn to'y taklifnomalari",
+    "subtitle": "Chiroyli, tez ochiladigan va Telegram'da ulashish uchun qulay taklifnoma — 10 daqiqada."
+  },
+  "notFound": {
+    "title": "Sahifa topilmadi",
+    "text": "Havola noto'g'ri yoki taklifnoma muddati tugagan bo'lishi mumkin.",
+    "back": "Bosh sahifa"
+  },
+  "error": {
+    "title": "Nimadir xato ketdi",
+    "text": "Iltimos, birozdan so'ng qayta urinib ko'ring.",
+    "retry": "Qayta urinish"
+  },
+  "seo": {
+    "title": "{{names}} — to'yga taklifnoma",
+    "description": "{{date}}, {{venue}}. Sizni intizorlik bilan kutamiz!"
+  },
+  "date": {
+    "full": "{{day}}-{{month}}, {{year}}",
+    "short": "{{day}}.{{monthNum}}.{{year}}",
+    "month": {
+      "1": "yanvar",
+      "2": "fevral",
+      "3": "mart",
+      "4": "aprel",
+      "5": "may",
+      "6": "iyun",
+      "7": "iyul",
+      "8": "avgust",
+      "9": "sentyabr",
+      "10": "oktyabr",
+      "11": "noyabr",
+      "12": "dekabr"
+    },
+    "weekday": {
+      "0": "Yakshanba",
+      "1": "Dushanba",
+      "2": "Seshanba",
+      "3": "Chorshanba",
+      "4": "Payshanba",
+      "5": "Juma",
+      "6": "Shanba"
+    }
+  },
+  "invitation": {
+    "intro": {
+      "eyebrow": "To'yga taklifnoma",
+      "open": "Taklifnomani ochish"
+    },
+    "hero": {
+      "invite": "Sizni nikoh to'yimizga taklif qilamiz",
+      "and": "&"
+    },
+    "sections": {
+      "greeting": "Aziz mehmonlar",
+      "countdown": "To'ygacha qoldi",
+      "events": "Tadbirlar",
+      "gallery": "Bizning lahzalar",
+      "location": "Manzil",
+      "rsvp": "Ishtirokingizni tasdiqlang",
+      "wishes": "Tilaklar"
+    },
+    "countdown": {
+      "days": {
+        "one": "kun",
+        "other": "kun"
+      },
+      "hours": {
+        "one": "soat",
+        "other": "soat"
+      },
+      "minutes": {
+        "one": "daqiqa",
+        "other": "daqiqa"
+      },
+      "seconds": {
+        "one": "soniya",
+        "other": "soniya"
+      },
+      "today": "Bugun — to'y kuni!",
+      "passed": "To'y bo'lib o'tdi. Tashrifingiz uchun rahmat!"
+    },
+    "event": {
+      "time": "Boshlanish vaqti",
+      "until": "gacha",
+      "directions": "Yo'nalish",
+      "openMap": "Yandex xaritada ochish",
+      "call": "Qo'ng'iroq qilish",
+      "mapTitle": "{{venue}} — xarita",
+      "loadMap": "Xaritani ko'rsatish"
+    },
+    "gallery": {
+      "open": "{{n}}-rasmni kattalashtirish",
+      "close": "Yopish",
+      "prev": "Oldingi rasm",
+      "next": "Keyingi rasm",
+      "counter": "{{current}} / {{total}}"
+    },
+    "music": {
+      "play": "Musiqani yoqish",
+      "pause": "Musiqani o'chirish"
+    },
+    "lang": {
+      "label": "Tilni tanlash",
+      "uz": "O'zbekcha",
+      "ru": "Русский"
+    },
+    "footer": {
+      "waiting": "Sizni kutib qolamiz!",
+      "madeWith": "Taklifnoma bilan yaratilgan"
+    },
+    "rsvp": {
+      "title": "Ishtirokingizni tasdiqlang",
+      "deadline": "Iltimos, {{date}}gacha javob bering",
+      "name": "Ismingiz",
+      "namePlaceholder": "Ism va familiya",
+      "phone": "Telefon raqamingiz",
+      "phoneHint": "Javobingizni o'zgartirmoqchi bo'lsangiz, shu raqam orqali yangilanadi",
+      "attendingLabel": "To'yga kelasizmi?",
+      "yes": "Albatta boraman",
+      "no": "Afsus, kela olmayman",
+      "guests": "Necha kishi bo'lasiz?",
+      "guestsHint": "O'zingiz bilan birga, ko'pi bilan {{max}} kishi",
+      "decrease": "Kamaytirish",
+      "increase": "Ko'paytirish",
+      "wish": "Juftlikka tilaklaringiz",
+      "wishPlaceholder": "Yoshlarga eng ezgu tilaklaringizni yozing…",
+      "submit": "Javobni yuborish",
+      "submitting": "Yuborilmoqda…",
+      "thanks": "Rahmat, {{name}}!",
+      "doneYes": "Javobingiz qabul qilindi. Sizni intizorlik bilan kutamiz!",
+      "doneNo": "Javobingiz uchun rahmat. Sizni sog'inib qolamiz!",
+      "updated": "Oldingi javobingiz yangilandi.",
+      "change": "Javobni o'zgartirish",
+      "closed": "Javob qabul qilish yakunlangan. Savollar bo'lsa, juftlikka to'g'ridan-to'g'ri murojaat qiling.",
+      "honeypot": "Bu maydonni bo'sh qoldiring",
+      "validation": {
+        "required": "Bu maydonni to'ldiring",
+        "minlength": "Kamida {{n}} ta harf kiriting",
+        "phone": "Raqamni to'liq kiriting, masalan: 90 123 45 67",
+        "attending": "Iltimos, javobingizni tanlang"
+      }
+    },
+    "wishes": {
+      "title": "Tilaklar",
+      "empty": "Birinchi bo'lib tilak qoldiring!"
+    }
+  },
+  "errors": {
+    "VALIDATION_ERROR": "Ma'lumotlarni tekshirib, qayta urinib ko'ring.",
+    "RATE_LIMITED": "Juda ko'p urinish. Bir daqiqadan so'ng qayta urinib ko'ring.",
+    "RSVP_CLOSED": "Javob qabul qilish yakunlangan.",
+    "FORM_EXPIRED": "Sahifa eskirgan. Iltimos, «Javobni yuborish» tugmasini qayta bosing.",
+    "SPAM_DETECTED": "Javobni yuborib bo'lmadi. Havolalarsiz yozib, bir necha soniyadan keyin qayta urinib ko'ring.",
+    "PHONE_REQUIRED": "Telefon raqamingizni kiriting.",
+    "TOO_MANY_GUESTS": "Mehmonlar soni ruxsat etilganidan ko'p.",
+    "NOT_FOUND": "Taklifnoma topilmadi.",
+    "NETWORK": "Internet aloqasini tekshirib, qayta urinib ko'ring.",
+    "INTERNAL_ERROR": "Xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring.",
+    "UNAUTHORIZED": "Sessiya tugagan. Iltimos, qaytadan kiring.",
+    "FORBIDDEN": "Bu amalga ruxsat yo'q.",
+    "INVALID_CREDENTIALS": "PIN kod yoki havola noto'g'ri.",
+    "PIN_LOCKED": "Juda ko'p noto'g'ri urinish. Kirish 15 daqiqaga bloklandi.",
+    "FEATURE_DISABLED": "Bu imkoniyat sizning paketingizda mavjud emas.",
+    "CONFLICT": "Ma'lumot boshqa joyda o'zgartirilgan. Sahifani yangilang.",
+    "SLUG_TAKEN": "Bu manzil band",
+    "GALLERY_LIMIT_REACHED": "Galereya limiti tugadi",
+    "UNSUPPORTED_FILE_TYPE": "Bu fayl turi qo'llab-quvvatlanmaydi",
+    "FILE_TOO_LARGE": "Fayl juda katta",
+    "FILE_REQUIRED": "Faylni tanlang"
+  },
+  "admin": {
+    "title": "Juftlik paneli",
+    "loading": "Yuklanmoqda…",
+    "login": {
+      "title": "Panelga kirish",
+      "subtitle": "Taklifnoma bilan birga berilgan 6 xonali PIN kodni kiriting",
+      "pin": "PIN kod",
+      "submit": "Kirish",
+      "submitting": "Tekshirilmoqda…",
+      "linkHint": "Maxfiy havolangiz bo'lsa, uni ochsangiz avtomatik kirasiz."
+    },
+    "header": {
+      "openInvitation": "Taklifnomani ochish",
+      "logout": "Chiqish",
+      "refresh": "Yangilash"
+    },
+    "status": {
+      "DRAFT": "Qoralama",
+      "ACTIVE": "Faol",
+      "ARCHIVED": "Arxivda"
+    },
+    "package": {
+      "BASIC": "Oddiy",
+      "STANDARD": "Standart",
+      "PREMIUM": "Premium"
+    },
+    "stats": {
+      "attendingGuests": "Keladigan mehmonlar",
+      "replies": "Jami javoblar",
+      "attendingReplies": "Keladi",
+      "declined": "Kelmaydi"
+    },
+    "telegram": {
+      "title": "Telegram bildirishnomalari",
+      "linked": "Ulangan. Har bir yangi javob Telegram'ga keladi.",
+      "notLinked": "Yangi javoblarni darhol Telegram'da oling.",
+      "connect": "Telegram'ga ulash"
+    },
+    "guests": {
+      "title": "Mehmonlar",
+      "search": "Ism, telefon yoki tilak…",
+      "filter": {
+        "label": "Filtr",
+        "all": "Hammasi",
+        "attending": "Keladi",
+        "declined": "Kelmaydi"
+      },
+      "sort": {
+        "label": "Saralash",
+        "newest": "Avval yangilari",
+        "oldest": "Avval eskilari",
+        "name": "Ism bo'yicha"
+      },
+      "found": "{{count}} ta javob",
+      "empty": "Hali javob yo'q. Taklifnoma havolasini mehmonlarga yuboring!",
+      "emptyFiltered": "Hech narsa topilmadi",
+      "more": "Yana ko'rsatish",
+      "attending": "Keladi · {{count}} kishi",
+      "declined": "Kelmaydi",
+      "wishHidden": "Tilaklar devorida yashirilgan",
+      "hideWish": "Devordan yashirish",
+      "showWish": "Devorda ko'rsatish",
+      "delete": "O'chirish",
+      "confirmDelete": "Ha, o'chirish",
+      "cancel": "Bekor qilish",
+      "answeredAt": "Javob berilgan: {{date}}",
+      "call": "Qo'ng'iroq qilish"
+    },
+    "export": {
+      "button": "Excel'ga yuklash",
+      "loading": "Tayyorlanmoqda…",
+      "locked": "Excel eksport Standart va Premium paketlarda mavjud"
+    }
+  },
+  "panel": {
+    "title": "Boshqaruv paneli",
+    "money": "{{amount}} so'm",
+    "nav": {
+      "orders": "Buyurtmalar",
+      "new": "Yangi taklifnoma",
+      "logout": "Chiqish",
+      "connectTelegram": "Telegram'ni ulash"
+    },
+    "login": {
+      "subtitle": "Faqat administrator uchun",
+      "email": "Email",
+      "password": "Parol",
+      "submit": "Kirish",
+      "submitting": "Tekshirilmoqda…",
+      "invalid": "Email yoki parol noto'g'ri."
+    },
+    "dashboard": {
+      "title": "Buyurtmalar",
+      "active": "Faol taklifnomalar",
+      "drafts": "Qoralamalar",
+      "revenueMonth": "Shu oy tushum",
+      "unpaid": "To'lanmagan",
+      "upcoming": "Yaqin 14 kundagi to'ylar",
+      "guestsShort": "{{count}} mehmon",
+      "search": "Slug, mijoz yoki telefon…",
+      "status": "Holat",
+      "allStatuses": "Barcha holatlar",
+      "allPackages": "Barcha paketlar",
+      "sortCreated": "Avval yangi buyurtmalar",
+      "sortEvent": "To'y sanasi bo'yicha",
+      "found": "{{count}} ta buyurtma",
+      "replies": "{{guests}} mehmon · {{replies}} javob",
+      "notPaid": "To'lanmagan",
+      "empty": "Hech narsa topilmadi. Birinchi taklifnomani yarating!"
+    },
+    "new": {
+      "title": "Yangi taklifnoma",
+      "created": "Taklifnoma yaratildi",
+      "nextSteps": "Taklifnoma qoralama holatida. Rasmlarni yuklang, ko'rib chiqing va «Nashr qilish» tugmasini bosing.",
+      "toMedia": "Rasm va musiqa yuklash",
+      "toDetail": "Taklifnomaga o'tish"
+    },
+    "detail": {
+      "preview": "Ko'rib chiqish",
+      "publish": "Nashr qilish",
+      "unpublish": "Qoralamaga qaytarish",
+      "archive": "Arxivlash",
+      "reactivate": "Qayta faollashtirish",
+      "tabs": {
+        "info": "Ma'lumotlar",
+        "media": "Rasm va musiqa",
+        "guests": "Mehmonlar",
+        "access": "Kirish va sozlamalar"
+      },
+      "deleteTitle": "Taklifnomani o'chirish",
+      "deleteHint": "Taklifnoma, barcha javoblar va rasmlar butunlay o'chiriladi. Tasdiqlash uchun slug'ni yozing: {{slug}}",
+      "delete": "Butunlay o'chirish"
+    },
+    "access": {
+      "newTitle": "Juftlik paneliga kirish",
+      "onceWarning": "Havola va PIN faqat hozir ko'rsatiladi. Nusxa olib, juftlikka yuboring.",
+      "link": "Maxfiy havola",
+      "pin": "PIN kod",
+      "copy": "Nusxa olish",
+      "copied": "Nusxa olindi ✓",
+      "copyMessage": "Juftlikka yuborish uchun matnni nusxalash",
+      "shareMessage": "Assalomu alaykum! {{names}} taklifnomasi tayyor:\n{{url}}\n\nMehmonlar javoblarini ko'rish uchun panel:\n{{adminUrl}}\nPIN: {{pin}}",
+      "coupleTitle": "Juftlik paneli (havola va PIN)",
+      "coupleHint": "Juftlik havola yoki PIN'ni yo'qotgan bo'lsa, yangisini yarating.",
+      "regenerate": "Yangi havola va PIN yaratish",
+      "regenerateWarn": "Eski havola va PIN ishlamay qoladi, juftlik paneldan chiqariladi.",
+      "regenerateConfirm": "Ha, yangisini yaratish",
+      "telegramLinked": "Juftlik Telegram botga ulangan",
+      "telegramHint": "Bu havolani juftlikka yuboring: ochib «Start» bosishsa, yangi javoblar Telegramga keladi.",
+      "botNotConfigured": "Telegram bot sozlanmagan (TELEGRAM_BOT_TOKEN)."
+    },
+    "media": {
+      "cover": "Muqova rasmi",
+      "coverHint": "Asosiy rasm. Undan Telegram ko'rinishi uchun 1200×630 rasm avtomatik yasaladi.",
+      "music": "Fon musiqasi",
+      "musicHint": "MP3 yoki M4A, 12 MB gacha.",
+      "gallery": "Galereya",
+      "galleryEmpty": "Hali rasm yo'q.",
+      "addPhotos": "Rasm qo'shish",
+      "upload": "Yuklash",
+      "replace": "Almashtirish",
+      "delete": "O'chirish",
+      "uploading": "Yuklanmoqda: {{done}} / {{total}}",
+      "notInPackage": "Bu imkoniyat tanlangan paketda yoqilmagan.",
+      "og": "Telegram ko'rinishi uchun rasm",
+      "ogHint": "Odatda muqovadan avtomatik yasaladi. Boshqa rasm kerak bo'lsa, shu yerga yuklang.",
+      "uploadOg": "Alohida rasm yuklash"
+    },
+    "preview": {
+      "banner": "Ko'rib chiqish rejimi: mehmonlar bu sahifani nashr qilinganidan keyin ko'radi"
+    },
+    "packages": {
+      "BASIC": "Hisoblagich, xarita, javob formasi",
+      "STANDARD": "+ musiqa, 12 ta rasm, rus tili, Telegram, Excel",
+      "PREMIUM": "+ 30 ta rasm"
+    },
+    "templates": {
+      "classic-gold": {
+        "name": "Klassik oltin",
+        "desc": "Fil suyagi rang, oltin bezaklar"
+      },
+      "minimal-white": {
+        "name": "Minimal oq",
+        "desc": "Toza, zamonaviy, ko'p bo'sh joy"
+      },
+      "national-pattern": {
+        "name": "Milliy naqsh",
+        "desc": "O'zbek naqshlari, boy ranglar"
+      }
+    },
+    "features": {
+      "countdown": "Hisoblagich",
+      "map": "Xarita",
+      "rsvp": "Javob formasi",
+      "music": "Musiqa",
+      "gallery": "Galereya",
+      "galleryLimit": "Galereya limiti (rasm)",
+      "wishesWall": "Tilaklar devori",
+      "multiLanguage": "Rus tili",
+      "excelExport": "Excel eksport (juftlik uchun)",
+      "telegramNotify": "Telegram bildirishnomalar"
+    },
+    "form": {
+      "optional": "ixtiyoriy",
+      "sections": {
+        "order": "Buyurtma",
+        "couple": "Juftlik",
+        "events": "Tadbirlar",
+        "texts": "Matnlar",
+        "rsvp": "Javob formasi",
+        "design": "Dizayn va til",
+        "seo": "SEO va Telegram ko'rinishi",
+        "features": "Imkoniyatlar (paketdan tashqari)"
+      },
+      "customerName": "Mijoz ismi",
+      "customerPhone": "Mijoz telefoni",
+      "price": "Narx (so'm)",
+      "paidAt": "To'langan sana",
+      "paidAtHint": "Bo'sh bo'lsa: hali to'lanmagan",
+      "package": "Paket",
+      "template": "Shablon",
+      "notes": "Izoh (faqat siz uchun)",
+      "enableRu": "Rus tilini qo'shish",
+      "ruNotInPackage": "Diqqat: tanlangan paketda rus tili yoqilmagan, mehmonlarga ko'rinmaydi.",
+      "groom": "Kuyov",
+      "bride": "Kelin",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "parents": "Ota-onasi (masalan: «Karimovlar oilasining o'g'li»)",
+      "order": "Ismlar tartibi",
+      "groomFirst": "Avval kuyov",
+      "brideFirst": "Avval kelin",
+      "slug": "Taklifnoma manzili",
+      "slugHint": "Faqat lotin harflari, raqamlar va chiziqcha",
+      "slugChecking": "Tekshirilmoqda…",
+      "slugAvailable": "Bo'sh",
+      "slugChangeWarn": "Manzil o'zgarsa, eski havola ishlamay qoladi.",
+      "addEvent": "Tadbir qo'shish",
+      "primaryEvent": "Asosiy tadbir (hisoblagich shunga)",
+      "moveUp": "Yuqoriga",
+      "moveDown": "Pastga",
+      "removeEvent": "Tadbirni o'chirish",
+      "eventTitle": "Tadbir nomi (masalan: «Nikoh to'yi»)",
+      "startsAt": "Boshlanishi",
+      "endsAt": "Tugashi",
+      "venueName": "To'yxona nomi",
+      "address": "Manzil",
+      "location": "Koordinatalar",
+      "locationHint": "Yandex yoki Google xaritadan havola yoki «41.31, 69.24» ko'rinishida",
+      "yandexOrgId": "Yandex tashkilot ID",
+      "yandexOrgIdHint": "Bo'lsa, xaritada to'yxona kartochkasi ochiladi",
+      "venuePhone": "To'yxona telefoni",
+      "greeting": "Taklif matni",
+      "closingText": "Yakuniy so'z",
+      "hashtag": "Heshteg",
+      "musicTitle": "Musiqa nomi",
+      "deadline": "Javob berish muddati",
+      "maxGuests": "Bitta javobda ko'pi bilan mehmon",
+      "askPhone": "Telefon raqamini so'rash",
+      "askWish": "Tilak so'rash",
+      "primaryColor": "Asosiy rang",
+      "accentColor": "Qo'shimcha rang",
+      "colorDefault": "Shablon rangi",
+      "colorReset": "Standartga qaytarish",
+      "defaultLocale": "Asosiy til",
+      "timezone": "Vaqt mintaqasi",
+      "seoHint": "Bo'sh qoldirilsa, ismlar va sanadan avtomatik yasaladi.",
+      "seoTitle": "Sarlavha",
+      "seoDescription": "Tavsif",
+      "featuresHint": "Odatda paket bo'yicha. Bitta mijoz uchun istisno kerak bo'lsa, shu yerda o'zgartiring.",
+      "byPackage": "Paket bo'yicha",
+      "on": "yoqilgan",
+      "off": "o'chiq",
+      "forceOn": "Yoqish",
+      "forceOff": "O'chirish",
+      "create": "Yaratish",
+      "save": "Saqlash",
+      "saving": "Saqlanmoqda…",
+      "saved": "Saqlandi",
+      "fixErrors": "Belgilangan maydonlarni to'g'rilang"
+    },
+    "validation": {
+      "required": "Bu maydonni to'ldiring",
+      "tooLong": "Juda uzun",
+      "invalidFormat": "Format noto'g'ri",
+      "invalid": "Qiymat noto'g'ri",
+      "invalidLocation": "Koordinatalarni tushunib bo'lmadi. Xaritadan havola yoki «41.31, 69.24» kiriting",
+      "exactly_one_primary_event": "Bitta asosiy tadbir tanlang",
+      "ends_before_start": "Tugash vaqti boshlanishdan keyin bo'lishi kerak",
+      "uz_required": "O'zbek tili majburiy",
+      "invalid_timezone": "Vaqt mintaqasi noto'g'ri (masalan: Asia/Tashkent)",
+      "duplicate_event_id": "Tadbirlar takrorlangan",
+      "default_locale_not_enabled": "Asosiy til yoqilgan tillar ichida bo'lishi kerak",
+      "invalid_slug": "Faqat kichik lotin harflari, raqamlar va chiziqcha (kamida 3 belgi)",
+      "reserved_slug": "Bu manzil band (tizim uchun)",
+      "invalid_phone": "Telefon raqami noto'g'ri"
+    }
+  }
+}

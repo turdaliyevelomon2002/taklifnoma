@@ -1,0 +1,151 @@
+@let cfg = config();
+@let l = lang();
+@let tz = cfg.timezone;
+@let main = primaryEvent();
+@let cover = media().cover;
+@let n = names();
+
+<div class="page" [style]="themeStyle()">
+  @if (hasManyLocales()) {
+    <tk-lang-switch [locales]="cfg.locales" />
+  }
+
+  @if (!opened()) {
+    <section class="intro" animate.leave="intro--leave">
+      <p class="eyebrow">{{ 'invitation.intro.eyebrow' | transloco }}</p>
+      <h1 class="intro__names">
+        <span>{{ n[0] }}</span>
+        <span class="amp">&amp;</span>
+        <span>{{ n[1] }}</span>
+      </h1>
+      <p class="intro__date">{{ main.startsAt | eventDate: 'short' : tz : l }}</p>
+      <button type="button" class="intro__open" (click)="openInvitation()">
+        {{ 'invitation.intro.open' | transloco }}
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+  }
+
+  <header class="hero" [class.hero--no-photo]="!cover">
+    @if (cover) {
+      <img
+        class="hero__photo"
+        [src]="cover.variants?.lg ?? cover.url"
+        [attr.srcset]="
+          cover.variants
+            ? cover.variants.sm + ' 480w, ' + cover.variants.md + ' 960w, ' + cover.variants.lg + ' 1600w'
+            : null
+        "
+        sizes="100vw"
+        [width]="cover.width ?? 1200"
+        [height]="cover.height ?? 1600"
+        alt=""
+        fetchpriority="high"
+      />
+    }
+    <div class="hero__caption">
+      <p class="eyebrow">{{ 'invitation.hero.invite' | transloco }}</p>
+      <h2 class="hero__names">{{ n[0] }} <span class="amp">&amp;</span> {{ n[1] }}</h2>
+      <p class="hero__date">
+        {{ main.startsAt | eventDate: 'weekday' : tz : l }} · {{ main.startsAt | eventDate: 'full' : tz : l }} ·
+        {{ main.startsAt | eventDate: 'time' : tz : l }}
+      </p>
+    </div>
+  </header>
+
+  <main class="content">
+    @if (cfg.greeting) {
+      <section class="section reveal">
+        <h2 class="section__title">{{ 'invitation.sections.greeting' | transloco }}</h2>
+        <p class="greeting">{{ cfg.greeting | loc: l }}</p>
+        @if (cfg.couple.groom.parents || cfg.couple.bride.parents) {
+          <div class="parents">
+            @if (cfg.couple.groom.parents) {
+              <p>{{ cfg.couple.groom.parents | loc: l }}</p>
+            }
+            @if (cfg.couple.bride.parents) {
+              <p>{{ cfg.couple.bride.parents | loc: l }}</p>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    @if (features().countdown) {
+      <section class="section reveal">
+        <h2 class="section__title">{{ 'invitation.sections.countdown' | transloco }}</h2>
+        <tk-countdown [target]="main.startsAt" />
+      </section>
+    }
+
+    <section class="section reveal">
+      <h2 class="section__title">{{ 'invitation.sections.events' | transloco }}</h2>
+      <div class="events">
+        @for (event of cfg.events; track event.id) {
+          <tk-event-card [event]="event" [timezone]="tz" />
+        }
+      </div>
+    </section>
+
+    @if (features().map) {
+      <section class="section reveal">
+        <h2 class="section__title">{{ 'invitation.sections.location' | transloco }}</h2>
+        <p class="venue-name">{{ main.venue.name | loc: l }}</p>
+        <tk-venue-map [venue]="main.venue" />
+      </section>
+    }
+
+    @if (gallery().length) {
+      <section class="section section--wide reveal">
+        <h2 class="section__title">{{ 'invitation.sections.gallery' | transloco }}</h2>
+        <tk-gallery [items]="gallery()" />
+      </section>
+    }
+
+    @if (features().rsvp) {
+      <section class="section reveal" id="rsvp">
+        <h2 class="section__title">{{ 'invitation.sections.rsvp' | transloco }}</h2>
+        @defer (on viewport; prefetch on idle) {
+          <tk-rsvp-form
+            [slug]="invitation().slug"
+            [rules]="cfg.rsvp"
+            [open]="invitation().rsvpOpen"
+            [timezone]="tz"
+          />
+        } @placeholder {
+          <div class="rsvp-placeholder"></div>
+        }
+      </section>
+    }
+
+    @if (features().wishesWall) {
+      <section class="section reveal">
+        <h2 class="section__title">{{ 'invitation.sections.wishes' | transloco }}</h2>
+        @defer (on viewport) {
+          <tk-wishes [slug]="invitation().slug" />
+        } @placeholder {
+          <div class="wishes-placeholder"></div>
+        }
+      </section>
+    }
+
+    <footer class="footer reveal">
+      <p class="footer__text">
+        @if (cfg.closingText) {
+          {{ cfg.closingText | loc: l }}
+        } @else {
+          {{ 'invitation.footer.waiting' | transloco }}
+        }
+      </p>
+      <p class="footer__names">{{ n[0] }} &amp; {{ n[1] }}</p>
+      @if (cfg.hashtag) {
+        <p class="footer__hashtag">{{ cfg.hashtag }}</p>
+      }
+      <a class="footer__brand" href="/">{{ 'invitation.footer.madeWith' | transloco }}</a>
+    </footer>
+  </main>
+
+  @if (opened() && musicUrl(); as src) {
+    <tk-music-toggle [src]="src" />
+  }
+</div>

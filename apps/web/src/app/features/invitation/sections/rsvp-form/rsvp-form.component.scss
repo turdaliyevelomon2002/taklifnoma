@@ -1,0 +1,203 @@
+:host {
+  display: block;
+  text-align: left;
+}
+
+.rsvp {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  background: var(--tk-surface);
+}
+
+.rsvp__deadline {
+  margin: 0;
+  text-align: center;
+  color: var(--tk-muted);
+  font-style: italic;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.field__label {
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--tk-text);
+}
+
+.field__input {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--tk-border);
+  border-radius: calc(var(--tk-radius) * 0.7);
+  background: var(--tk-field-bg, var(--tk-bg));
+  color: var(--tk-text);
+  // 16px: iOS'da input bosilganda sahifa kattalashib ketmasin.
+  font: inherit;
+  font-size: 16px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--tk-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tk-primary) 18%, transparent);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: #b3261e;
+  }
+}
+
+.field__input--area {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+.field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--tk-muted);
+}
+
+.field__hint--right {
+  text-align: right;
+}
+
+.field__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b3261e;
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.choice__btn {
+  min-height: 3rem;
+  padding: 0.6rem 0.5rem;
+  border: 1px solid var(--tk-border);
+  border-radius: calc(var(--tk-radius) * 0.7);
+  background: var(--tk-field-bg, var(--tk-bg));
+  color: var(--tk-text);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.choice__btn--active {
+  border-color: var(--tk-primary);
+  background: var(--tk-primary);
+  color: var(--tk-primary-contrast);
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stepper__btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--tk-primary);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tk-primary);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+.stepper__value {
+  min-width: 2ch;
+  font-family: var(--tk-font-heading);
+  font-size: 1.75rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+// Honeypot: ekrandan tashqarida (display:none emas, aks holda ba'zi botlar o'tkazib yuboradi).
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.rsvp__error {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: calc(var(--tk-radius) * 0.7);
+  background: #fdecea;
+  color: #8c1d18;
+  font-size: 0.9rem;
+}
+
+.rsvp__submit {
+  width: 100%;
+  min-height: 3.1rem;
+  font-size: 1rem;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+}
+
+.rsvp__closed,
+.rsvp__done {
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  background: var(--tk-surface);
+}
+
+.rsvp__closed {
+  margin: 0;
+  color: var(--tk-muted);
+}
+
+.rsvp__done-icon {
+  font-size: 2rem;
+  color: var(--tk-primary);
+}
+
+.rsvp__done-title {
+  margin: 0.25rem 0 0.5rem;
+  font-family: var(--tk-font-heading);
+  font-size: 1.5rem;
+  color: var(--tk-primary);
+}
+
+.rsvp__done-text {
+  margin: 0 0 1rem;
+}
+
+.rsvp__done-note {
+  margin: -0.5rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--tk-muted);
+}

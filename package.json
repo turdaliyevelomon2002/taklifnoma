@@ -1,0 +1,39 @@
+{
+  "name": "taklifnoma",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Onlayn to'y taklifnomasi SaaS",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24.15"
+  },
+  "scripts": {
+    "build:shared": "npm run build -w @taklifnoma/shared",
+    "build:api": "npm run build:shared && npm run build -w @taklifnoma/api",
+    "dev:infra": "docker compose -f docker-compose.dev.yml up -d",
+    "dev:infra:down": "docker compose -f docker-compose.dev.yml down",
+    "dev:api": "npm run build:shared && npm run start:dev -w @taklifnoma/api",
+    "db:migrate": "npm run prisma:migrate -w @taklifnoma/api",
+    "db:seed": "npm run prisma:seed -w @taklifnoma/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run build:shared && npm test --workspaces --if-present",
+    "build:web": "npm run build:shared && npm run build -w @taklifnoma/web",
+    "dev:web": "npm run build:shared && npm start -w @taklifnoma/web"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
+  "allowScripts": {
+    "prisma": true,
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "argon2": false,
+    "esbuild": false,
+    "lmdb": false,
+    "msgpackr-extract": false,
+    "@parcel/watcher": false
+  }
+}

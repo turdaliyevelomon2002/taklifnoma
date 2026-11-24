@@ -1,0 +1,303 @@
+:host {
+  --tk-bg: #ffffff;
+  --tk-surface: #ffffff;
+  --tk-text: #1c1c1c;
+  --tk-muted: #8a8a8a;
+  --tk-primary: #1c1c1c;
+  --tk-primary-contrast: #ffffff;
+  --tk-accent: #b9a58a;
+  --tk-border: #e8e8e8;
+  --tk-radius: 2px;
+  --tk-shadow: none;
+  --tk-font-heading: 'Playfair Display', Georgia, serif;
+  --tk-font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --tk-font-script: 'Playfair Display', Georgia, serif;
+
+  display: block;
+  min-height: 100svh;
+  background: var(--tk-bg);
+  color: var(--tk-text);
+  font-family: var(--tk-font-body);
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.75;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+
+.amp {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--tk-accent);
+}
+
+// --- Intro ---
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--tk-bg);
+  text-align: center;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+
+  &.intro--leave {
+    opacity: 0;
+    transform: translateY(-2rem);
+  }
+}
+
+.intro__names {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-family: var(--tk-font-heading);
+  font-size: clamp(2.6rem, 12vw, 4rem);
+  font-weight: 400;
+  line-height: 1.15;
+
+  .amp {
+    font-size: 0.6em;
+    margin-block: 0.2em;
+  }
+}
+
+.intro__date {
+  margin: 1.75rem 0 2.5rem;
+  padding: 0.5rem 0;
+  border-block: 1px solid var(--tk-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+}
+
+.intro__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.75rem;
+  border: 1px solid var(--tk-text);
+  background: transparent;
+  color: var(--tk-text);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--tk-text);
+    color: var(--tk-bg);
+  }
+}
+
+// --- Hero: to'liq kenglikdagi rasm ---
+.hero {
+  position: relative;
+  display: grid;
+  min-height: 92svh;
+}
+
+.hero__photo {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  min-height: 92svh;
+  object-fit: cover;
+}
+
+.hero__caption {
+  grid-area: 1 / 1;
+  align-self: end;
+  padding: 6rem 1.5rem 2.5rem;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+
+  .eyebrow {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .amp {
+    color: inherit;
+  }
+}
+
+.hero--no-photo {
+  min-height: 70svh;
+
+  .hero__caption {
+    align-self: center;
+    color: var(--tk-text);
+    background: none;
+
+    .eyebrow {
+      color: var(--tk-muted);
+    }
+  }
+}
+
+.hero__names {
+  margin: 0 0 0.75rem;
+  font-family: var(--tk-font-heading);
+  font-size: clamp(2.4rem, 10vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.hero__date {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+// --- Kontent ---
+.content {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+}
+
+.section {
+  padding-block: 3.5rem;
+  border-bottom: 1px solid var(--tk-border);
+  text-align: center;
+}
+
+.section__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 2rem;
+  font-family: var(--tk-font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--tk-text);
+
+  &::after {
+    content: '';
+    width: 2.5rem;
+    height: 1px;
+    background: var(--tk-accent);
+  }
+}
+
+.greeting {
+  margin: 0;
+  font-family: var(--tk-font-heading);
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.parents {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--tk-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.events {
+  display: grid;
+  gap: 1rem;
+}
+
+.venue-name {
+  margin: -0.75rem 0 1.25rem;
+  font-weight: 500;
+}
+
+.rsvp-placeholder {
+  min-height: 32rem;
+}
+
+.wishes-placeholder {
+  min-height: 8rem;
+}
+
+// --- Footer ---
+.footer {
+  padding-top: 3.5rem;
+  text-align: center;
+}
+
+.footer__text {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.footer__names {
+  margin: 1rem 0 0.5rem;
+  font-family: var(--tk-font-heading);
+  font-size: 2rem;
+  font-style: italic;
+}
+
+.footer__hashtag {
+  margin: 0 0 2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--tk-accent);
+}
+
+.footer__brand {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--tk-muted);
+  text-decoration: none;
+}
+
+// --- Animatsiya ---
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 18%;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    transition: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .section--wide {
+    margin-inline: -8rem;
+  }
+}

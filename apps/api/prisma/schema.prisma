@@ -1,0 +1,173 @@
+// Ma'lumotlar bazasi sxemasi.
+// Enum qiymatlari packages/shared/src/enums.ts bilan mos bo'lishi shart.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PackageType {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum InvitationStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum MediaKind {
+  COVER
+  GALLERY
+  MUSIC
+  OG_IMAGE
+}
+
+enum NotifyTarget {
+  COUPLE
+  OWNER
+}
+
+enum NotifyStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+/// Tizim egasi (owner admin panel).
+model Owner {
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String   @unique
+  passwordHash     String
+  telegramChatId   String?
+  /// Botga ulanish uchun deep-link kodi: t.me/<bot>?start=o_<kod>
+  telegramLinkCode String?  @unique @db.VarChar(32)
+  createdAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("owners")
+}
+
+model Invitation {
+  id               String           @id @default(uuid()) @db.Uuid
+  slug             String           @unique @db.VarChar(60)
+  templateKey      String           @db.VarChar(40)
+  package          PackageType      @default(BASIC)
+  status           InvitationStatus @default(DRAFT)
+  /// InvitationConfig (packages/shared). Zod bilan tekshirilgan.
+  config           Json
+  configVersion    Int              @default(1)
+  /// Partial<FeatureFlags>: paketdan tashqari istisnolar.
+  featureOverrides Json?
+  /// config'dagi asosiy tadbir sanasi: saralash, filtr va muddat uchun.
+  eventDate        DateTime
+
+  // Juftlik admin paneliga kirish
+  /// Maxfiy havola tokenining sha256 xeshi. Tokenning o'zi saqlanmaydi.
+  adminTokenHash   String           @unique @db.Char(64)
+  /// 6 xonali PIN (argon2).
+  adminPinHash     String?
+  pinFailedCount   Int              @default(0)
+  pinLockedUntil   DateTime?
+  /// Kirish ma'lumotlari qayta generatsiya qilinsa oshadi: eski sessiyalar bekor bo'ladi.
+  accessVersion    Int              @default(1)
+
+  // Telegram
+  coupleChatId     String?
+  /// Botga ulanish uchun deep-link kodi: t.me/<bot>?start=<kod>
+  telegramLinkCode String?          @unique @db.VarChar(32)
+
+  // Buyurtma
+  customerName     String           @db.VarChar(100)
+  customerPhone    String           @db.VarChar(20)
+  /// so'mda
+  price            Int?
+  paidAt           DateTime?
+  notes            String?
+
+  publishedAt      DateTime?
+  /// To'ydan keyin shu sanagacha sahifa ochiq turadi.
+  expiresAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  media            MediaAsset[]
+  rsvps            Rsvp[]
+
+  @@index([status, eventDate])
+  @@index([createdAt])
+  @@map("invitations")
+}
+
+model MediaAsset {
+  id           String     @id @default(uuid()) @db.Uuid
+  invitationId String     @db.Uuid
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  kind         MediaKind
+  /// Asosiy fayl kaliti (S3 key).
+  storageKey   String
+  /// Rasm variantlari: { sm, md, lg, og } -> S3 key
+  variants     Json?
+  mimeType     String     @db.VarChar(100)
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+
+  @@index([invitationId, kind, sortOrder])
+  @@map("media_assets")
+}
+
+model Rsvp {
+  id           String         @id @default(uuid()) @db.Uuid
+  invitationId String         @db.Uuid
+  invitation   Invitation     @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name         String         @db.VarChar(100)
+  /// +998XXXXXXXXX. config.rsvp.askPhone=false bo'lsa bo'sh bo'lishi mumkin.
+  phone        String?        @db.VarChar(20)
+  attending    Boolean
+  guestCount   Int            @default(1)
+  wish         String?        @db.VarChar(1000)
+  /// Juftlik tilakni sahifadagi tilaklar devoridan yashirishi mumkin.
+  wishHidden   Boolean        @default(false)
+  locale       String         @db.VarChar(5)
+  /// Spam tahlili uchun IP xeshi (xom IP saqlanmaydi).
+  ipHash       String?        @db.Char(64)
+  userAgent    String?        @db.VarChar(300)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  notifications Notification[]
+
+  /// Bir raqamdan qayta yuborilsa, eski javob yangilanadi.
+  @@unique([invitationId, phone])
+  @@index([invitationId, createdAt])
+  @@index([invitationId, ipHash, createdAt])
+  @@map("rsvps")
+}
+
+/// Telegram bildirishnomalari uchun outbox (retry bilan).
+model Notification {
+  id          String       @id @default(uuid()) @db.Uuid
+  rsvpId      String       @db.Uuid
+  rsvp        Rsvp         @relation(fields: [rsvpId], references: [id], onDelete: Cascade)
+  target      NotifyTarget
+  /// Mavjud javob yangilangan (yangi javob emas).
+  isUpdate    Boolean      @default(false)
+  status      NotifyStatus @default(PENDING)
+  attempts    Int          @default(0)
+  lastError   String?
+  nextRetryAt DateTime     @default(now())
+  sentAt      DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@index([status, nextRetryAt])
+  @@map("notifications")
+}

@@ -1,0 +1,281 @@
+:host {
+  --tk-bg: #f8f3ea;
+  --tk-surface: #fffdf8;
+  --tk-text: #3d3226;
+  --tk-muted: #7d6d58;
+  --tk-primary: #8c6a1f;
+  --tk-primary-contrast: #fffdf8;
+  --tk-accent: #c9a24b;
+  --tk-border: #e6d8bd;
+  --tk-radius: 14px;
+  --tk-shadow: 0 8px 24px rgb(80 60 20 / 0.12);
+  --tk-font-heading: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --tk-font-body: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --tk-font-script: 'Great Vibes', 'Segoe Script', cursive;
+
+  display: block;
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 0 0, rgb(201 162 75 / 0.12), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgb(201 162 75 / 0.12), transparent 40%),
+    var(--tk-bg);
+  color: var(--tk-text);
+  font-family: var(--tk-font-body);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.page {
+  padding: 0.75rem;
+}
+
+.card {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.25rem 2.5rem;
+  text-align: center;
+  background: var(--tk-surface);
+  border-radius: calc(var(--tk-radius) * 1.5);
+  box-shadow: var(--tk-shadow);
+
+  // Ikki qatorli oltin ramka
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    border: 1px solid var(--tk-accent);
+    border-radius: inherit;
+  }
+  &::before { inset: 0.5rem; opacity: 0.7; }
+  &::after { inset: 0.8rem; opacity: 0.35; }
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+
+.script {
+  font-family: var(--tk-font-script);
+  font-weight: 400;
+  color: var(--tk-primary);
+  line-height: 1.1;
+}
+
+.amp {
+  display: inline-block;
+  margin-inline: 0.15em;
+  font-family: var(--tk-font-heading);
+  font-style: italic;
+  font-size: 0.6em;
+  color: var(--tk-accent);
+}
+
+// --- Intro ---
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: var(--tk-bg);
+  overflow: hidden;
+  text-align: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  &.intro--leave {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.intro__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  filter: sepia(0.4) blur(1px);
+}
+
+.intro__content {
+  position: relative;
+  padding: 2.5rem 1.5rem;
+  max-width: 24rem;
+  border: 1px solid var(--tk-accent);
+  border-radius: 999px 999px var(--tk-radius) var(--tk-radius);
+  background: color-mix(in srgb, var(--tk-surface) 88%, transparent);
+}
+
+.intro__names {
+  margin: 0.5rem 0;
+  font-size: clamp(2.6rem, 13vw, 3.6rem);
+}
+
+.intro__date {
+  margin: 0 0 1.75rem;
+  letter-spacing: 0.3em;
+  color: var(--tk-text);
+}
+
+.intro__open {
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { box-shadow: 0 0 0 0.6rem rgb(201 162 75 / 0.15); }
+}
+
+// --- Hero ---
+.hero__names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 0 1.5rem;
+  font-size: clamp(3rem, 15vw, 4.25rem);
+}
+
+.hero__arch {
+  width: min(80%, 22rem);
+  margin: 0 auto 1.5rem;
+  padding: 0.4rem;
+  border: 1px solid var(--tk-accent);
+  border-radius: 999px 999px var(--tk-radius) var(--tk-radius);
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}
+
+.hero__date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0;
+}
+
+.hero__weekday {
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+
+.hero__full {
+  font-family: var(--tk-font-heading);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.hero__time {
+  font-size: 1.25rem;
+  color: var(--tk-primary);
+}
+
+// --- Bo'limlar ---
+.section {
+  margin-block: 2.5rem;
+}
+
+.section__title {
+  margin: 0 0 1.25rem;
+  font-family: var(--tk-font-heading);
+  font-size: 1.85rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--tk-primary);
+}
+
+.greeting {
+  margin: 0 auto;
+  max-width: 28rem;
+  white-space: pre-line;
+}
+
+.parents {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  font-style: italic;
+  color: var(--tk-muted);
+
+  p { margin: 0; }
+}
+
+.events {
+  display: grid;
+  gap: 1rem;
+}
+
+.venue-name {
+  margin: -0.5rem 0 1rem;
+  font-weight: 600;
+}
+
+.rsvp-placeholder {
+  min-height: 32rem;
+}
+
+.wishes-placeholder {
+  min-height: 8rem;
+}
+
+// --- Footer ---
+.footer__text {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.footer__names {
+  margin: 0.5rem 0;
+  font-size: 2.6rem;
+}
+
+.footer__hashtag {
+  margin: 0 0 1.5rem;
+  letter-spacing: 0.1em;
+  color: var(--tk-accent);
+}
+
+.footer__brand {
+  font-size: 0.8rem;
+  color: var(--tk-muted);
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+// --- Scroll animatsiyasi (JS'siz, faqat qo'llab-quvvatlovchi brauzerlarda) ---
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 20%;
+    }
+  }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(1.5rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro, .intro__open { transition: none; animation: none; }
+}
+
+@media (min-width: 600px) {
+  .page { padding: 2.5rem 1rem; }
+  .card { padding-inline: 2.5rem; }
+}

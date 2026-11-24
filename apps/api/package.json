@@ -1,0 +1,74 @@
+{
+  "name": "@taklifnoma/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build && tsc -p tsconfig.seed.json",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed",
+    "postinstall": "prisma generate",
+    "seed:prod": "node dist-seed/seed.js"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.800.0",
+    "@nestjs/common": "^11.1.0",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.0",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/platform-express": "^11.1.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@prisma/client": "~6.19.3",
+    "@taklifnoma/shared": "*",
+    "argon2": "^0.43.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.6.1",
+    "exceljs": "^4.4.0",
+    "helmet": "^8.1.0",
+    "prisma": "~6.19.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "sharp": "^0.35.5",
+    "uuid": "^11.1.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.7",
+    "@nestjs/testing": "^11.1.0",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.15.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "tsx": "^4.19.4",
+    "typescript": "~5.8.3"
+  },
+  "jest": {
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "isolatedModules": true
+        }
+      ]
+    },
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "testEnvironment": "node"
+  }
+}

@@ -1,0 +1,97 @@
+@let l = lang();
+
+<div class="admin">
+  <div class="lang" role="group" [attr.aria-label]="'invitation.lang.label' | transloco">
+    @for (code of locales; track code) {
+      <button
+        type="button"
+        class="lang__btn"
+        [class.lang__btn--active]="code === l"
+        [attr.aria-pressed]="code === l"
+        (click)="setLang(code)"
+      >
+        {{ code.toUpperCase() }}
+      </button>
+    }
+  </div>
+
+  @switch (view()) {
+    @case ('checking') {
+      <p class="admin__loading" role="status">{{ 'admin.loading' | transloco }}</p>
+    }
+
+    @case ('login') {
+      <tk-pin-login [slug]="slug()" [initialError]="loginError()" (loggedIn)="onLoggedIn()" />
+    }
+
+    @case ('ready') {
+      @if (session(); as s) {
+        <header class="head">
+          <div>
+            <p class="head__eyebrow">{{ 'admin.title' | transloco }}</p>
+            <h1 class="head__names">{{ names() }}</h1>
+            <p class="head__meta">
+              <span>{{ s.eventDate | eventDate: 'full' : s.timezone : l }}</span>
+              <span class="badge" [class.badge--active]="s.status === 'ACTIVE'">
+                {{ 'admin.status.' + s.status | transloco }}
+              </span>
+              <span class="badge">{{ 'admin.package.' + s.package | transloco }}</span>
+            </p>
+          </div>
+          <div class="head__actions">
+            <a class="tk-btn tk-btn--ghost" [href]="s.publicUrl" target="_blank" rel="noopener">
+              {{ 'admin.header.openInvitation' | transloco }}
+            </a>
+            <button type="button" class="tk-btn tk-btn--ghost" (click)="logout()">
+              {{ 'admin.header.logout' | transloco }}
+            </button>
+          </div>
+        </header>
+
+        <section class="stats" [attr.aria-busy]="refreshing()">
+          <div class="stat stat--main">
+            <span class="stat__value">{{ s.stats.attendingGuests }}</span>
+            <span class="stat__label">{{ 'admin.stats.attendingGuests' | transloco }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value">{{ s.stats.replies }}</span>
+            <span class="stat__label">{{ 'admin.stats.replies' | transloco }}</span>
+          </div>
+          <div class="stat stat--yes">
+            <span class="stat__value">{{ s.stats.attendingReplies }}</span>
+            <span class="stat__label">{{ 'admin.stats.attendingReplies' | transloco }}</span>
+          </div>
+          <div class="stat stat--no">
+            <span class="stat__value">{{ s.stats.notAttendingReplies }}</span>
+            <span class="stat__label">{{ 'admin.stats.declined' | transloco }}</span>
+          </div>
+        </section>
+
+        @if (s.features.telegramNotify && (s.telegramLinked || s.telegramLinkUrl)) {
+          <section class="tg" [class.tg--linked]="s.telegramLinked">
+            <div>
+              <h2 class="tg__title">{{ 'admin.telegram.title' | transloco }}</h2>
+              <p class="tg__text">
+                {{ (s.telegramLinked ? 'admin.telegram.linked' : 'admin.telegram.notLinked') | transloco }}
+              </p>
+            </div>
+            @if (!s.telegramLinked && s.telegramLinkUrl) {
+              <a class="tk-btn" [href]="s.telegramLinkUrl" target="_blank" rel="noopener">
+                {{ 'admin.telegram.connect' | transloco }}
+              </a>
+            }
+          </section>
+        }
+
+        <tk-guest-list
+          [source]="api"
+          [stats]="s.stats"
+          [timezone]="s.timezone"
+          [canExport]="s.features.excelExport"
+          [wishModeration]="s.features.wishesWall"
+          (changed)="refresh()"
+        />
+      }
+    }
+  }
+</div>

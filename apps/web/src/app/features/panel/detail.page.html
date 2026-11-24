@@ -1,0 +1,134 @@
+@let l = lang();
+
+<div class="page">
+  <a class="back" routerLink="/panel">← {{ 'panel.nav.orders' | transloco }}</a>
+
+  @if (loadError(); as key) {
+    <p class="alert" role="alert">{{ key | transloco }}</p>
+  }
+
+  @if (detail(); as d) {
+    <header class="head">
+      <div class="head__info">
+        <h1 class="page__title">{{ d.coupleNames }}</h1>
+        <p class="head__meta">
+          <span class="badge badge--{{ d.status }}">{{ 'admin.status.' + d.status | transloco }}</span>
+          <span class="badge">{{ 'admin.package.' + d.package | transloco }}</span>
+          <span class="muted">{{ d.eventDate | eventDate: 'full' : d.config.timezone : l }}</span>
+          <span class="muted">· {{ d.price | money: l }}</span>
+          @if (!d.paidAt && (d.price ?? 0) > 0) {
+            <span class="badge badge--unpaid">{{ 'panel.dashboard.notPaid' | transloco }}</span>
+          }
+        </p>
+        @if (d.status === 'ACTIVE') {
+          <a class="head__url" [href]="d.publicUrl" target="_blank" rel="noopener">{{ d.publicUrl }} ↗</a>
+        } @else {
+          <span class="muted head__url">{{ d.publicUrl }}</span>
+        }
+      </div>
+      <div class="head__actions">
+        <a class="btn" [routerLink]="['/panel/i', d.id, 'preview']" target="_blank">👁 {{ 'panel.detail.preview' | transloco }}</a>
+        @switch (d.status) {
+          @case ('DRAFT') {
+            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">{{ 'panel.detail.publish' | transloco }}</button>
+          }
+          @case ('ACTIVE') {
+            <button type="button" class="btn" (click)="setStatus('DRAFT')" [disabled]="busy()">{{ 'panel.detail.unpublish' | transloco }}</button>
+            <button type="button" class="btn" (click)="setStatus('ARCHIVED')" [disabled]="busy()">{{ 'panel.detail.archive' | transloco }}</button>
+          }
+          @case ('ARCHIVED') {
+            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">{{ 'panel.detail.reactivate' | transloco }}</button>
+          }
+        }
+      </div>
+    </header>
+
+    @if (actionError(); as key) {
+      <p class="alert" role="alert">{{ key | transloco }}</p>
+    }
+
+    <nav class="tabs" role="tablist">
+      @for (t of tabs; track t) {
+        <button type="button" role="tab" class="tabs__btn" [class.is-active]="activeTab() === t" [attr.aria-selected]="activeTab() === t" (click)="selectTab(t)">
+          {{ 'panel.detail.tabs.' + t | transloco }}
+          @if (t === 'guests') {
+            <span class="tabs__count">{{ d.stats.replies }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    @switch (activeTab()) {
+      @case ('info') {
+        <tk-invitation-editor [detail]="d" (saved)="onSaved($event)" />
+      }
+      @case ('media') {
+        <tk-media-manager [invitation]="d" (changed)="load()" />
+      }
+      @case ('guests') {
+        <div class="guest-stats muted">
+          {{ 'panel.dashboard.replies' | transloco: { guests: d.stats.attendingGuests, replies: d.stats.replies } }}
+        </div>
+        <tk-guest-list
+          [source]="guestSource()"
+          [stats]="d.stats"
+          [timezone]="d.config.timezone"
+          [canExport]="true"
+          [wishModeration]="d.features.wishesWall"
+          (changed)="load()"
+        />
+      }
+      @case ('access') {
+        <div class="access">
+          @if (credentials(); as c) {
+            <tk-credentials-card [credentials]="c" [messageText]="shareText(d, c)" />
+          }
+
+          <section class="card">
+            <h2 class="card__title">{{ 'panel.access.coupleTitle' | transloco }}</h2>
+            <p class="muted">{{ 'panel.access.coupleHint' | transloco }}</p>
+            @if (confirmRegenerate()) {
+              <p class="warn">{{ 'panel.access.regenerateWarn' | transloco }}</p>
+              <div class="row">
+                <button type="button" class="btn btn--danger-solid" (click)="regenerate()" [disabled]="busy()">{{ 'panel.access.regenerateConfirm' | transloco }}</button>
+                <button type="button" class="btn" (click)="confirmRegenerate.set(false)">{{ 'admin.guests.cancel' | transloco }}</button>
+              </div>
+            } @else {
+              <button type="button" class="btn btn--ghost" (click)="confirmRegenerate.set(true)">{{ 'panel.access.regenerate' | transloco }}</button>
+            }
+          </section>
+
+          <section class="card">
+            <h2 class="card__title">{{ 'admin.telegram.title' | transloco }}</h2>
+            @if (!d.features.telegramNotify) {
+              <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
+            } @else if (d.coupleTelegramLinked) {
+              <p class="hint hint--ok">✓ {{ 'panel.access.telegramLinked' | transloco }}</p>
+            } @else if (d.telegramLinkUrl; as url) {
+              <p class="muted">{{ 'panel.access.telegramHint' | transloco }}</p>
+              <div class="row">
+                <code class="code">{{ url }}</code>
+                <button type="button" class="btn" (click)="copy(url)">{{ 'panel.access.copy' | transloco }}</button>
+              </div>
+            } @else {
+              <p class="hint">{{ 'panel.access.botNotConfigured' | transloco }}</p>
+            }
+          </section>
+
+          <section class="card danger">
+            <h2 class="card__title">{{ 'panel.detail.deleteTitle' | transloco }}</h2>
+            <p class="muted">{{ 'panel.detail.deleteHint' | transloco: { slug: d.slug } }}</p>
+            <div class="row">
+              <input class="input" [value]="deleteConfirmText()" (input)="deleteConfirmText.set($any($event.target).value)" [placeholder]="d.slug" [attr.aria-label]="'panel.detail.deleteTitle' | transloco" />
+              <button type="button" class="btn btn--danger-solid" (click)="remove()" [disabled]="busy() || deleteConfirmText() !== d.slug">
+                {{ 'panel.detail.delete' | transloco }}
+              </button>
+            </div>
+          </section>
+        </div>
+      }
+    }
+  } @else if (!loadError()) {
+    <p class="loading">{{ 'admin.loading' | transloco }}</p>
+  }
+</div>

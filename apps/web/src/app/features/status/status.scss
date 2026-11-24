@@ -1,0 +1,28 @@
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.status__code {
+  margin: 0;
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--tk-accent);
+}
+
+.status__title {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.status__text {
+  margin: 0 0 1.5rem;
+  max-width: 24rem;
+  color: var(--tk-muted);
+}

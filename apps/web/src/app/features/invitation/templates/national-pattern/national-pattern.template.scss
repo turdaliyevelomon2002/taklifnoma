@@ -1,0 +1,334 @@
+// Sakkiz qirrali yulduzli girih naqshi (60×60 plitka). Rang: oltin, shaffoflik bilan.
+$girih: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23d4a537' stroke-width='1' stroke-opacity='.35'%3E%3Cpath d='M18 18h24v24H18z'/%3E%3Cpath d='M30 13l17 17-17 17-17-17z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3Cpath d='M0 0l13 13M60 0L47 13M0 60l13-13M60 60L47 47M30 0v13M30 60V47M0 30h13M60 30H47'/%3E%3C/g%3E%3C/svg%3E");
+// Hoshiya tasmasi: ketma-ket olmos va nuqtalar.
+$band: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M14 1l6 6-6 6-6-6z' fill='%23d4a537'/%3E%3Ccircle cx='1' cy='7' r='1.6' fill='%231f3b73'/%3E%3Ccircle cx='27' cy='7' r='1.6' fill='%231f3b73'/%3E%3C/svg%3E");
+
+:host {
+  --tk-bg: #13284f;
+  --tk-surface: #fbf6ec;
+  --tk-text: #2a2418;
+  --tk-muted: #6f6450;
+  --tk-primary: #1f3b73;
+  --tk-primary-contrast: #fbf6ec;
+  --tk-accent: #d4a537;
+  --tk-border: #e3d3ad;
+  --tk-field-bg: #ffffff;
+  --tk-radius: 12px;
+  --tk-shadow: 0 12px 40px rgb(5 15 35 / 0.45);
+  --tk-font-heading: 'Philosopher', Georgia, serif;
+  --tk-font-body: 'Lora', Georgia, 'Times New Roman', serif;
+  --tk-font-script: 'Marck Script', 'Segoe Script', cursive;
+
+  display: block;
+  min-height: 100svh;
+  background: $girih, var(--tk-bg);
+  background-size: 60px 60px, auto;
+  color: var(--tk-text);
+  font-family: var(--tk-font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+.defs {
+  position: absolute;
+}
+
+.page {
+  padding: 1rem 0.75rem;
+}
+
+.script {
+  font-family: var(--tk-font-script);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.amp {
+  display: inline-block;
+  margin-inline: 0.15em;
+  font-size: 0.6em;
+  color: var(--tk-accent);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: var(--tk-font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--tk-muted);
+}
+
+.star {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: var(--tk-accent);
+  flex: none;
+}
+
+.star--big {
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 0.75rem;
+}
+
+// --- Intro: naqshli fon, mehrob ravoq ---
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: $girih, var(--tk-bg);
+  background-size: 60px 60px, auto;
+  text-align: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+  &.intro--leave {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+.intro__arch {
+  position: relative;
+  width: min(100%, 22rem);
+  padding: 3.5rem 1.5rem 2.25rem;
+  border-radius: 50% 50% var(--tk-radius) var(--tk-radius) / 38% 38% var(--tk-radius) var(--tk-radius);
+  background: var(--tk-surface);
+  box-shadow:
+    0 0 0 4px var(--tk-bg),
+    0 0 0 6px var(--tk-accent),
+    var(--tk-shadow);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0.6rem;
+    border: 1px solid var(--tk-accent);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
+.intro__names {
+  display: flex;
+  flex-direction: column;
+  margin: 0.25rem 0 0.75rem;
+  font-size: clamp(2.4rem, 12vw, 3.25rem);
+  color: var(--tk-primary);
+}
+
+.intro__date {
+  margin: 0 0 1.75rem;
+  font-family: var(--tk-font-heading);
+  letter-spacing: 0.3em;
+}
+
+.intro__open {
+  box-shadow: 0 0 0 3px var(--tk-surface), 0 0 0 4px var(--tk-accent);
+}
+
+// --- Asosiy karta ---
+.card {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 2.5rem;
+  text-align: center;
+  background: var(--tk-surface);
+  border-radius: calc(var(--tk-radius) * 1.5);
+  box-shadow:
+    0 0 0 5px var(--tk-bg),
+    0 0 0 7px var(--tk-accent),
+    var(--tk-shadow);
+}
+
+// --- Hero: mehrob shaklidagi rasm ---
+.mihrab {
+  position: relative;
+  width: min(86%, 22rem);
+  margin: 0 auto 1.75rem;
+  padding: 0.5rem;
+  aspect-ratio: 3 / 4;
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  background: $girih, var(--tk-primary);
+  background-size: 40px 40px, auto;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0.25rem;
+    border: 1.5px solid var(--tk-accent);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
+.mihrab__photo,
+.mihrab__pattern {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+}
+
+.hero__names {
+  margin: 0 0 1rem;
+  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  color: var(--tk-primary);
+}
+
+.hero__date {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.75rem 2rem;
+  border-block: 2px solid var(--tk-accent);
+  font-family: var(--tk-font-heading);
+
+  span {
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--tk-muted);
+  }
+
+  strong {
+    font-size: 1.5rem;
+    color: var(--tk-primary);
+  }
+}
+
+// --- Hoshiya tasmasi ---
+.band {
+  height: 14px;
+  margin: 2.25rem -1.25rem;
+  background: $band repeat-x center;
+  border-block: 1px solid var(--tk-accent);
+  opacity: 0.9;
+}
+
+// --- Bo'limlar ---
+.section {
+  margin-block: 2.25rem;
+}
+
+.section--tile {
+  margin-inline: -0.5rem;
+  padding: 1.5rem 0.5rem;
+  border-radius: var(--tk-radius);
+  background: color-mix(in srgb, var(--tk-accent) 10%, transparent);
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  font-family: var(--tk-font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--tk-primary);
+}
+
+.greeting {
+  margin: 0 auto;
+  max-width: 28rem;
+  white-space: pre-line;
+}
+
+.parents {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+  font-style: italic;
+  color: var(--tk-muted);
+
+  p {
+    margin: 0;
+  }
+}
+
+.events {
+  display: grid;
+  gap: 1rem;
+}
+
+.venue-name {
+  margin: -0.5rem 0 1rem;
+  font-weight: 600;
+}
+
+.rsvp-placeholder {
+  min-height: 32rem;
+}
+
+.wishes-placeholder {
+  min-height: 8rem;
+}
+
+// --- Footer ---
+.footer__text {
+  margin: 0;
+}
+
+.footer__names {
+  margin: 0.5rem 0;
+  font-size: 2.4rem;
+  color: var(--tk-primary);
+}
+
+.footer__hashtag {
+  margin: 0 0 1.5rem;
+  font-family: var(--tk-font-heading);
+  letter-spacing: 0.1em;
+  color: var(--tk-accent);
+}
+
+.footer__brand {
+  font-size: 0.8rem;
+  color: var(--tk-muted);
+  text-decoration: none;
+}
+
+// --- Animatsiya ---
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 20%;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    transition: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .page {
+    padding: 3rem 1rem;
+  }
+
+  .card {
+    padding-inline: 2.5rem;
+  }
+
+  .band {
+    margin-inline: -2.5rem;
+  }
+}

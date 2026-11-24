@@ -1,0 +1,120 @@
+@let l = lang();
+
+<div class="page">
+  <div class="page__head">
+    <h1 class="page__title">{{ 'panel.dashboard.title' | transloco }}</h1>
+    <a class="btn btn--primary" routerLink="/panel/new">+ {{ 'panel.nav.new' | transloco }}</a>
+  </div>
+
+  @if (summary(); as s) {
+    <section class="kpis">
+      <div class="kpi">
+        <span class="kpi__value">{{ s.counts.ACTIVE }}</span>
+        <span class="kpi__label">{{ 'panel.dashboard.active' | transloco }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__value">{{ s.counts.DRAFT }}</span>
+        <span class="kpi__label">{{ 'panel.dashboard.drafts' | transloco }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__value">{{ s.revenue.thisMonth | money: l }}</span>
+        <span class="kpi__label">{{ 'panel.dashboard.revenueMonth' | transloco }}</span>
+      </div>
+      <div class="kpi" [class.kpi--warn]="s.unpaid > 0">
+        <span class="kpi__value">{{ s.unpaid }}</span>
+        <span class="kpi__label">{{ 'panel.dashboard.unpaid' | transloco }}</span>
+      </div>
+    </section>
+
+    @if (s.upcoming.length) {
+      <section class="card upcoming">
+        <h2 class="card__title">{{ 'panel.dashboard.upcoming' | transloco }}</h2>
+        <ul class="upcoming__list">
+          @for (u of s.upcoming; track u.id) {
+            <li>
+              <a [routerLink]="['/panel/i', u.id]" class="upcoming__item">
+                <span class="upcoming__date">{{ u.eventDate | eventDate: 'short' : tz : l }}</span>
+                <span class="upcoming__names">{{ u.coupleNames }}</span>
+                <span class="muted upcoming__stats">{{ 'panel.dashboard.guestsShort' | transloco: { count: u.stats.attendingGuests } }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+
+  <section class="card">
+    <div class="filters">
+      <input
+        class="input filters__search"
+        type="search"
+        maxlength="100"
+        [placeholder]="'panel.dashboard.search' | transloco"
+        [attr.aria-label]="'panel.dashboard.search' | transloco"
+        (input)="onSearch($any($event.target).value)"
+      />
+      <select class="input input--sm" [value]="status()" (change)="setStatus($any($event.target).value)" [attr.aria-label]="'panel.dashboard.status' | transloco">
+        <option value="">{{ 'panel.dashboard.allStatuses' | transloco }}</option>
+        @for (st of statuses; track st) {
+          <option [value]="st">{{ 'admin.status.' + st | transloco }}</option>
+        }
+      </select>
+      <select class="input input--sm" [value]="pkg()" (change)="setPackage($any($event.target).value)" [attr.aria-label]="'panel.form.package' | transloco">
+        <option value="">{{ 'panel.dashboard.allPackages' | transloco }}</option>
+        @for (p of packages; track p) {
+          <option [value]="p">{{ 'admin.package.' + p | transloco }}</option>
+        }
+      </select>
+      <select class="input input--sm" [value]="sort()" (change)="setSort($any($event.target).value)" [attr.aria-label]="'admin.guests.sort.label' | transloco">
+        <option value="createdAt">{{ 'panel.dashboard.sortCreated' | transloco }}</option>
+        <option value="eventDate">{{ 'panel.dashboard.sortEvent' | transloco }}</option>
+      </select>
+    </div>
+
+    @if (error(); as key) {
+      <p class="alert" role="alert">{{ key | transloco }}</p>
+    }
+
+    <p class="muted found">{{ 'panel.dashboard.found' | transloco: { count: total() } }}</p>
+
+    @if (items().length) {
+      <ul class="orders" [attr.aria-busy]="loading()">
+        @for (o of items(); track o.id) {
+          <li>
+            <a class="order" [routerLink]="['/panel/i', o.id]">
+              <div class="order__main">
+                <span class="order__names">{{ o.coupleNames }}</span>
+                <span class="muted order__slug">/{{ o.slug }} · {{ o.customerName }}</span>
+              </div>
+              <div class="order__date">
+                <span>{{ o.eventDate | eventDate: 'short' : tz : l }}</span>
+                <span class="muted">{{ 'panel.dashboard.replies' | transloco: { guests: o.stats.attendingGuests, replies: o.stats.replies } }}</span>
+              </div>
+              <div class="order__badges">
+                <span class="badge badge--{{ o.status }}">{{ 'admin.status.' + o.status | transloco }}</span>
+                <span class="badge">{{ 'admin.package.' + o.package | transloco }}</span>
+                @if (isUnpaid(o)) {
+                  <span class="badge badge--unpaid">{{ 'panel.dashboard.notPaid' | transloco }}</span>
+                }
+              </div>
+              <div class="order__price">{{ o.price | money: l }}</div>
+            </a>
+          </li>
+        }
+      </ul>
+
+      @if (pages() > 1) {
+        <nav class="pager">
+          <button type="button" class="btn" (click)="page.set(page() - 1)" [disabled]="page() <= 1 || loading()">←</button>
+          <span class="muted">{{ page() }} / {{ pages() }}</span>
+          <button type="button" class="btn" (click)="page.set(page() + 1)" [disabled]="page() >= pages() || loading()">→</button>
+        </nav>
+      }
+    } @else if (!loading()) {
+      <p class="empty muted">{{ 'panel.dashboard.empty' | transloco }}</p>
+    } @else {
+      <p class="loading">{{ 'admin.loading' | transloco }}</p>
+    }
+  </section>
+</div>

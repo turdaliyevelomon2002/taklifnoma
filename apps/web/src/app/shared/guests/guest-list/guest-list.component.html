@@ -1,0 +1,137 @@
+@let st = stats();
+@let l = lang();
+@let tz = timezone();
+@let counts = { all: st.replies, attending: st.attendingReplies, declined: st.notAttendingReplies };
+
+<section class="list">
+  <div class="list__head">
+    <h2 class="list__title">{{ 'admin.guests.title' | transloco }}</h2>
+    <div class="list__tools">
+      <button type="button" class="tool-btn" (click)="reload()" [disabled]="loading()">
+        ↻ {{ 'admin.header.refresh' | transloco }}
+      </button>
+      @if (canExport()) {
+        <button type="button" class="tk-btn excel" (click)="exportExcel()" [disabled]="exporting()">
+          {{ (exporting() ? 'admin.export.loading' : 'admin.export.button') | transloco }}
+        </button>
+      } @else {
+        <span class="locked" [attr.title]="'admin.export.locked' | transloco">
+          🔒 {{ 'admin.export.button' | transloco }}
+        </span>
+      }
+    </div>
+  </div>
+  @if (!canExport()) {
+    <p class="hint">{{ 'admin.export.locked' | transloco }}</p>
+  }
+  @if (exportError(); as key) {
+    <p class="error" role="alert">{{ key | transloco }}</p>
+  }
+
+  <div class="filters" role="tablist" [attr.aria-label]="'admin.guests.filter.label' | transloco">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        role="tab"
+        class="filters__btn"
+        [class.filters__btn--active]="filter() === f"
+        [attr.aria-selected]="filter() === f"
+        (click)="filter.set(f)"
+      >
+        {{ 'admin.guests.filter.' + f | transloco }}
+        <span class="filters__count">{{ counts[f] }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="search-row">
+    <label class="visually-hidden" for="guest-search">{{ 'admin.guests.search' | transloco }}</label>
+    <input
+      id="guest-search"
+      class="search"
+      type="search"
+      maxlength="100"
+      [placeholder]="'admin.guests.search' | transloco"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <label class="visually-hidden" for="guest-sort">{{ 'admin.guests.sort.label' | transloco }}</label>
+    <select id="guest-sort" class="sort" [value]="sort()" (change)="sort.set($any($event.target).value)">
+      @for (o of sorts; track o) {
+        <option [value]="o">{{ 'admin.guests.sort.' + o | transloco }}</option>
+      }
+    </select>
+  </div>
+
+  @if (error(); as key) {
+    <p class="error" role="alert">{{ key | transloco }}</p>
+  }
+
+  <p class="found" aria-live="polite">{{ 'admin.guests.found' | transloco: { count: total() } }}</p>
+
+  @if (items().length) {
+    <ul class="guests" [attr.aria-busy]="loading()">
+      @for (g of items(); track g.id) {
+        @let when = (g.updatedAt | eventDate: 'short' : tz : l) + ' ' + (g.updatedAt | eventDate: 'time' : tz : l);
+        @let busy = busyId() === g.id;
+        <li class="guest" [class.guest--no]="!g.attending">
+          <div class="guest__top">
+            <span class="guest__name">{{ g.name }}</span>
+            <span class="pill" [class.pill--yes]="g.attending" [class.pill--no]="!g.attending">
+              @if (g.attending) {
+                {{ 'admin.guests.attending' | transloco: { count: g.guestCount } }}
+              } @else {
+                {{ 'admin.guests.declined' | transloco }}
+              }
+            </span>
+          </div>
+
+          @if (g.phone) {
+            <a class="guest__phone" [href]="'tel:' + g.phone" [attr.aria-label]="('admin.guests.call' | transloco) + ' ' + phone(g.phone)">
+              {{ phone(g.phone) }}
+            </a>
+          }
+
+          @if (g.wish) {
+            <blockquote class="guest__wish" [class.guest__wish--hidden]="g.wishHidden">{{ g.wish }}</blockquote>
+            @if (g.wishHidden) {
+              <p class="guest__note">{{ 'admin.guests.wishHidden' | transloco }}</p>
+            }
+          }
+
+          <div class="guest__foot">
+            <span class="guest__date">{{ 'admin.guests.answeredAt' | transloco: { date: when } }}</span>
+            <div class="guest__actions">
+              @if (confirmDeleteId() === g.id) {
+                <button type="button" class="link" (click)="confirmDeleteId.set(null)" [disabled]="busy">
+                  {{ 'admin.guests.cancel' | transloco }}
+                </button>
+                <button type="button" class="link link--danger link--strong" (click)="remove(g)" [disabled]="busy">
+                  {{ 'admin.guests.confirmDelete' | transloco }}
+                </button>
+              } @else {
+                @if (g.wish && wishModeration()) {
+                  <button type="button" class="link" (click)="toggleWish(g)" [disabled]="busy">
+                    {{ (g.wishHidden ? 'admin.guests.showWish' : 'admin.guests.hideWish') | transloco }}
+                  </button>
+                }
+                <button type="button" class="link link--danger" (click)="confirmDeleteId.set(g.id)" [disabled]="busy">
+                  {{ 'admin.guests.delete' | transloco }}
+                </button>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (items().length < total()) {
+      <button type="button" class="tk-btn tk-btn--ghost more" (click)="loadMore()" [disabled]="loading()">
+        {{ (loading() ? 'admin.loading' : 'admin.guests.more') | transloco }}
+      </button>
+    }
+  } @else if (!loading()) {
+    <p class="empty">
+      {{ (query() || filter() !== 'all' ? 'admin.guests.emptyFiltered' : 'admin.guests.empty') | transloco }}
+    </p>
+  }
+</section>

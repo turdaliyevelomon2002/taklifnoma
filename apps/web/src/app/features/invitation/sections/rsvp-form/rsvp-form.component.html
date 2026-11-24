@@ -1,0 +1,166 @@
+@let r = rules();
+@let s = state();
+
+@if (!open()) {
+  <p class="rsvp__closed">{{ 'invitation.rsvp.closed' | transloco }}</p>
+} @else if (s.kind === 'done') {
+  <div class="rsvp__done" role="status">
+    <div class="rsvp__done-icon" aria-hidden="true">{{ s.attending ? '♥' : '✉' }}</div>
+    <h3 class="rsvp__done-title">{{ 'invitation.rsvp.thanks' | transloco: { name: s.name } }}</h3>
+    <p class="rsvp__done-text">
+      {{ (s.attending ? 'invitation.rsvp.doneYes' : 'invitation.rsvp.doneNo') | transloco }}
+    </p>
+    @if (s.result === 'updated') {
+      <p class="rsvp__done-note">{{ 'invitation.rsvp.updated' | transloco }}</p>
+    }
+    <button type="button" class="tk-btn tk-btn--ghost" (click)="edit()">
+      {{ 'invitation.rsvp.change' | transloco }}
+    </button>
+  </div>
+} @else {
+  <form class="rsvp" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (r.deadline) {
+      <p class="rsvp__deadline">
+        {{ 'invitation.rsvp.deadline' | transloco: { date: (r.deadline | eventDate: 'full' : timezone() : lang()) } }}
+      </p>
+    }
+
+    <!-- Ism -->
+    <div class="field">
+      <label class="field__label" for="rsvp-name">{{ 'invitation.rsvp.name' | transloco }}</label>
+      <input
+        id="rsvp-name"
+        class="field__input"
+        type="text"
+        formControlName="name"
+        autocomplete="name"
+        [attr.maxlength]="limits.nameMax"
+        [placeholder]="'invitation.rsvp.namePlaceholder' | transloco"
+        [attr.aria-invalid]="showError('name')"
+        aria-describedby="rsvp-name-error"
+      />
+      @if (showError('name')) {
+        <p id="rsvp-name-error" class="field__error">
+          @if (form.controls.name.hasError('required')) {
+            {{ 'invitation.rsvp.validation.required' | transloco }}
+          } @else {
+            {{ 'invitation.rsvp.validation.minlength' | transloco: { n: limits.nameMin } }}
+          }
+        </p>
+      }
+    </div>
+
+    <!-- Telefon -->
+    @if (r.askPhone) {
+      <div class="field">
+        <label class="field__label" for="rsvp-phone">{{ 'invitation.rsvp.phone' | transloco }}</label>
+        <input
+          id="rsvp-phone"
+          class="field__input"
+          type="tel"
+          inputmode="tel"
+          formControlName="phone"
+          autocomplete="tel"
+          maxlength="20"
+          placeholder="+998 90 123 45 67"
+          [attr.aria-invalid]="showError('phone')"
+          aria-describedby="rsvp-phone-error rsvp-phone-hint"
+        />
+        <p id="rsvp-phone-hint" class="field__hint">{{ 'invitation.rsvp.phoneHint' | transloco }}</p>
+        @if (showError('phone')) {
+          <p id="rsvp-phone-error" class="field__error">
+            {{
+              (form.controls.phone.hasError('required')
+                ? 'invitation.rsvp.validation.required'
+                : 'invitation.rsvp.validation.phone'
+              ) | transloco
+            }}
+          </p>
+        }
+      </div>
+    }
+
+    <!-- Keladimi -->
+    <fieldset class="field">
+      <legend class="field__label">{{ 'invitation.rsvp.attendingLabel' | transloco }}</legend>
+      <div class="choice">
+        <button
+          type="button"
+          class="choice__btn"
+          [class.choice__btn--active]="attending() === true"
+          [attr.aria-pressed]="attending() === true"
+          (click)="setAttending(true)"
+        >
+          {{ 'invitation.rsvp.yes' | transloco }}
+        </button>
+        <button
+          type="button"
+          class="choice__btn"
+          [class.choice__btn--active]="attending() === false"
+          [attr.aria-pressed]="attending() === false"
+          (click)="setAttending(false)"
+        >
+          {{ 'invitation.rsvp.no' | transloco }}
+        </button>
+      </div>
+      @if (showError('attending')) {
+        <p class="field__error">{{ 'invitation.rsvp.validation.attending' | transloco }}</p>
+      }
+    </fieldset>
+
+    <!-- Necha kishi -->
+    @if (attending() === true) {
+      <div class="field">
+        <span class="field__label" id="rsvp-guests-label">{{ 'invitation.rsvp.guests' | transloco }}</span>
+        <div class="stepper" role="group" aria-labelledby="rsvp-guests-label">
+          <button
+            type="button"
+            class="stepper__btn"
+            (click)="stepGuests(-1)"
+            [disabled]="guestCount() <= 1"
+            [attr.aria-label]="'invitation.rsvp.decrease' | transloco"
+          >−</button>
+          <output class="stepper__value" aria-live="polite">{{ guestCount() }}</output>
+          <button
+            type="button"
+            class="stepper__btn"
+            (click)="stepGuests(1)"
+            [disabled]="guestCount() >= r.maxGuestsPerReply"
+            [attr.aria-label]="'invitation.rsvp.increase' | transloco"
+          >+</button>
+        </div>
+        <p class="field__hint">{{ 'invitation.rsvp.guestsHint' | transloco: { max: r.maxGuestsPerReply } }}</p>
+      </div>
+    }
+
+    <!-- Tilak -->
+    @if (r.askWish) {
+      <div class="field">
+        <label class="field__label" for="rsvp-wish">{{ 'invitation.rsvp.wish' | transloco }}</label>
+        <textarea
+          id="rsvp-wish"
+          class="field__input field__input--area"
+          formControlName="wish"
+          rows="4"
+          [attr.maxlength]="limits.wishMax"
+          [placeholder]="'invitation.rsvp.wishPlaceholder' | transloco"
+        ></textarea>
+        <p class="field__hint field__hint--right">{{ wishLength() }} / {{ limits.wishMax }}</p>
+      </div>
+    }
+
+    <!-- Honeypot: ko'rinmaydi, ekran o'quvchilar ham o'qimaydi -->
+    <div class="hp" aria-hidden="true">
+      <label for="rsvp-website">{{ 'invitation.rsvp.honeypot' | transloco }}</label>
+      <input id="rsvp-website" type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+    </div>
+
+    @if (error(); as key) {
+      <p class="rsvp__error" role="alert">{{ key | transloco }}</p>
+    }
+
+    <button type="submit" class="tk-btn rsvp__submit" [disabled]="s.kind === 'submitting'">
+      {{ (s.kind === 'submitting' ? 'invitation.rsvp.submitting' : 'invitation.rsvp.submit') | transloco }}
+    </button>
+  </form>
+}

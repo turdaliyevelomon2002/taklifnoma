@@ -1,0 +1,106 @@
+@let f = features();
+
+@if (error(); as key) {
+  <p class="alert" role="alert">{{ key | transloco }}</p>
+}
+@if (progress(); as p) {
+  <p class="uploading" role="status">{{ 'panel.media.uploading' | transloco: { done: p.done, total: p.total } }}</p>
+}
+
+<div class="media-grid">
+  <!-- Muqova -->
+  <section class="card">
+    <h2 class="card__title">{{ 'panel.media.cover' | transloco }}</h2>
+    <p class="hint">{{ 'panel.media.coverHint' | transloco }}</p>
+    @if (cover(); as c) {
+      <figure class="cover">
+        <img [src]="c.variants?.md ?? c.url" alt="" loading="lazy" />
+      </figure>
+    }
+    <div class="row">
+      <label class="btn btn--ghost" [class.is-busy]="busy() === 'cover'">
+        {{ (cover() ? 'panel.media.replace' : 'panel.media.upload') | transloco }}
+        <input #coverInput type="file" class="visually-hidden" [accept]="imageAccept" [disabled]="!!busy()" (change)="upload('cover', coverInput)" />
+      </label>
+      @if (cover(); as c) {
+        <button type="button" class="link link--danger" (click)="remove(c)" [disabled]="!!busy()">{{ 'panel.media.delete' | transloco }}</button>
+      }
+    </div>
+  </section>
+
+  <!-- Musiqa -->
+  <section class="card">
+    <h2 class="card__title">{{ 'panel.media.music' | transloco }}</h2>
+    @if (!f.music) {
+      <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
+    } @else {
+      <p class="hint">{{ 'panel.media.musicHint' | transloco }}</p>
+      @if (music(); as m) {
+        <audio class="audio" controls preload="none" [src]="m.url"></audio>
+      }
+      <div class="row">
+        <label class="btn btn--ghost">
+          {{ (music() ? 'panel.media.replace' : 'panel.media.upload') | transloco }}
+          <input #musicInput type="file" class="visually-hidden" [accept]="audioAccept" [disabled]="!!busy()" (change)="upload('music', musicInput)" />
+        </label>
+        @if (music(); as m) {
+          <button type="button" class="link link--danger" (click)="remove(m)" [disabled]="!!busy()">{{ 'panel.media.delete' | transloco }}</button>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<!-- Galereya -->
+<section class="card gallery-card">
+  <div class="card__head">
+    <h2 class="card__title">
+      {{ 'panel.media.gallery' | transloco }}
+      @if (f.gallery) {
+        <span class="muted count">{{ gallery().length }} / {{ f.galleryLimit }}</span>
+      }
+    </h2>
+    @if (f.gallery) {
+      <label class="btn btn--ghost" [class.is-disabled]="!galleryLeft() || !!busy()">
+        + {{ 'panel.media.addPhotos' | transloco }}
+        <input #galleryInput type="file" class="visually-hidden" multiple [accept]="imageAccept" [disabled]="!galleryLeft() || !!busy()" (change)="upload('gallery', galleryInput)" />
+      </label>
+    }
+  </div>
+  @if (!f.gallery) {
+    <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
+  } @else if (gallery().length) {
+    <ul class="gallery">
+      @for (m of gallery(); track m.id; let i = $index, first = $first, last = $last) {
+        <li class="thumb">
+          <img [src]="m.variants?.sm ?? m.url" alt="" loading="lazy" />
+          <div class="thumb__tools">
+            <button type="button" class="icon-btn" (click)="move(i, -1)" [disabled]="first" [attr.aria-label]="'panel.form.moveUp' | transloco">←</button>
+            <button type="button" class="icon-btn" (click)="move(i, 1)" [disabled]="last" [attr.aria-label]="'panel.form.moveDown' | transloco">→</button>
+            <button type="button" class="icon-btn icon-btn--danger" (click)="remove(m)" [attr.aria-label]="'panel.media.delete' | transloco">✕</button>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="hint">{{ 'panel.media.galleryEmpty' | transloco }}</p>
+  }
+</section>
+
+<!-- OG rasm -->
+<details class="card og-card">
+  <summary class="card__title">{{ 'panel.media.og' | transloco }}</summary>
+  <p class="hint">{{ 'panel.media.ogHint' | transloco }}</p>
+  @if (ogImage() ?? cover(); as og) {
+    <img class="og" [src]="og.ogUrl ?? og.url" alt="" loading="lazy" />
+  }
+  <div class="row">
+    <label class="btn btn--ghost">
+      {{ 'panel.media.uploadOg' | transloco }}
+      <input #ogInput type="file" class="visually-hidden" [accept]="imageAccept" [disabled]="!!busy()" (change)="upload('og-image', ogInput)" />
+    </label>
+    @if (ogImage(); as og) {
+      <button type="button" class="link link--danger" (click)="remove(og)">{{ 'panel.media.delete' | transloco }}</button>
+    }
+  </div>
+</details>

@@ -1,0 +1,318 @@
+@let ru = showRu();
+@let order = form.controls.order;
+@let couple = form.controls.couple;
+@let texts = form.controls.texts;
+@let theme = form.controls.theme;
+@let seo = form.controls.seo;
+@let effective = effectiveFeatures();
+
+<form class="editor" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <!-- 1. Buyurtma -->
+  <section class="card" formGroupName="order">
+    <h2 class="card__title">{{ 'panel.form.sections.order' | transloco }}</h2>
+    <div class="grid">
+      <label class="field">
+        <span class="label">{{ 'panel.form.customerName' | transloco }}</span>
+        <input class="input" formControlName="customerName" maxlength="100" autocomplete="off" />
+        <tk-field-error path="customerName" />
+      </label>
+      <label class="field">
+        <span class="label">{{ 'panel.form.customerPhone' | transloco }}</span>
+        <input class="input" formControlName="customerPhone" type="tel" inputmode="tel" placeholder="+998 90 123 45 67" maxlength="20" />
+        <tk-field-error path="customerPhone" />
+      </label>
+      <label class="field">
+        <span class="label">{{ 'panel.form.price' | transloco }}</span>
+        <input class="input" formControlName="price" type="number" min="0" step="1000" inputmode="numeric" />
+        <tk-field-error path="price" />
+      </label>
+      @if (isEdit()) {
+        <label class="field">
+          <span class="label">{{ 'panel.form.paidAt' | transloco }}</span>
+          <input class="input" formControlName="paidAt" type="date" />
+          <span class="hint">{{ 'panel.form.paidAtHint' | transloco }}</span>
+        </label>
+      }
+    </div>
+
+    <div class="field">
+      <span class="label">{{ 'panel.form.package' | transloco }}</span>
+      <div class="choices">
+        @for (p of packages; track p) {
+          <label class="choice" [class.choice--active]="order.controls.package.value === p">
+            <input type="radio" formControlName="package" [value]="p" />
+            <span class="choice__title">{{ 'admin.package.' + p | transloco }}</span>
+            <span class="choice__desc">{{ 'panel.packages.' + p | transloco }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">{{ 'panel.form.template' | transloco }}</span>
+      <div class="choices">
+        @for (t of templates; track t) {
+          <label class="choice" [class.choice--active]="order.controls.templateKey.value === t">
+            <input type="radio" formControlName="templateKey" [value]="t" />
+            <span class="swatch swatch--{{ t }}" aria-hidden="true"></span>
+            <span class="choice__title">{{ 'panel.templates.' + t + '.name' | transloco }}</span>
+            <span class="choice__desc">{{ 'panel.templates.' + t + '.desc' | transloco }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <label class="field">
+      <span class="label">{{ 'panel.form.notes' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+      <textarea class="input input--area" formControlName="notes" rows="2" maxlength="2000"></textarea>
+    </label>
+  </section>
+
+  <!-- 2. Juftlik -->
+  <section class="card" formGroupName="couple">
+    <h2 class="card__title">{{ 'panel.form.sections.couple' | transloco }}</h2>
+    <div class="settings-row">
+      <label class="check">
+        <input type="checkbox" [formControl]="form.controls.settings.controls.ru" />
+        {{ 'panel.form.enableRu' | transloco }}
+      </label>
+      @if (!effective.multiLanguage && ru) {
+        <span class="warn">{{ 'panel.form.ruNotInPackage' | transloco }}</span>
+      }
+    </div>
+
+    @for (who of ['groom', 'bride']; track who) {
+      @let person = who === 'groom' ? couple.controls.groom : couple.controls.bride;
+      <fieldset class="person">
+        <legend class="person__title">{{ 'panel.form.' + who | transloco }}</legend>
+        <div class="grid">
+          <tk-localized-field [group]="person.controls.firstName" label="panel.form.firstName" [path]="'config.couple.' + who + '.firstName'" [showRu]="ru" [maxlength]="50" />
+          <tk-localized-field [group]="person.controls.lastName" label="panel.form.lastName" [path]="'config.couple.' + who + '.lastName'" [showRu]="ru" [optional]="true" [maxlength]="50" />
+        </div>
+        <tk-localized-field [group]="person.controls.parents" label="panel.form.parents" [path]="'config.couple.' + who + '.parents'" [showRu]="ru" [optional]="true" [maxlength]="150" />
+      </fieldset>
+    }
+
+    <div class="field">
+      <span class="label">{{ 'panel.form.order' | transloco }}</span>
+      <div class="segmented">
+        <label><input type="radio" formControlName="order" value="groom-first" /> {{ 'panel.form.groomFirst' | transloco }}</label>
+        <label><input type="radio" formControlName="order" value="bride-first" /> {{ 'panel.form.brideFirst' | transloco }}</label>
+      </div>
+    </div>
+
+    <div class="field" [formGroup]="order">
+      <label class="label" for="slug">{{ 'panel.form.slug' | transloco }}</label>
+      <div class="slug">
+        <span class="slug__prefix">domen.uz/</span>
+        <input id="slug" class="input slug__input" formControlName="slug" maxlength="60" autocomplete="off" (input)="onSlugInput(order.controls.slug.value)" />
+      </div>
+      @switch (slugState()) {
+        @case ('checking') { <span class="hint">{{ 'panel.form.slugChecking' | transloco }}</span> }
+        @case ('available') { <span class="hint hint--ok">✓ {{ 'panel.form.slugAvailable' | transloco }}</span> }
+        @case ('taken') { <span class="hint hint--bad">{{ 'errors.SLUG_TAKEN' | transloco }}</span> }
+        @case ('invalid') { <span class="hint hint--bad">{{ 'panel.validation.invalid_slug' | transloco }}</span> }
+        @default { <span class="hint">{{ 'panel.form.slugHint' | transloco }}</span> }
+      }
+      @if (isEdit() && detail()?.slug !== order.controls.slug.value) {
+        <span class="warn">{{ 'panel.form.slugChangeWarn' | transloco }}</span>
+      }
+      <tk-field-error path="slug" />
+    </div>
+  </section>
+
+  <!-- 3. Tadbirlar -->
+  <section class="card">
+    <div class="card__head">
+      <h2 class="card__title">{{ 'panel.form.sections.events' | transloco }}</h2>
+      <button type="button" class="btn btn--ghost" (click)="addEvent()" [disabled]="events.length >= 10">
+        + {{ 'panel.form.addEvent' | transloco }}
+      </button>
+    </div>
+    <tk-field-error path="config.events" [exact]="true" />
+
+    @for (ev of events.controls; track ev; let i = $index, first = $first, last = $last) {
+      @let p = 'config.events.' + i;
+      <fieldset class="event" [formGroup]="ev" [class.event--primary]="ev.controls.isPrimary.value">
+        <div class="event__head">
+          <label class="check">
+            <input type="radio" name="primary-event" [checked]="ev.controls.isPrimary.value" (change)="setPrimary(i)" />
+            {{ 'panel.form.primaryEvent' | transloco }}
+          </label>
+          <div class="event__tools">
+            <button type="button" class="icon-btn" (click)="moveEvent(i, -1)" [disabled]="first" [attr.aria-label]="'panel.form.moveUp' | transloco">↑</button>
+            <button type="button" class="icon-btn" (click)="moveEvent(i, 1)" [disabled]="last" [attr.aria-label]="'panel.form.moveDown' | transloco">↓</button>
+            @if (events.length > 1) {
+              <button type="button" class="icon-btn icon-btn--danger" (click)="removeEvent(i)" [attr.aria-label]="'panel.form.removeEvent' | transloco">✕</button>
+            }
+          </div>
+        </div>
+
+        <tk-localized-field [group]="ev.controls.title" label="panel.form.eventTitle" [path]="p + '.title'" [showRu]="ru" [maxlength]="80" />
+        <div class="grid">
+          <label class="field">
+            <span class="label">{{ 'panel.form.startsAt' | transloco }}</span>
+            <input class="input" type="datetime-local" formControlName="startsAt" />
+            <tk-field-error [path]="p + '.startsAt'" />
+          </label>
+          <label class="field">
+            <span class="label">{{ 'panel.form.endsAt' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+            <input class="input" type="datetime-local" formControlName="endsAt" />
+            <tk-field-error [path]="p + '.endsAt'" />
+          </label>
+        </div>
+        <tk-localized-field [group]="ev.controls.venueName" label="panel.form.venueName" [path]="p + '.venue.name'" [showRu]="ru" [maxlength]="120" />
+        <tk-localized-field [group]="ev.controls.address" label="panel.form.address" [path]="p + '.venue.address'" [showRu]="ru" [maxlength]="250" />
+        <div class="grid">
+          <label class="field">
+            <span class="label">{{ 'panel.form.location' | transloco }}</span>
+            <input class="input" formControlName="location" placeholder="41.311081, 69.240562" />
+            <span class="hint">{{ 'panel.form.locationHint' | transloco }}</span>
+            <tk-field-error [path]="p + '.venue.location'" />
+          </label>
+          <label class="field">
+            <span class="label">{{ 'panel.form.yandexOrgId' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+            <input class="input" formControlName="yandexOrgId" inputmode="numeric" maxlength="20" />
+            <span class="hint">{{ 'panel.form.yandexOrgIdHint' | transloco }}</span>
+            <tk-field-error [path]="p + '.venue.yandexOrgId'" />
+          </label>
+          <label class="field">
+            <span class="label">{{ 'panel.form.venuePhone' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+            <input class="input" formControlName="phone" type="tel" inputmode="tel" maxlength="20" />
+            <tk-field-error [path]="p + '.venue.phone'" />
+          </label>
+        </div>
+      </fieldset>
+    }
+  </section>
+
+  <!-- 4. Matnlar -->
+  <section class="card" formGroupName="texts">
+    <h2 class="card__title">{{ 'panel.form.sections.texts' | transloco }}</h2>
+    <tk-localized-field [group]="texts.controls.greeting" label="panel.form.greeting" path="config.greeting" [showRu]="ru" [multiline]="true" [optional]="true" [maxlength]="1000" />
+    <tk-localized-field [group]="texts.controls.closingText" label="panel.form.closingText" path="config.closingText" [showRu]="ru" [multiline]="true" [optional]="true" [maxlength]="500" />
+    <div class="grid">
+      <label class="field">
+        <span class="label">{{ 'panel.form.hashtag' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+        <input class="input" formControlName="hashtag" placeholder="#AliMadina2027" maxlength="41" />
+        <tk-field-error path="config.hashtag" />
+      </label>
+      <label class="field">
+        <span class="label">{{ 'panel.form.musicTitle' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+        <input class="input" formControlName="musicTitle" maxlength="100" />
+      </label>
+    </div>
+  </section>
+
+  <!-- 5. RSVP va dizayn -->
+  <section class="card">
+    <h2 class="card__title">{{ 'panel.form.sections.rsvp' | transloco }}</h2>
+    <div class="grid" formGroupName="rsvp">
+      <label class="field">
+        <span class="label">{{ 'panel.form.deadline' | transloco }} <span class="optional">{{ 'panel.form.optional' | transloco }}</span></span>
+        <input class="input" type="datetime-local" formControlName="deadline" />
+        <tk-field-error path="config.rsvp.deadline" />
+      </label>
+      <label class="field">
+        <span class="label">{{ 'panel.form.maxGuests' | transloco }}</span>
+        <input class="input" type="number" min="1" max="20" formControlName="maxGuestsPerReply" />
+        <tk-field-error path="config.rsvp.maxGuestsPerReply" />
+      </label>
+      <label class="check"><input type="checkbox" formControlName="askPhone" /> {{ 'panel.form.askPhone' | transloco }}</label>
+      <label class="check"><input type="checkbox" formControlName="askWish" /> {{ 'panel.form.askWish' | transloco }}</label>
+    </div>
+
+    <h3 class="card__subtitle">{{ 'panel.form.sections.design' | transloco }}</h3>
+    <div class="grid" formGroupName="theme">
+      @for (c of ['primaryColor', 'accentColor']; track c) {
+        @let ctrl = c === 'primaryColor' ? theme.controls.primaryColor : theme.controls.accentColor;
+        <div class="field">
+          <span class="label">{{ 'panel.form.' + c | transloco }}</span>
+          <div class="color">
+            <input type="color" class="color__picker" [value]="ctrl.value || '#8c6a1f'" (input)="ctrl.setValue($any($event.target).value)" [attr.aria-label]="'panel.form.' + c | transloco" />
+            <span class="color__value">{{ ctrl.value || ('panel.form.colorDefault' | transloco) }}</span>
+            @if (ctrl.value) {
+              <button type="button" class="link" (click)="ctrl.setValue('')">{{ 'panel.form.colorReset' | transloco }}</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="grid" [formGroup]="form.controls.settings">
+      @if (ru) {
+        <label class="field">
+          <span class="label">{{ 'panel.form.defaultLocale' | transloco }}</span>
+          <select class="input" formControlName="defaultLocale">
+            <option value="uz">O'zbekcha</option>
+            <option value="ru">Русский</option>
+          </select>
+          <tk-field-error path="config.defaultLocale" />
+        </label>
+      }
+      <label class="field">
+        <span class="label">{{ 'panel.form.timezone' | transloco }}</span>
+        <input class="input" formControlName="timezone" list="tz-list" maxlength="64" />
+        <datalist id="tz-list">
+          <option value="Asia/Tashkent"></option>
+          <option value="Asia/Samarkand"></option>
+          <option value="Europe/Moscow"></option>
+          <option value="Asia/Almaty"></option>
+          <option value="Europe/Istanbul"></option>
+          <option value="Asia/Dubai"></option>
+        </datalist>
+        <tk-field-error path="config.timezone" />
+      </label>
+    </div>
+  </section>
+
+  <!-- 6. SEO -->
+  <details class="card card--collapsible" formGroupName="seo">
+    <summary class="card__title">{{ 'panel.form.sections.seo' | transloco }}</summary>
+    <p class="hint">{{ 'panel.form.seoHint' | transloco }}</p>
+    <tk-localized-field [group]="seo.controls.title" label="panel.form.seoTitle" path="config.seo.title" [showRu]="ru" [optional]="true" [maxlength]="90" />
+    <tk-localized-field [group]="seo.controls.description" label="panel.form.seoDescription" path="config.seo.description" [showRu]="ru" [multiline]="true" [optional]="true" [maxlength]="200" />
+  </details>
+
+  <!-- 7. Imkoniyatlar -->
+  <details class="card card--collapsible" formGroupName="features">
+    <summary class="card__title">{{ 'panel.form.sections.features' | transloco }}</summary>
+    <p class="hint">{{ 'panel.form.featuresHint' | transloco }}</p>
+    <div class="features">
+      @for (k of booleanFeatures; track k) {
+        <div class="feature">
+          <span class="feature__name">
+            <span class="dot" [class.dot--on]="effective[k]" aria-hidden="true"></span>
+            {{ 'panel.features.' + k | transloco }}
+          </span>
+          <select class="input input--sm" [formControlName]="k">
+            <option value="package">
+              {{ 'panel.form.byPackage' | transloco }} ({{ (featureLabelState(k) ? 'panel.form.on' : 'panel.form.off') | transloco }})
+            </option>
+            <option value="on">{{ 'panel.form.forceOn' | transloco }}</option>
+            <option value="off">{{ 'panel.form.forceOff' | transloco }}</option>
+          </select>
+        </div>
+      }
+      <div class="feature">
+        <span class="feature__name">{{ 'panel.features.galleryLimit' | transloco }}</span>
+        <input class="input input--sm" type="number" min="0" max="60" formControlName="galleryLimit" [placeholder]="packageFeatures().galleryLimit" />
+      </div>
+    </div>
+    <tk-field-error path="featureOverrides" />
+  </details>
+
+  <!-- Saqlash paneli -->
+  <div class="savebar">
+    <div class="savebar__status" aria-live="polite">
+      @if (saveError(); as key) {
+        <span class="savebar__error">{{ key | transloco }}</span>
+      } @else if (savedAt()) {
+        <span class="savebar__ok">✓ {{ 'panel.form.saved' | transloco }}</span>
+      }
+    </div>
+    <button type="submit" class="btn btn--primary" [disabled]="saving()">
+      {{ (saving() ? 'panel.form.saving' : isEdit() ? 'panel.form.save' : 'panel.form.create') | transloco }}
+    </button>
+  </div>
+</form>

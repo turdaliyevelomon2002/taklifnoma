@@ -1,0 +1,49 @@
+{
+  "telegram": {
+    "start": {
+      "help": "Assalomu alaykum! Bu Taklifnoma boti.\n\nTo'yingizga kelgan javoblar shu yerga keladi. Ulanish uchun admin panelingizdagi «Telegram'ga ulash» tugmasini bosing.",
+      "coupleLinked": "✅ Bot ulandi: <b>{{names}}</b> taklifnomasi.\n\nEndi har bir yangi javob shu yerga keladi.",
+      "ownerLinked": "✅ Owner hisobi ulandi. Barcha taklifnomalardagi yangi javoblar shu yerga keladi.",
+      "invalidCode": "❌ Havola eskirgan yoki noto'g'ri. Admin paneldan yangi havolani oling."
+    },
+    "stop": {
+      "done": "🔕 Bildirishnomalar o'chirildi. Qayta ulash uchun admin paneldagi havoladan foydalaning.",
+      "nothing": "Bu chat hech qaysi taklifnomaga ulanmagan."
+    },
+    "rsvp": {
+      "titleNew": "💌 Yangi javob",
+      "titleUpdated": "✏️ Javob yangilandi",
+      "attending": "✅ Keladi · {{count}} kishi",
+      "notAttending": "❌ Kela olmaydi",
+      "wish": "💬 {{wish}}",
+      "summary": "📊 Jami: {{guests}} kishi keladi ({{replies}} ta javob)",
+      "openPanel": "Mehmonlar ro'yxati"
+    }
+  },
+  "export": {
+    "sheet": "Mehmonlar",
+    "summarySheet": "Statistika",
+    "col": {
+      "no": "№",
+      "name": "Ism",
+      "phone": "Telefon",
+      "answer": "Javob",
+      "guests": "Kishilar soni",
+      "wish": "Tilak",
+      "lang": "Til",
+      "date": "Sana"
+    },
+    "yes": "Keladi",
+    "no": "Kelmaydi",
+    "total": "Jami",
+    "summary": {
+      "title": "{{names}} — mehmonlar",
+      "replies": "Javoblar soni",
+      "attendingReplies": "Keladi (javoblar)",
+      "attendingGuests": "Keladigan mehmonlar",
+      "declined": "Kelmaydi",
+      "exportedAt": "Yuklab olingan vaqt"
+    },
+    "filePrefix": "mehmonlar"
+  }
+}
