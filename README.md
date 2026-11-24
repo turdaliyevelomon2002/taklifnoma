@@ -201,6 +201,8 @@ Ranglar CSS o'zgaruvchilari orqali (`--tk-primary`, `--tk-accent`, `--tk-bg`, `-
 
 ## Production (Docker)
 
+To'liq bosqichma-bosqich yo'riqnoma (lokal sinash, domen, server, Telegram): [docs/DEPLOY.md](docs/DEPLOY.md)
+
 ```
 Internet ──► Caddy :443 (HTTPS, Let's Encrypt)
                ├─ /api/*    ──► api  (NestJS, :3000) ──► postgres, minio
