@@ -5,7 +5,21 @@
   <p class="rsvp__closed">{{ 'invitation.rsvp.closed' | transloco }}</p>
 } @else if (s.kind === 'done') {
   <div class="rsvp__done" role="status">
-    <div class="rsvp__done-icon" aria-hidden="true">{{ s.attending ? '♥' : '✉' }}</div>
+    <div class="rsvp__done-icon" [class.rsvp__done-icon--no]="!s.attending" aria-hidden="true">
+      <svg viewBox="0 0 52 52" width="72" height="72">
+        <circle class="rsvp__done-circle" cx="26" cy="26" r="24" fill="none" />
+        @if (s.attending) {
+          <path class="rsvp__done-check" fill="none" d="M15 27l7 7 15-16" />
+        } @else {
+          <path class="rsvp__done-check" fill="none" d="M16 21l10 7 10-7M16 19h20v15H16z" />
+        }
+      </svg>
+      @if (s.attending) {
+        @for (c of confetti; track c) {
+          <span class="confetti" [style.--c]="c"></span>
+        }
+      }
+    </div>
     <h3 class="rsvp__done-title">{{ 'invitation.rsvp.thanks' | transloco: { name: s.name } }}</h3>
     <p class="rsvp__done-text">
       {{ (s.attending ? 'invitation.rsvp.doneYes' : 'invitation.rsvp.doneNo') | transloco }}
@@ -19,6 +33,11 @@
   </div>
 } @else {
   <form class="rsvp" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="rsvp__head" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" />
+      </svg>
+    </div>
     @if (r.deadline) {
       <p class="rsvp__deadline">
         {{ 'invitation.rsvp.deadline' | transloco: { date: (r.deadline | eventDate: 'full' : timezone() : lang()) } }}
@@ -91,7 +110,10 @@
           [attr.aria-pressed]="attending() === true"
           (click)="setAttending(true)"
         >
-          {{ 'invitation.rsvp.yes' | transloco }}
+          <span class="choice__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+          </span>
+          <span>{{ 'invitation.rsvp.yes' | transloco }}</span>
         </button>
         <button
           type="button"
@@ -100,7 +122,10 @@
           [attr.aria-pressed]="attending() === false"
           (click)="setAttending(false)"
         >
-          {{ 'invitation.rsvp.no' | transloco }}
+          <span class="choice__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </span>
+          <span>{{ 'invitation.rsvp.no' | transloco }}</span>
         </button>
       </div>
       @if (showError('attending')) {
@@ -160,7 +185,13 @@
     }
 
     <button type="submit" class="tk-btn rsvp__submit" [disabled]="s.kind === 'submitting'">
+      @if (s.kind === 'submitting') {
+        <span class="spinner" aria-hidden="true"></span>
+      }
       {{ (s.kind === 'submitting' ? 'invitation.rsvp.submitting' : 'invitation.rsvp.submit') | transloco }}
+      @if (s.kind !== 'submitting') {
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>
+      }
     </button>
   </form>
 }

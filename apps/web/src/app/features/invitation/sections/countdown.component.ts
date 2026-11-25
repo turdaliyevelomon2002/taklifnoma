@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { TickDirective } from './tick.directive';
 import { LangService } from '../../../core/i18n/lang.service';
 
 const DAY = 86_400_000;
@@ -21,66 +22,109 @@ interface Unit {
 /** To'ygacha qolgan vaqt. Server vaqti bilan render qilinadi, brauzerda har soniyada yangilanadi. */
 @Component({
   selector: 'tk-countdown',
-  imports: [TranslocoPipe],
+  imports: [TranslocoPipe, TickDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @switch (state()) {
       @case ('upcoming') {
         <div class="countdown" role="timer" aria-live="off">
-          @for (unit of units(); track unit.key) {
-            <div class="countdown__cell">
-              <span class="countdown__value">{{ unit.value }}</span>
-              <span class="countdown__label">{{
+          @for (unit of units(); track unit.key; let last = $last) {
+            <div class="cell">
+              <span class="cell__value">
+                <span class="cell__digit" [tkTick]="unit.value">{{ pad(unit.value) }}</span>
+              </span>
+              <span class="cell__label">{{
                 i18n.pluralKey('invitation.countdown.' + unit.key, unit.value) | transloco
               }}</span>
             </div>
+            @if (!last) {
+              <span class="sep" aria-hidden="true">:</span>
+            }
           }
         </div>
       }
       @case ('today') {
-        <p class="countdown__message">{{ 'invitation.countdown.today' | transloco }}</p>
+        <p class="message"><span aria-hidden="true">✦</span> {{ 'invitation.countdown.today' | transloco }} <span aria-hidden="true">✦</span></p>
       }
       @case ('passed') {
-        <p class="countdown__message">{{ 'invitation.countdown.passed' | transloco }}</p>
+        <p class="message">{{ 'invitation.countdown.passed' | transloco }}</p>
       }
     }
   `,
   styles: `
     :host { display: block; }
     .countdown {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.5rem;
-      max-width: 22rem;
-      margin-inline: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: clamp(0.25rem, 1.5vw, 0.6rem);
     }
-    .countdown__cell {
+    .cell {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0.75rem 0.25rem;
-      border: 1px solid var(--tk-border);
-      border-radius: var(--tk-radius);
-      background: var(--tk-surface);
+      gap: 0.5rem;
+      flex: 0 1 4.6rem;
+      min-width: 0;
     }
-    .countdown__value {
+    .cell__value {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1 / 1.08;
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--tk-accent) 45%, transparent);
+      border-radius: calc(var(--tk-radius) * 1.1);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--tk-surface) 96%, #fff) 0 50%, var(--tk-surface) 50% 100%);
+      box-shadow:
+        0 1px 0 color-mix(in srgb, #fff 60%, transparent) inset,
+        0 10px 24px -12px color-mix(in srgb, var(--tk-primary) 45%, transparent);
+    }
+    /* "Flip" kartaning o'rta chizig'i */
+    .cell__value::after {
+      content: '';
+      position: absolute;
+      inset: 50% 0 auto;
+      height: 1px;
+      background: color-mix(in srgb, var(--tk-accent) 25%, transparent);
+    }
+    .cell__digit {
+      grid-area: 1 / 1;
       font-family: var(--tk-font-heading);
-      font-size: clamp(1.6rem, 7vw, 2.2rem);
+      font-size: clamp(1.55rem, 7.5vw, 2.3rem);
+      font-weight: 600;
       line-height: 1;
       color: var(--tk-primary);
       font-variant-numeric: tabular-nums;
     }
-    .countdown__label {
-      margin-top: 0.35rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.04em;
+    .cell__label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
       color: var(--tk-muted);
     }
-    .countdown__message {
+    .sep {
+      align-self: center;
+      margin-top: -1.6rem;
       font-family: var(--tk-font-heading);
-      font-size: 1.35rem;
+      font-size: 1.5rem;
+      color: var(--tk-accent);
+      opacity: 0.7;
+      animation: blink 1s steps(2, jump-none) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.2; } }
+    .message {
+      margin: 0;
+      font-family: var(--tk-font-heading);
+      font-size: 1.4rem;
       color: var(--tk-primary);
       text-align: center;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sep { animation: none; }
     }
   `,
 })
@@ -108,6 +152,10 @@ export class CountdownComponent {
       { key: 'seconds', value: total % 60 },
     ];
   });
+
+  protected pad(v: number): string {
+    return v < 10 ? `0${v}` : String(v);
+  }
 
   constructor() {
     const destroyRef = inject(DestroyRef);

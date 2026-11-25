@@ -9,7 +9,8 @@ import { validateEnv } from './env';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      envFilePath: ['.env'],
+      // .env.local (git'ga tushmaydi) shaxsiy qiymatlar uchun: masalan, Telegram bot tokeni. Unda .env dan ustun.
+      envFilePath: ['.env.local', '.env'],
       validate: validateEnv,
     }),
   ],

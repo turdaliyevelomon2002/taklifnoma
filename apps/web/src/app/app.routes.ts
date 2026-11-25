@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
+import { homeResolver } from './features/home/home.resolver';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     loadComponent: () => import('./features/home/home.page').then((m) => m.HomePage),
+    resolve: { lang: homeResolver },
   },
   // Owner paneli. "panel" slug sifatida band qilingan (RESERVED_SLUGS), :slug'dan oldin turishi shart.
   {

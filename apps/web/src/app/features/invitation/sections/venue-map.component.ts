@@ -42,8 +42,13 @@ import { yandexWidgetUrl } from '../utils/maps';
       aspect-ratio: 4 / 3;
       overflow: hidden;
       border: 1px solid var(--tk-border);
-      border-radius: var(--tk-radius);
-      background: var(--tk-surface);
+      border-radius: calc(var(--tk-radius) * 1.3);
+      background:
+        radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--tk-accent) 18%, transparent), transparent 55%),
+        repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--tk-border) 70%, transparent) 23px 24px),
+        repeating-linear-gradient(90deg, transparent 0 23px, color-mix(in srgb, var(--tk-border) 70%, transparent) 23px 24px),
+        var(--tk-surface);
+      box-shadow: 0 18px 40px -26px color-mix(in srgb, var(--tk-primary) 70%, transparent);
     }
     .map__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .map__placeholder {
@@ -52,8 +57,10 @@ import { yandexWidgetUrl } from '../utils/maps';
       display: grid;
       place-items: center;
       color: var(--tk-primary);
-      opacity: 0.6;
     }
+    .map__placeholder svg { animation: bob 1.8s ease-in-out infinite; filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.2)); }
+    @keyframes bob { 50% { transform: translateY(-6px); } }
+    @media (prefers-reduced-motion: reduce) { .map__placeholder svg { animation: none; } }
   `,
 })
 export class VenueMapComponent {

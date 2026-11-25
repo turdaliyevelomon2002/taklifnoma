@@ -3,7 +3,7 @@ import type { Locale } from '@taklifnoma/shared/enums';
 import { LangService } from '../../core/i18n/lang.service';
 import { zonedParts } from './datetime';
 
-export type EventDateFormat = 'full' | 'short' | 'time' | 'weekday';
+export type EventDateFormat = 'full' | 'short' | 'time' | 'weekday' | 'day' | 'month';
 
 /**
  * {{ event.startsAt | eventDate: 'full' : config.timezone : lang() }}
@@ -18,6 +18,10 @@ export class EventDatePipe implements PipeTransform {
     switch (format) {
       case 'time':
         return `${p.hour}:${p.minute}`;
+      case 'day':
+        return String(p.day);
+      case 'month':
+        return this.i18n.translate(`date.month.${p.month}`);
       case 'weekday':
         return this.i18n.translate(`date.weekday.${p.weekday}`);
       case 'short':

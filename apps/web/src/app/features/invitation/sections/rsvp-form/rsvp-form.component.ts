@@ -61,6 +61,9 @@ type State =
   styleUrl: './rsvp-form.component.scss',
 })
 export class RsvpFormComponent {
+  /** Muvaffaqiyat animatsiyasidagi konfetti bo'laklari (har biri o'z yo'nalishida). */
+  protected readonly confetti = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
   readonly slug = input.required<string>();
   readonly rules = input.required<RsvpConfig>();
   readonly open = input.required<boolean>();

@@ -185,7 +185,10 @@
     </footer>
   </main>
 
-  @if (opened() && musicUrl(); as src) {
-    <tk-music-toggle [src]="src" />
+  @if (opened()) {
+    <tk-scroll-extras [rsvp]="features().rsvp" />
+    @if (musicUrl(); as src) {
+      <tk-music-toggle [src]="src" />
+    }
   }
 </div>

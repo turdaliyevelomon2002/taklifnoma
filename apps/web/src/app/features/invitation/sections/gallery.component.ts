@@ -25,7 +25,7 @@ import type { MediaView } from '@taklifnoma/shared';
   template: `
     <ul class="grid">
       @for (item of items(); track item.id; let i = $index) {
-        <li class="grid__item" [class.grid__item--wide]="i % 5 === 0">
+        <li class="grid__item" [class.grid__item--wide]="i % 5 === 0" [class.grid__item--tall]="i % 5 === 3">
           <button
             type="button"
             class="grid__button"
@@ -42,6 +42,9 @@ import type { MediaView } from '@taklifnoma/shared';
               decoding="async"
               alt=""
             />
+            <span class="grid__zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg>
+            </span>
           </button>
         </li>
       }
@@ -77,18 +80,23 @@ import type { MediaView } from '@taklifnoma/shared';
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.5rem;
+      grid-auto-flow: dense;
+      gap: 0.6rem;
       margin: 0;
       padding: 0;
       list-style: none;
     }
     .grid__item--wide { grid-column: span 2; }
+    .grid__item--tall { grid-row: span 2; }
     .grid__button {
+      position: relative;
       display: block;
       width: 100%;
+      height: 100%;
       padding: 0;
       border: 0;
-      border-radius: var(--tk-radius);
+      border-radius: calc(var(--tk-radius) * 1.15);
+      box-shadow: 0 12px 26px -18px rgb(0 0 0 / 0.5);
       overflow: hidden;
       background: var(--tk-surface);
       cursor: zoom-in;
@@ -99,10 +107,39 @@ import type { MediaView } from '@taklifnoma/shared';
       height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.4s ease;
     }
     .grid__item--wide img { aspect-ratio: 16 / 10; }
-    .grid__button:hover img { transform: scale(1.03); }
+    /* Baland katak: rasm qatorlar balandligini belgilamaydi, faqat to'ldiradi */
+    .grid__item--tall img { position: absolute; inset: 0; aspect-ratio: auto; }
+    .grid__button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgb(0 0 0 / 0.35));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .grid__zoom {
+      position: absolute;
+      right: 0.6rem;
+      bottom: 0.6rem;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 50%;
+      background: rgb(255 255 255 / 0.85);
+      color: #222;
+      opacity: 0;
+      transform: translateY(0.4rem);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+    .grid__button:hover img { transform: scale(1.06); }
+    .grid__button:hover::after, .grid__button:focus-visible::after { opacity: 1; }
+    .grid__button:hover .grid__zoom, .grid__button:focus-visible .grid__zoom { opacity: 1; transform: none; }
 
     .lightbox {
       width: 100vw;
@@ -121,8 +158,17 @@ import type { MediaView } from '@taklifnoma/shared';
       place-items: center;
       animation: fade 0.2s ease;
     }
-    .lightbox::backdrop { background: rgb(0 0 0 / 0.92); }
-    .lightbox__img { max-width: 100vw; max-height: 85vh; object-fit: contain; user-select: none; }
+    .lightbox::backdrop { background: rgb(10 8 6 / 0.9); backdrop-filter: blur(14px); }
+    .lightbox__img {
+      max-width: min(100vw, 64rem);
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+      user-select: none;
+      animation: zoom-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    @keyframes zoom-in { from { opacity: 0; transform: scale(0.94); } }
     .lightbox__counter {
       position: absolute;
       bottom: 1.25rem;
@@ -142,10 +188,13 @@ import type { MediaView } from '@taklifnoma/shared';
       border-radius: 50%;
       background: rgb(255 255 255 / 0.12);
       color: #fff;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s ease;
       font-size: 1.6rem;
       line-height: 1;
       cursor: pointer;
     }
+    .lightbox__btn:hover { background: rgb(255 255 255 / 0.24); }
     .lightbox__close { top: 1rem; right: 1rem; font-size: 1.1rem; }
     .lightbox__prev { left: 0.75rem; top: 50%; transform: translateY(-50%); }
     .lightbox__next { right: 0.75rem; top: 50%; transform: translateY(-50%); }

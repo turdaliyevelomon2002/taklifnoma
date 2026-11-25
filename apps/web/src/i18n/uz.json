@@ -5,7 +5,220 @@
   },
   "home": {
     "title": "Onlayn to'y taklifnomalari",
-    "subtitle": "Chiroyli, tez ochiladigan va Telegram'da ulashish uchun qulay taklifnoma — 10 daqiqada."
+    "subtitle": "Chiroyli, tez ochiladigan va Telegram'da ulashish uchun qulay taklifnoma — 10 daqiqada.",
+    "seo": {
+      "title": "Taklifnoma — onlayn to'y taklifnomalari",
+      "description": "Zamonaviy onlayn to'y taklifnomasi: hisoblagich, xarita, mehmonlar javobi, galereya, musiqa va Telegram xabarlari. Bitta havola — barcha mehmonlarga."
+    },
+    "nav": {
+      "label": "Asosiy menyu",
+      "features": "Imkoniyatlar",
+      "templates": "Shablonlar",
+      "pricing": "Paketlar",
+      "faq": "Savollar",
+      "demo": "Demoni ko'rish"
+    },
+    "hero": {
+      "badge": "Yangi avlod to'y taklifnomalari",
+      "titleA": "To'yingizga",
+      "titleHighlight": "munosib",
+      "titleB": "onlayn taklifnoma",
+      "subtitle": "Qog'oz taklifnoma o'rniga — bitta chiroyli havola. Mehmonlar telefonda ochadi, manzilni xaritada ko'radi va kelish-kelmasligini bir zumda bildiradi.",
+      "ctaOrder": "Buyurtma berish",
+      "ctaDemo": "Jonli demoni ko'rish",
+      "stats": {
+        "1": {
+          "value": "3",
+          "label": "zamonaviy shablon"
+        },
+        "2": {
+          "value": "uz · ru",
+          "label": "ikki tilda"
+        },
+        "3": {
+          "value": "24/7",
+          "label": "javoblar Telegramda"
+        }
+      }
+    },
+    "mock": {
+      "invite": "To'yimizga taklif qilamiz",
+      "names": "Ali & Madina",
+      "date": "14-iyun, 2027",
+      "rsvp": "Javob berish",
+      "cd": {
+        "d": "kun",
+        "h": "soat",
+        "m": "daq",
+        "s": "son",
+        "dv": "201",
+        "hv": "08",
+        "mv": "42",
+        "sv": "17"
+      },
+      "notifTitle": "Yangi javob",
+      "notifText": "Dilnoza R. · 2 kishi keladi",
+      "statValue": "26 mehmon",
+      "statLabel": "kelishini tasdiqladi"
+    },
+    "marquee": {
+      "1": "Klassik oltin",
+      "2": "Minimal oq",
+      "3": "Milliy naqsh",
+      "4": "To'ygacha hisoblagich",
+      "5": "Yandex xarita",
+      "6": "Telegram xabarlari",
+      "7": "Tilaklar devori"
+    },
+    "steps": {
+      "eyebrow": "Oddiy jarayon",
+      "title": "Uch qadamda tayyor",
+      "items": {
+        "1": {
+          "title": "Ma'lumot yuborasiz",
+          "text": "Ismlar, sana, to'yxona manzili va bir nechta suratlaringiz — boshqa hech narsa kerak emas."
+        },
+        "2": {
+          "title": "Biz bezab beramiz",
+          "text": "Shablon tanlanadi, matnlar va ranglar sozlanadi. Nashrdan oldin ko'rib chiqasiz."
+        },
+        "3": {
+          "title": "Havolani ulashasiz",
+          "text": "Telegram yoki istalgan messenjerda yuborasiz, mehmonlar javobi esa sizga darhol keladi."
+        }
+      }
+    },
+    "features": {
+      "eyebrow": "Imkoniyatlar",
+      "title": "Taklifnomadan ham ko'proq",
+      "subtitle": "Mehmonlarga qulay, sizga esa to'yni tashkil qilishda haqiqiy yordamchi.",
+      "items": {
+        "rsvp": {
+          "title": "Mehmonlar javobi (RSVP)",
+          "text": "Mehmon bir necha soniyada kelish-kelmasligini, necha kishi bo'lishini va tilagini yozadi. Ro'yxatdan o'tish shart emas."
+        },
+        "telegram": {
+          "title": "Telegram xabarlari",
+          "text": "Har bir yangi javob darhol sizga va juftlikka Telegramda keladi."
+        },
+        "map": {
+          "title": "Xarita va yo'nalish",
+          "text": "Bir bosishda Yandex xaritada marshrut — mehmonlar to'yxonani adashmay topadi."
+        },
+        "countdown": {
+          "title": "To'ygacha hisoblagich",
+          "text": "Kun, soat, daqiqa va soniyalar jonli ravishda kamayib boradi."
+        },
+        "gallery": {
+          "title": "Galereya va musiqa",
+          "text": "30 tagacha surat va fon musiqasi. Rasmlar avtomatik siqiladi — sahifa tez ochiladi."
+        },
+        "excel": {
+          "title": "Mehmonlar ro'yxati va Excel",
+          "text": "Juftlik shaxsiy panelda kim kelishini ko'radi, qidiradi va ro'yxatni Excel'ga yuklab oladi — stol rejasi uchun ayni muddao."
+        },
+        "lang": {
+          "title": "Ikki tilda",
+          "text": "Taklifnoma o'zbek va rus tilida. Mehmon tilni bir bosishda tanlaydi, havola ulashilganda til saqlanadi."
+        }
+      }
+    },
+    "templates": {
+      "eyebrow": "Shablonlar",
+      "title": "Har bir juftlikka o'z uslubi",
+      "subtitle": "Har bir dizayn telefon uchun yaratilgan. Ranglarni o'zingizga moslashtirish mumkin.",
+      "cta": "Jonli demoni ochish",
+      "items": {
+        "classic": {
+          "name": "Klassik oltin",
+          "text": "Fil suyagi foni, oltin ramkalar va kalligrafik ismlar. Muhrli konvert bilan ochiladi."
+        },
+        "minimal": {
+          "name": "Minimal oq",
+          "text": "Toza oq fon, to'liq ekranli surat va zamonaviy tipografiya."
+        },
+        "national": {
+          "name": "Milliy naqsh",
+          "text": "To'q ko'k fon, o'zbekona girih naqshi va mehrob shaklidagi ravoq."
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "Paketlar",
+      "title": "O'zingizga mosini tanlang",
+      "subtitle": "Barcha paketlarda mobil dizayn, xavfsiz javob formasi va shaxsiy havola bor.",
+      "popular": "Ommabop",
+      "cta": "Narxini bilish",
+      "included": "mavjud",
+      "notIncluded": "mavjud emas",
+      "note": "Narx paket va qo'shimcha istaklarga qarab kelishiladi. Kerakli imkoniyatni alohida qo'shib berishimiz ham mumkin.",
+      "packages": {
+        "basic": {
+          "name": "Oddiy",
+          "tagline": "Eng kerakli narsalar"
+        },
+        "standard": {
+          "name": "Standart",
+          "tagline": "Ko'pchilik tanlaydigan to'liq to'plam"
+        },
+        "premium": {
+          "name": "Premium",
+          "tagline": "Katta galereya va hamma imkoniyatlar"
+        }
+      },
+      "rows": {
+        "countdown": "To'ygacha hisoblagich",
+        "map": "Xarita va yo'nalish",
+        "rsvp": "Mehmonlar javobi",
+        "music": "Fon musiqasi",
+        "gallery12": "12 ta suratli galereya",
+        "gallery30": "30 ta suratli galereya",
+        "wishes": "Tilaklar devori",
+        "russian": "Rus tili",
+        "telegram": "Telegram xabarlari",
+        "excel": "Excel ro'yxat"
+      }
+    },
+    "faq": {
+      "eyebrow": "Savollar",
+      "title": "Ko'p beriladigan savollar",
+      "items": {
+        "1": {
+          "q": "Taklifnoma qancha vaqtda tayyor bo'ladi?",
+          "a": "Ma'lumotlar va suratlar tayyor bo'lsa, odatda bir kun ichida. Shoshilinch buyurtmalarni bir necha soatda ham bajaramiz."
+        },
+        "2": {
+          "q": "Mehmonlar biror narsa o'rnatishi kerakmi?",
+          "a": "Yo'q. Taklifnoma oddiy havola: istalgan telefon yoki kompyuter brauzerida ochiladi, ro'yxatdan o'tish talab qilinmaydi."
+        },
+        "3": {
+          "q": "Ma'lumotlarni keyin o'zgartirsa bo'ladimi?",
+          "a": "Ha. Vaqt, manzil yoki matn o'zgarsa, havola o'zgarmagan holda yangilaymiz — mehmonlar doim so'nggi ma'lumotni ko'radi."
+        },
+        "4": {
+          "q": "Mehmonlar javobini qayerda ko'raman?",
+          "a": "Juftlik uchun maxsus havola va PIN kod beriladi. U yerda statistika, mehmonlar ro'yxati va Excel yuklab olish bor. Yangi javoblar Telegramga ham keladi."
+        },
+        "5": {
+          "q": "Taklifnoma qancha muddat ochiq turadi?",
+          "a": "To'ydan keyin ham ochiq qoladi: mehmonlar tilaklari va suratlaringiz esdalik sifatida saqlanadi."
+        },
+        "6": {
+          "q": "Rus tilida ham bo'ladimi?",
+          "a": "Ha, Standart va Premium paketlarda taklifnoma o'zbek va rus tilida bo'ladi — mehmon o'zi tanlaydi."
+        }
+      }
+    },
+    "cta": {
+      "script": "Baxtli kuningiz",
+      "title": "Taklifnomangizni bugunoq buyurtma qiling",
+      "text": "Savollaringiz bormi yoki shablon tanlay olmayapsizmi? Yozing — maslahat beramiz va namunasini ko'rsatamiz.",
+      "telegram": "Telegramda yozish"
+    },
+    "footer": {
+      "tagline": "Onlayn to'y taklifnomalari",
+      "copy": "© {{year}} Taklifnoma. Barcha huquqlar himoyalangan."
+    }
   },
   "notFound": {
     "title": "Sahifa topilmadi",
@@ -55,7 +268,8 @@
     },
     "hero": {
       "invite": "Sizni nikoh to'yimizga taklif qilamiz",
-      "and": "&"
+      "and": "&",
+      "scroll": "Pastga aylantirish"
     },
     "sections": {
       "greeting": "Aziz mehmonlar",
@@ -93,7 +307,9 @@
       "openMap": "Yandex xaritada ochish",
       "call": "Qo'ng'iroq qilish",
       "mapTitle": "{{venue}} — xarita",
-      "loadMap": "Xaritani ko'rsatish"
+      "loadMap": "Xaritani ko'rsatish",
+      "primary": "Asosiy tadbir",
+      "addToCalendar": "Kalendarga qo'shish"
     },
     "gallery": {
       "open": "{{n}}-rasmni kattalashtirish",
@@ -149,7 +365,11 @@
     },
     "wishes": {
       "title": "Tilaklar",
-      "empty": "Birinchi bo'lib tilak qoldiring!"
+      "empty": "Birinchi bo'lib tilak qoldiring!",
+      "count": "{{n}} ta tilak"
+    },
+    "cta": {
+      "rsvp": "Javob berish"
     }
   },
   "errors": {

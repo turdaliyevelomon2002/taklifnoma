@@ -1,43 +1,79 @@
 :host {
-  --tk-bg: #f8f3ea;
+  --tk-bg: #f6efe2;
   --tk-surface: #fffdf8;
-  --tk-text: #3d3226;
-  --tk-muted: #7d6d58;
-  --tk-primary: #8c6a1f;
+  --tk-text: #3b3024;
+  --tk-muted: #84735c;
+  --tk-primary: #8a6619;
   --tk-primary-contrast: #fffdf8;
   --tk-accent: #c9a24b;
-  --tk-border: #e6d8bd;
-  --tk-radius: 14px;
-  --tk-shadow: 0 8px 24px rgb(80 60 20 / 0.12);
+  --tk-border: #eadcc0;
+  --tk-radius: 16px;
+  --tk-shadow: 0 30px 80px -40px rgb(80 60 20 / 0.45);
   --tk-font-heading: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --tk-font-body: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --tk-font-script: 'Great Vibes', 'Segoe Script', cursive;
+  --gold-gradient: linear-gradient(115deg, #7a5612 0%, #c9a24b 28%, #f3dc9a 45%, #b8892f 62%, #7a5612 100%);
 
   display: block;
   min-height: 100svh;
   background:
-    radial-gradient(circle at 0 0, rgb(201 162 75 / 0.12), transparent 40%),
-    radial-gradient(circle at 100% 100%, rgb(201 162 75 / 0.12), transparent 40%),
+    radial-gradient(60rem 40rem at 10% -10%, rgb(201 162 75 / 0.22), transparent 60%),
+    radial-gradient(50rem 40rem at 110% 110%, rgb(201 162 75 / 0.2), transparent 60%),
     var(--tk-bg);
   color: var(--tk-text);
   font-family: var(--tk-font-body);
-  font-size: 1.125rem;
+  font-size: 1.15rem;
   line-height: 1.6;
 }
 
 .page {
+  position: relative;
   padding: 0.75rem;
+  overflow-x: clip;
 }
 
+// --- Fonda suzuvchi oltin uchqunlar ---
+.sparkles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sparkle {
+  position: absolute;
+  left: var(--x);
+  bottom: -2rem;
+  width: var(--size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6d8 0 30%, #e3c174 60%, transparent 72%);
+  opacity: 0;
+  animation: float var(--d) linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes float {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(2.5rem, -105vh) scale(1.1); }
+}
+
+// --- Asosiy karta ---
 .card {
   position: relative;
-  max-width: 34rem;
+  z-index: 1;
+  max-width: 35rem;
   margin: 0 auto;
-  padding: 3.5rem 1.25rem 2.5rem;
+  padding: 3.75rem 1.25rem 2.75rem;
   text-align: center;
-  background: var(--tk-surface);
-  border-radius: calc(var(--tk-radius) * 1.5);
-  box-shadow: var(--tk-shadow);
+  background:
+    radial-gradient(30rem 18rem at 50% 0, rgb(201 162 75 / 0.1), transparent 70%),
+    var(--tk-surface);
+  border-radius: calc(var(--tk-radius) * 1.6);
+  box-shadow: var(--tk-shadow), 0 2px 0 rgb(255 255 255 / 0.8) inset;
 
   // Ikki qatorli oltin ramka
   &::before,
@@ -48,14 +84,16 @@
     border: 1px solid var(--tk-accent);
     border-radius: inherit;
   }
-  &::before { inset: 0.5rem; opacity: 0.7; }
-  &::after { inset: 0.8rem; opacity: 0.35; }
+
+  &::before { inset: 0.5rem; opacity: 0.75; }
+  &::after { inset: 0.85rem; opacity: 0.35; }
 }
 
 .eyebrow {
-  margin: 0 0 0.75rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.22em;
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--tk-muted);
 }
@@ -67,16 +105,33 @@
   line-height: 1.1;
 }
 
+// Oltin metall effektli matn (sekin yaltiraydi)
+.gold-text {
+  background: var(--gold-gradient);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+  // Kalligrafik harflarning dumi kesilmasin
+  padding-inline: 0.12em;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 .amp {
   display: inline-block;
   margin-inline: 0.15em;
   font-family: var(--tk-font-heading);
   font-style: italic;
-  font-size: 0.6em;
+  font-size: 0.55em;
   color: var(--tk-accent);
 }
 
-// --- Intro ---
+// =========================== Kirish: konvert ===========================
 .intro {
   position: fixed;
   inset: 0;
@@ -84,70 +139,244 @@
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  background: var(--tk-bg);
+  background:
+    radial-gradient(40rem 30rem at 50% 30%, rgb(255 250 235 / 0.95), transparent 70%),
+    var(--tk-bg);
   overflow: hidden;
   text-align: center;
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition: opacity 0.7s ease, transform 0.7s ease, filter 0.7s ease;
 
   &.intro--leave {
     opacity: 0;
-    transform: scale(1.04);
+    transform: scale(1.08);
+    filter: blur(6px);
   }
 }
 
 .intro__bg {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -2rem;
+  width: calc(100% + 4rem);
+  height: calc(100% + 4rem);
   object-fit: cover;
-  opacity: 0.22;
-  filter: sepia(0.4) blur(1px);
+  opacity: 0.18;
+  filter: sepia(0.5) blur(10px);
+}
+
+.intro__glow {
+  position: absolute;
+  width: 34rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(232 200 120 / 0.35), transparent 65%);
+  animation: breathe 5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% { transform: scale(1.12); opacity: 0.7; }
 }
 
 .intro__content {
   position: relative;
-  padding: 2.5rem 1.5rem;
-  max-width: 24rem;
-  border: 1px solid var(--tk-accent);
-  border-radius: 999px 999px var(--tk-radius) var(--tk-radius);
-  background: color-mix(in srgb, var(--tk-surface) 88%, transparent);
+  display: grid;
+  justify-items: center;
+  width: min(100%, 24rem);
+}
+
+.intro__eyebrow,
+.intro__names,
+.intro__date {
+  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .intro__names {
-  margin: 0.5rem 0;
-  font-size: clamp(2.6rem, 13vw, 3.6rem);
+  margin: 0.25rem 0 0.4rem;
+  font-size: clamp(2.8rem, 13vw, 3.8rem);
+  animation-delay: 0.12s;
 }
 
 .intro__date {
   margin: 0 0 1.75rem;
-  letter-spacing: 0.3em;
+  font-weight: 600;
+  letter-spacing: 0.35em;
   color: var(--tk-text);
+  animation-delay: 0.24s;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(1rem); }
+}
+
+// Konvert: orqa devor, xat, old cho'ntak, qopqoq va muhr qatlamlari
+.envelope {
+  --paper: #fbf3e2;
+  --paper-dark: #efe0c2;
+  position: relative;
+  width: min(80vw, 18.5rem);
+  aspect-ratio: 1.45;
+  margin-bottom: 1.9rem;
+  perspective: 900px;
+  animation: rise 0.9s 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) both, sway 5s 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 22px 26px rgb(90 65 20 / 0.28));
+}
+
+@keyframes sway {
+  50% { transform: translateY(-6px) rotate(-0.6deg); }
+}
+
+.envelope > div {
+  position: absolute;
+  inset: 0;
+}
+
+.envelope__back {
+  border-radius: 8px;
+  background: linear-gradient(160deg, var(--paper-dark), #e6d2ab);
+}
+
+.envelope__letter {
+  inset: 6% 7% 8% !important;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.55rem;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 13px, rgb(201 162 75 / 0.08) 13px 14px),
+    #fffdf7;
+  box-shadow: 0 0 0 1px rgb(201 162 75 / 0.35) inset;
+  transition: transform 0.8s 0.55s cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+
+.envelope__letter-names {
+  font-size: 1.7rem;
+}
+
+.envelope__letter-line {
+  width: 55%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tk-accent), transparent);
+}
+
+.envelope__letter-line--short {
+  width: 30%;
+}
+
+.envelope__front {
+  border-radius: 0 0 8px 8px;
+  // Yon va pastki buklamalar: diagonal soyalar
+  background:
+    linear-gradient(to top right, transparent 49.5%, rgb(150 115 50 / 0.12) 50%, transparent 51.5%) left bottom / 50% 100% no-repeat,
+    linear-gradient(to top left, transparent 49.5%, rgb(150 115 50 / 0.12) 50%, transparent 51.5%) right bottom / 50% 100% no-repeat,
+    linear-gradient(to top, #f3e5c8, var(--paper));
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+}
+
+.envelope__flap {
+  z-index: 3;
+  height: 60%;
+  bottom: auto !important;
+  background: linear-gradient(180deg, #f8ecd3, var(--paper-dark));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform 0.6s 0.2s cubic-bezier(0.45, 0, 0.3, 1), z-index 0s 0.5s;
+}
+
+.seal {
+  z-index: 4;
+  inset: auto !important;
+  top: 60% !important;
+  left: 50% !important;
+  display: grid;
+  place-items: center;
+  width: 4.1rem;
+  height: 4.1rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e2bd63, #a87c25 55%, #6e5013);
+  box-shadow:
+    0 0 0 3px rgb(168 124 37 / 0.55),
+    0 0 0 5px rgb(110 80 19 / 0.25),
+    0 6px 12px rgb(60 40 5 / 0.45),
+    inset 0 2px 4px rgb(255 240 200 / 0.6),
+    inset 0 -3px 6px rgb(60 40 5 / 0.45);
+  transform: translate(-50%, -50%);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.seal__text {
+  display: grid;
+  place-items: center;
+  width: 78%;
+  height: 78%;
+  border: 1px solid rgb(255 236 180 / 0.6);
+  border-radius: 50%;
+  color: #fff5d6;
+  font-family: var(--tk-font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 1px rgb(60 40 5 / 0.6);
 }
 
 .intro__open {
-  animation: pulse 2.4s ease-in-out infinite;
+  position: relative;
+  padding-inline: 1.8rem;
+  animation: rise 0.9s 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) both, pulse 2.4s 1.5s ease-in-out infinite;
+  box-shadow: 0 14px 28px -12px rgb(138 102 25 / 0.8);
 }
 
 @keyframes pulse {
-  50% { box-shadow: 0 0 0 0.6rem rgb(201 162 75 / 0.15); }
+  50% { box-shadow: 0 0 0 0.65rem rgb(201 162 75 / 0.18), 0 14px 28px -12px rgb(138 102 25 / 0.8); }
 }
 
-// --- Hero ---
+// Ochilish ketma-ketligi
+.intro--opening {
+  .envelope { animation: none; }
+
+  .seal {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5) rotate(-20deg);
+  }
+
+  .envelope__flap {
+    z-index: 0;
+    transform: rotateX(180deg);
+  }
+
+  .envelope__letter {
+    z-index: 2;
+    transform: translateY(-58%);
+  }
+
+  .intro__open {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
+
+// =========================== Hero ===========================
+.hero {
+  position: relative;
+}
+
 .hero__names {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 0 1.5rem;
-  font-size: clamp(3rem, 15vw, 4.25rem);
+  margin: 0 0 1.75rem;
+  font-size: clamp(3.2rem, 16vw, 4.6rem);
+  line-height: 1.05;
 }
 
 .hero__arch {
+  position: relative;
   width: min(80%, 22rem);
-  margin: 0 auto 1.5rem;
-  padding: 0.4rem;
+  margin: 0 auto 2rem;
+  padding: 0.45rem;
   border: 1px solid var(--tk-accent);
   border-radius: 999px 999px var(--tk-radius) var(--tk-radius);
+  box-shadow: 0 30px 50px -30px rgb(80 60 20 / 0.6);
 
   img {
     display: block;
@@ -159,101 +388,249 @@
   }
 }
 
+// Arka atrofidagi ikkinchi, sekin "nafas oluvchi" chiziq
+.hero__arch-ring {
+  position: absolute;
+  inset: -0.7rem;
+  border: 1px dashed rgb(201 162 75 / 0.55);
+  border-radius: 999px 999px calc(var(--tk-radius) * 1.4) calc(var(--tk-radius) * 1.4);
+  pointer-events: none;
+  animation: ring 6s ease-in-out infinite;
+}
+
+@keyframes ring {
+  50% { inset: -1rem; opacity: 0.5; }
+}
+
 .hero__date {
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 3vw, 1.1rem);
   margin: 0;
 }
 
-.hero__weekday {
-  font-size: 0.9rem;
-  letter-spacing: 0.2em;
+.hero__date-part {
+  flex: 1;
+  max-width: 7.5rem;
+  padding-block: 0.45rem;
+  border-block: 1px solid var(--tk-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--tk-muted);
 }
 
-.hero__full {
-  font-family: var(--tk-font-heading);
-  font-size: 1.6rem;
-  font-weight: 600;
+.hero__date-main {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
-.hero__time {
-  font-size: 1.25rem;
+.hero__date-day {
+  font-family: var(--tk-font-heading);
+  font-size: 3.4rem;
+  font-weight: 600;
+  line-height: 1;
   color: var(--tk-primary);
 }
 
-// --- Bo'limlar ---
+.hero__date-rest {
+  display: grid;
+  text-align: left;
+  font-family: var(--tk-font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-transform: capitalize;
+}
+
+.hero__scroll {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 2.6rem;
+  margin-top: 2rem;
+  border: 1.5px solid var(--tk-accent);
+  border-radius: 999px;
+
+  span {
+    width: 3px;
+    height: 0.55rem;
+    border-radius: 3px;
+    background: var(--tk-primary);
+    animation: wheel 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes wheel {
+  0% { opacity: 0; transform: translateY(-0.5rem); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(0.5rem); }
+}
+
+// =========================== Bo'limlar ===========================
 .section {
-  margin-block: 2.5rem;
+  margin-block: 2.75rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.section--panel {
+  margin-inline: -0.25rem;
+  padding: 2rem 0.75rem 2.25rem;
+  border-radius: calc(var(--tk-radius) * 1.3);
+  background:
+    radial-gradient(20rem 10rem at 50% 0, rgb(201 162 75 / 0.18), transparent 70%),
+    linear-gradient(180deg, #fbf4e6, #f6ecd8);
+  box-shadow: 0 0 0 1px rgb(201 162 75 / 0.25) inset;
 }
 
 .section__title {
-  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
   font-family: var(--tk-font-heading);
-  font-size: 1.85rem;
+  font-size: clamp(1.75rem, 7vw, 2.1rem);
   font-weight: 500;
   font-style: italic;
+  line-height: 1.15;
   color: var(--tk-primary);
+
+  // Sarlavha yonidagi romb bezaklar
+  &::before,
+  &::after {
+    content: '';
+    flex: none;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--tk-accent);
+    transform: rotate(45deg);
+    opacity: 0.7;
+  }
 }
 
 .greeting {
   margin: 0 auto;
   max-width: 28rem;
+  font-size: 1.2rem;
   white-space: pre-line;
+}
+
+.greeting::first-line {
+  font-weight: 600;
+  color: var(--tk-primary);
 }
 
 .parents {
   display: grid;
-  gap: 0.5rem;
-  margin-top: 1.25rem;
-  font-style: italic;
-  color: var(--tk-muted);
-
-  p { margin: 0; }
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.75rem;
 }
 
+.parent {
+  padding: 1rem 0.9rem 1.1rem;
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  background: linear-gradient(180deg, #fffaf0, var(--tk-surface));
+
+  p {
+    margin: 0.25rem 0 0;
+    font-style: italic;
+    color: var(--tk-muted);
+    line-height: 1.4;
+  }
+}
+
+.parent__name {
+  font-size: 2rem;
+}
+
+// Tadbirlar: bir nechta bo'lsa, orqada vertikal "vaqt chizig'i"
 .events {
+  position: relative;
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
+}
+
+.events--timeline::before {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 50%;
+  width: 0;
+  border-left: 1.5px dashed rgb(201 162 75 / 0.7);
+}
+
+.events > * {
+  position: relative;
 }
 
 .venue-name {
-  margin: -0.5rem 0 1rem;
+  margin: -0.5rem 0 0.15rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
+.venue-address {
+  margin: 0 auto 1.1rem;
+  max-width: 26rem;
+  font-size: 1rem;
+  color: var(--tk-muted);
+}
+
 .rsvp-placeholder {
-  min-height: 32rem;
+  min-height: 34rem;
 }
 
 .wishes-placeholder {
   min-height: 8rem;
 }
 
-// --- Footer ---
+// =========================== Footer ===========================
+.footer {
+  padding-top: 0.5rem;
+}
+
 .footer__text {
-  margin: 0;
-  font-size: 1.2rem;
+  margin: 0 auto;
+  max-width: 26rem;
+  font-size: 1.25rem;
 }
 
 .footer__names {
-  margin: 0.5rem 0;
-  font-size: 2.6rem;
+  margin: 0.75rem 0;
+  font-size: clamp(2.6rem, 12vw, 3.3rem);
 }
 
 .footer__hashtag {
-  margin: 0 0 1.5rem;
-  letter-spacing: 0.1em;
-  color: var(--tk-accent);
+  display: inline-block;
+  margin: 0 0 1.75rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: rgb(201 162 75 / 0.14);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--tk-primary);
 }
 
 .footer__brand {
-  font-size: 0.8rem;
+  display: block;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
   color: var(--tk-muted);
   text-decoration: none;
-  opacity: 0.8;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    color: var(--tk-primary);
+    opacity: 1;
+  }
 }
 
 // --- Scroll animatsiyasi (JS'siz, faqat qo'llab-quvvatlovchi brauzerlarda) ---
@@ -262,20 +639,30 @@
     .reveal {
       animation: reveal linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 20%;
+      animation-range: entry 0% cover 22%;
     }
   }
 }
 
 @keyframes reveal {
-  from { opacity: 0; transform: translateY(1.5rem); }
+  from { opacity: 0; transform: translateY(2rem) scale(0.98); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro, .intro__open { transition: none; animation: none; }
+  .intro,
+  .intro *,
+  .sparkle,
+  .gold-text,
+  .hero__arch-ring,
+  .hero__scroll span {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .sparkles { display: none; }
 }
 
 @media (min-width: 600px) {
-  .page { padding: 2.5rem 1rem; }
-  .card { padding-inline: 2.5rem; }
+  .page { padding: 3rem 1rem; }
+  .card { padding: 4.5rem 3rem 3.25rem; }
 }

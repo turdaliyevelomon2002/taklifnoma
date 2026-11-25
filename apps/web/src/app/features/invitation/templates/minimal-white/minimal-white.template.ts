@@ -7,6 +7,7 @@ import { EventCardComponent } from '../../sections/event-card.component';
 import { GalleryComponent } from '../../sections/gallery.component';
 import { LangSwitchComponent } from '../../sections/lang-switch.component';
 import { MusicToggleComponent } from '../../sections/music-toggle.component';
+import { ScrollExtrasComponent } from '../../sections/scroll-extras.component';
 import { RsvpFormComponent } from '../../sections/rsvp-form/rsvp-form.component';
 import { VenueMapComponent } from '../../sections/venue-map.component';
 import { WishesComponent } from '../../sections/wishes.component';
@@ -25,6 +26,7 @@ import { InvitationTemplateBase } from '../template-base';
     LangSwitchComponent,
     MusicToggleComponent,
     RsvpFormComponent,
+    ScrollExtrasComponent,
     VenueMapComponent,
     WishesComponent,
   ],

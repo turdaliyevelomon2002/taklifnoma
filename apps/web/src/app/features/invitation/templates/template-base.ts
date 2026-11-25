@@ -2,6 +2,7 @@ import { computed, Directive, DOCUMENT, effect, inject, input, signal } from '@a
 import type { PublicInvitation } from '@taklifnoma/shared';
 import { LangService } from '../../../core/i18n/lang.service';
 import { MusicPlayer } from '../music-player.service';
+import { zonedParts } from '../../../shared/date/datetime';
 import { coupleNames, primaryEvent } from '../utils/config';
 
 /**
@@ -22,6 +23,14 @@ export abstract class InvitationTemplateBase {
   protected readonly media = computed(() => this.invitation().media);
   protected readonly primaryEvent = computed(() => primaryEvent(this.config()));
   protected readonly names = computed(() => coupleNames(this.config(), this.lang()));
+  /** Muhr/monogramma uchun bosh harflar: "A·M". */
+  protected readonly initials = computed(() =>
+    this.names()
+      .map((n) => n.trim().charAt(0).toUpperCase())
+      .join('·'),
+  );
+  /** Asosiy tadbir yili (taklifnoma vaqt zonasida). */
+  protected readonly year = computed(() => zonedParts(this.primaryEvent().startsAt, this.config().timezone).year);
   protected readonly hasManyLocales = computed(() => this.config().locales.length > 1);
 
   /** Galereya/musiqa paket bo'yicha o'chiq bo'lsa API ularni umuman qaytarmaydi. */
@@ -30,6 +39,8 @@ export abstract class InvitationTemplateBase {
 
   /** Kirish "darvozasi" (intro) ochilganmi. */
   protected readonly opened = signal(false);
+  /** Ochilish animatsiyasi ketyapti (masalan, konvert ochilmoqda). */
+  protected readonly opening = signal(false);
 
   /** Shablon ranglarini config.theme bilan almashtirish (CSS custom properties). */
   protected readonly themeStyle = computed(() => {
@@ -48,10 +59,21 @@ export abstract class InvitationTemplateBase {
     });
   }
 
-  /** Taklifnomani ochish: foydalanuvchi harakati bo'lgani uchun musiqa ham shu yerda boshlanadi. */
-  protected openInvitation(): void {
-    this.opened.set(true);
+  /**
+   * Taklifnomani ochish. Musiqa darhol (foydalanuvchi harakati ichida) boshlanadi: aks holda iOS
+   * uni bloklaydi. delayMs: shablonning ochilish animatsiyasi davomiyligi.
+   */
+  protected openInvitation(delayMs = 0): void {
+    if (this.opening() || this.opened()) return;
     const src = this.musicUrl();
     if (src) void this.music.play(src);
+    const reduced =
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!delayMs || reduced) {
+      this.opened.set(true);
+      return;
+    }
+    this.opening.set(true);
+    setTimeout(() => this.opened.set(true), delayMs);
   }
 }
