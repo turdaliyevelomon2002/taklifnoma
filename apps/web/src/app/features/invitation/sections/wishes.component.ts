@@ -1,5 +1,5 @@
 import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { PublicWish } from '@taklifnoma/shared';
 import { RsvpApi } from '../../../core/api/rsvp-api.service';
@@ -14,10 +14,25 @@ import { WishesStore } from '../wishes.store';
   imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (items().length) {
-      <p class="wishes__count">{{ 'invitation.wishes.count' | transloco: { n: items().length } }}</p>
+    @if (items().length || ownPending().length) {
+      @if (items().length) {
+        <p class="wishes__count">{{ 'invitation.wishes.count' | transloco: { n: items().length } }}</p>
+      }
       <div class="wishes__scroller">
         <ul class="wishes">
+          @for (w of ownPending(); track w.id) {
+            <li class="wish wish--own">
+              <span class="wish__badge">
+                <span aria-hidden="true">⏳</span> {{ 'invitation.wishes.pending' | transloco }}
+              </span>
+              <p class="wish__text">{{ w.text }}</p>
+              <div class="wish__author">
+                <span class="wish__avatar" aria-hidden="true">{{ initials(w.name) }}</span>
+                <span class="wish__name">{{ w.name }}</span>
+              </div>
+              <p class="wish__hint">{{ 'invitation.wishes.pendingHint' | transloco }}</p>
+            </li>
+          }
           @for (w of items(); track w.id; let i = $index) {
             <li class="wish" [style.--i]="i % 6">
               <svg class="wish__quote" viewBox="0 0 32 24" width="28" height="21" aria-hidden="true">
@@ -98,6 +113,24 @@ import { WishesStore } from '../wishes.store';
       letter-spacing: 0.03em;
     }
     .wish__name { font-weight: 700; font-size: 0.92rem; color: var(--tk-primary); }
+    .wish--own {
+      border-style: dashed;
+      border-color: color-mix(in srgb, var(--tk-accent) 70%, transparent);
+      background: color-mix(in srgb, var(--tk-accent) 6%, var(--tk-surface));
+    }
+    .wish__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--tk-accent) 18%, transparent);
+      color: var(--tk-primary);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .wish__hint { margin: 0.75rem 0 0; font-size: 0.78rem; color: var(--tk-muted); line-height: 1.4; }
     .wishes__empty {
       display: grid;
       justify-items: center;
@@ -121,6 +154,18 @@ export class WishesComponent {
     this.api.wishesUrl(this.slug(), this.store.version()),
   );
   protected readonly items = computed(() => (this.wishes.hasValue() ? this.wishes.value() : []));
+  /** Mehmonning o'z tilaklari: hali devorda yo'qlari (tasdiqlanmagan) tepada alohida, yangisi avval. */
+  protected readonly ownPending = computed(() => {
+    const onWall = new Set(this.items().map((w) => w.id));
+    return this.store
+      .own()
+      .filter((w) => !onWall.has(w.id))
+      .reverse();
+  });
+
+  constructor() {
+    afterNextRender(() => this.store.load(this.slug()));
+  }
 
   protected initials(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);

@@ -23,6 +23,8 @@ Lokal Docker infra (PostgreSQL :5434, SeaweedFS :8333) bilan to'liq sinalgan. Pr
 - API xatolari: `{statusCode, code, issues?, details?}`; web'da `core/api/api-error.ts` (`errorKey`, TRANSLATED ro'yxati) — yangi xato kodi qo'shilsa u yerga va `errors.*` i18n'ga ham qo'shing.
 - Shablonlar: `features/invitation/templates/<kalit>/`, `InvitationTemplateBase` dan meros, `registry.ts` da ro'yxatdan o'tadi. Ranglar `--tk-*` CSS o'zgaruvchilari.
 - Panellar (`/panel/**`, `/:slug/admin`) `RenderMode.Client`, `X-Robots-Tag: noindex`.
+- Tilaklar: alohida `Wish` jadvali (muallif = `rsvpId`, bir mehmon bir nechta tilak, chegara `RSVP_LIMITS.wishesPerGuest`); keyingi tilak `POST public/.../wishes` (Telegram initData yoki RSVP bergan `guestToken`). Holat PENDING/APPROVED/HIDDEN (`config.rsvp.moderateWishes`), so'kinish filtri `apps/api/src/rsvp/profanity.ts` (rad etmaydi, belgilaydi). Telegram tugmalari `w:a|h:<rsvpId>` callback.
+- Mehmon identifikatsiyasi: Telegram Mini App (`/tg` -> `/:slug`, initData URL fragmentidan `TelegramWebAppService`), serverda `telegram/init-data.ts` imzoni tekshiradi; `config.rsvp.telegramOnly`, env `TELEGRAM_MINIAPP_NAME`.
 - Vaqtlar taklifnomaning `config.timezone` ida (default `Asia/Tashkent`).
 - Root `package.json` dagi `allowScripts`: Prisma skriptlariga ruxsat, qolganlari prebuilt binar bilan ishlaydi.
 

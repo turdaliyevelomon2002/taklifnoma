@@ -18,6 +18,19 @@
       "wish": "💬 {{wish}}",
       "summary": "📊 Jami: {{guests}} kishi keladi ({{replies}} ta javob)",
       "openPanel": "Mehmonlar ro'yxati"
+    },
+    "wish": {
+      "pending": "⏳ Tilak tasdiqlashingizni kutmoqda: tasdiqlamaguningizcha boshqa mehmonlar uni ko'rmaydi.",
+      "flagged": "⚠️ Tilakda nojo'ya so'z bo'lishi mumkin.",
+      "approve": "✅ Ko'rsatish",
+      "hide": "🚫 Yashirish",
+      "isApproved": "✅ Tilaklar devorida ko'rinmoqda",
+      "isHidden": "🚫 Yashirilgan",
+      "approvedToast": "✅ Tilak devorga chiqdi",
+      "hiddenToast": "🚫 Tilak yashirildi",
+      "forbidden": "Bu amal uchun ruxsat yo'q",
+      "notFound": "Javob topilmadi (o'chirilgan bo'lishi mumkin)",
+      "newTitle": "✍️ Yangi tilak"
     }
   },
   "export": {

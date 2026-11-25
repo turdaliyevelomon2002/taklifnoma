@@ -82,6 +82,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_WEBHOOK_URL: https://${DOMAIN}/api/telegram/webhook
       TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+      TELEGRAM_MINIAPP_NAME: ${TELEGRAM_MINIAPP_NAME:-}
     depends_on:
       postgres:
         condition: service_healthy

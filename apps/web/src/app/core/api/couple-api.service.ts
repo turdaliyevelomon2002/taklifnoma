@@ -6,6 +6,7 @@ import type {
   GuestPage,
   GuestView,
   Locale,
+  WishStatusInput,
 } from '@taklifnoma/shared';
 import { firstValueFrom } from 'rxjs';
 import { request, toApiError } from './api-error';
@@ -40,9 +41,10 @@ export class CoupleApi implements GuestSource {
     return request(firstValueFrom(this.http.get<GuestPage>('/api/couple/guests', { params })));
   }
 
-  setWishHidden(id: string, hidden: boolean): Promise<GuestView> {
+  /** Tilak holati (wishId). Javobda tilak muallifining yangilangan kartasi qaytadi. */
+  setWishStatus(wishId: string, status: WishStatusInput['status']): Promise<GuestView> {
     return request(
-      firstValueFrom(this.http.patch<GuestView>(`/api/couple/guests/${id}/wish`, { hidden })),
+      firstValueFrom(this.http.patch<GuestView>(`/api/couple/wishes/${wishId}`, { status })),
     );
   }
 

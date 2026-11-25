@@ -23,6 +23,16 @@ export const ERROR_CODES = [
   'SPAM_DETECTED',
   'PHONE_REQUIRED',
   'TOO_MANY_GUESTS',
+  /** Taklifnoma faqat Telegram (Mini App) orqali javob qabul qiladi. */
+  'TELEGRAM_REQUIRED',
+  /** Telegram initData imzosi noto'g'ri yoki eskirgan. */
+  'TELEGRAM_AUTH_INVALID',
+  /** Bu telefon raqami bilan boshqa Telegram akkaunt javob bergan. */
+  'PHONE_TAKEN',
+  /** Tilak qo'shishdan oldin javob (RSVP) berilishi kerak. */
+  'REPLY_REQUIRED',
+  /** Bitta mehmon uchun tilaklar chegarasi. */
+  'WISH_LIMIT_REACHED',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

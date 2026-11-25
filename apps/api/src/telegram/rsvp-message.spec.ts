@@ -5,7 +5,7 @@ const base = {
   isUpdate: false,
   coupleNames: 'Ali & Madina',
   guest: { name: 'Aziz', phone: '+998901234567', attending: true, guestCount: 3, wish: null },
-  stats: { replies: 18, attendingReplies: 15, attendingGuests: 45, notAttendingReplies: 3 },
+  stats: { replies: 18, attendingReplies: 15, attendingGuests: 45, notAttendingReplies: 3, pendingWishes: 0 },
 };
 
 describe('buildRsvpMessage', () => {

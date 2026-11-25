@@ -36,14 +36,34 @@ export interface TgMessage {
   text?: string;
 }
 
+export interface TgCallbackQuery {
+  id: string;
+  from: TgUser;
+  message?: TgMessage;
+  data?: string;
+}
+
 export interface TgUpdate {
   update_id: number;
   message?: TgMessage;
+  callback_query?: TgCallbackQuery;
 }
+
+/** Inline tugma: havola (faqat https) yoki bot'ga qaytadigan callback (64 baytgacha). */
+export type TgInlineButton = { text: string; url: string } | { text: string; callback_data: string };
 
 export interface SendMessageOptions {
   /** Xabar ostidagi tugma (faqat https havolalar; Telegram localhost'ni qabul qilmaydi). */
   button?: { text: string; url: string };
+  /** To'liq inline klaviatura (button bilan birga berilmaydi). */
+  keyboard?: TgInlineButton[][];
+}
+
+/** https bo'lmagan havola tugmalarini olib tashlaydi (Telegram ularni rad etadi). */
+export function safeKeyboard(rows: TgInlineButton[][]): TgInlineButton[][] {
+  return rows
+    .map((row) => row.filter((b) => !('url' in b) || b.url.startsWith('https://')))
+    .filter((row) => row.length > 0);
 }
 
 /**
@@ -88,17 +108,37 @@ export class TelegramApi {
   }
 
   sendMessage(chatId: string | number, html: string, options: SendMessageOptions = {}): Promise<TgMessage> {
-    const button = options.button;
+    const rows = safeKeyboard(options.keyboard ?? (options.button ? [[options.button]] : []));
     return this.call<TgMessage>('sendMessage', {
       chat_id: chatId,
       text: html,
       parse_mode: 'HTML',
       link_preview_options: { is_disabled: true },
-      ...(button &&
-        button.url.startsWith('https://') && {
-          reply_markup: { inline_keyboard: [[{ text: button.text, url: button.url }]] },
-        }),
+      ...(rows.length && { reply_markup: { inline_keyboard: rows } }),
     });
+  }
+
+  /** Callback tugmasi bosilganda Telegram'ga javob (aks holda tugmada "soat" aylanib turadi). */
+  async answerCallback(id: string, text?: string): Promise<void> {
+    try {
+      await this.call('answerCallbackQuery', { callback_query_id: id, ...(text && { text }) });
+    } catch (err) {
+      this.logger.warn(`answerCallbackQuery xatosi: ${String(err)}`);
+    }
+  }
+
+  /** Xabar ostidagi tugmalarni almashtirish. */
+  async editKeyboard(chatId: number, messageId: number, rows: TgInlineButton[][]): Promise<void> {
+    try {
+      await this.call('editMessageReplyMarkup', {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: { inline_keyboard: safeKeyboard(rows) },
+      });
+    } catch (err) {
+      // "message is not modified": tugma ikki marta bosilgan, zarari yo'q.
+      this.logger.debug(`editMessageReplyMarkup: ${String(err)}`);
+    }
   }
 
   async getMe(): Promise<TgUser> {

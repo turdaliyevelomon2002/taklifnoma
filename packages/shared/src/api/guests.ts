@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { LOCALES, type Locale } from '../enums';
+import { LOCALES, type Locale, type WishStatus } from '../enums';
 
 /** Mehmonlar ro'yxati (juftlik paneli va keyinchalik owner paneli uchun umumiy). */
-export const GUEST_FILTERS = ['all', 'attending', 'declined'] as const;
+export const GUEST_FILTERS = ['all', 'attending', 'declined', 'pendingWishes'] as const;
 export type GuestFilter = (typeof GUEST_FILTERS)[number];
 
 export const GUEST_SORTS = ['newest', 'oldest', 'name'] as const;
@@ -29,6 +29,15 @@ export const guestExportQuerySchema = z.object({
   lang: z.enum(LOCALES).default('uz'),
 });
 
+export interface GuestWish {
+  id: string;
+  text: string;
+  status: WishStatus;
+  /** So'kinish filtri matnda yoki muallif ismida shubhali so'z topgan. */
+  flagged: boolean;
+  createdAt: string;
+}
+
 export interface GuestView {
   id: string;
   name: string;
@@ -36,8 +45,10 @@ export interface GuestView {
   phone: string | null;
   attending: boolean;
   guestCount: number;
-  wish: string | null;
-  wishHidden: boolean;
+  /** Shu mehmon yozgan tilaklar (eskisi avval). */
+  wishes: GuestWish[];
+  /** Javob Telegram Mini App orqali berilgan bo'lsa. */
+  telegram: { id: string; username: string | null } | null;
   locale: Locale;
   createdAt: string;
   updatedAt: string;
@@ -51,5 +62,6 @@ export interface GuestPage {
   pageSize: number;
 }
 
-export const wishVisibilitySchema = z.object({ hidden: z.boolean() });
-export type WishVisibilityInput = z.infer<typeof wishVisibilitySchema>;
+/** Juftlik/owner tilakni tasdiqlaydi yoki yashiradi (PENDING ga qaytarib bo'lmaydi). */
+export const wishStatusSchema = z.object({ status: z.enum(['APPROVED', 'HIDDEN']) });
+export type WishStatusInput = z.infer<typeof wishStatusSchema>;

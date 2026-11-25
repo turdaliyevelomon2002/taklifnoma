@@ -11,7 +11,7 @@ import {
   untracked,
 } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import type { GuestFilter, GuestSort, GuestView, RsvpStats } from '@taklifnoma/shared';
+import type { GuestFilter, GuestSort, GuestView, RsvpStats, WishStatusInput } from '@taklifnoma/shared';
 import { formatUzPhone } from '@taklifnoma/shared/phone';
 import { errorKey, toApiError } from '../../../core/api/api-error';
 import type { GuestSource } from '../../../core/api/guest-source';
@@ -34,7 +34,7 @@ export class GuestListComponent {
   readonly timezone = input.required<string>();
   /** Excel eksport paketda bormi (juftlik) yoki har doim (owner). */
   readonly canExport = input(false);
-  /** Tilaklar devori yoqilgan bo'lsa tilakni yashirish tugmasi ko'rinadi. */
+  /** Tilaklar devori yoqilgan bo'lsa: tasdiqlash/yashirish tugmalari va "Kutilayotgan tilaklar" filtri. */
   readonly wishModeration = input(false);
   /** Ma'lumot o'zgardi (o'chirildi): ota komponent statistikani yangilaydi. */
   readonly changed = output<void>();
@@ -42,7 +42,10 @@ export class GuestListComponent {
   private readonly document = inject(DOCUMENT);
   protected readonly lang = inject(LangService).lang;
 
-  protected readonly filters: GuestFilter[] = ['all', 'attending', 'declined'];
+  protected readonly baseFilters: GuestFilter[] = ['all', 'attending', 'declined'];
+  protected filters(): GuestFilter[] {
+    return this.wishModeration() ? [...this.baseFilters, 'pendingWishes'] : this.baseFilters;
+  }
   protected readonly sorts: GuestSort[] = ['newest', 'oldest', 'name'];
 
   protected readonly filter = signal<GuestFilter>('all');
@@ -108,11 +111,19 @@ export class GuestListComponent {
     return formatUzPhone(value);
   }
 
-  protected async toggleWish(guest: GuestView): Promise<void> {
-    this.busyId.set(guest.id);
+  protected async setWish(wishId: string, status: WishStatusInput['status']): Promise<void> {
+    this.busyId.set(wishId);
     try {
-      const updated = await this.source().setWishHidden(guest.id, !guest.wishHidden);
-      this.items.update((list) => list.map((g) => (g.id === updated.id ? updated : g)));
+      const updated = await this.source().setWishStatus(wishId, status);
+      // "Kutilayotganlar" filtrida: mehmonning hamma tilagi hal qilinsa, u ro'yxatdan chiqadi.
+      if (this.filter() === 'pendingWishes' && !updated.wishes.some((w) => w.status === 'PENDING')) {
+        this.items.update((list) => list.filter((g) => g.id !== updated.id));
+        this.total.update((n) => Math.max(0, n - 1));
+      } else {
+        this.items.update((list) => list.map((g) => (g.id === updated.id ? updated : g)));
+      }
+      // Statistika (kutilayotganlar soni) yangilansin.
+      this.changed.emit();
     } catch (err) {
       this.error.set(errorKey(toApiError(err).code));
     } finally {

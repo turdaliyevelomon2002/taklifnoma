@@ -20,6 +20,10 @@ export type MediaKind = (typeof MEDIA_KINDS)[number];
 export const SINGLE_MEDIA_KINDS: readonly MediaKind[] = ['COVER', 'MUSIC', 'OG_IMAGE'];
 
 /** Kod ichida ro'yxatdan o'tgan shablonlar. Frontend registry bilan mos bo'lishi shart. */
+/** Tilak holati: PENDING (tasdiq kutmoqda), APPROVED (devorda ko'rinadi), HIDDEN (yashirilgan). */
+export const WISH_STATUSES = ['PENDING', 'APPROVED', 'HIDDEN'] as const;
+export type WishStatus = (typeof WISH_STATUSES)[number];
+
 export const TEMPLATE_KEYS = ['classic-gold', 'minimal-white', 'national-pattern'] as const;
 export type TemplateKey = (typeof TEMPLATE_KEYS)[number];
 

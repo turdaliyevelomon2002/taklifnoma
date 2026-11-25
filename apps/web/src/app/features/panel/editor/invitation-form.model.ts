@@ -97,6 +97,8 @@ export function buildInvitationForm(fb: NonNullableFormBuilder) {
       maxGuestsPerReply: [5],
       askPhone: [true],
       askWish: [true],
+      moderateWishes: [true],
+      telegramOnly: [false],
     }),
     theme: fb.group({ primaryColor: [''], accentColor: [''] }),
     seo: fb.group({ title: localized(), description: localized() }),
@@ -176,6 +178,9 @@ export function patchFromDetail(form: InvitationForm, fb: NonNullableFormBuilder
       maxGuestsPerReply: c.rsvp.maxGuestsPerReply,
       askPhone: c.rsvp.askPhone,
       askWish: c.rsvp.askWish,
+      // Eski config'larda maydon yo'q: yoqiq deb hisoblanadi.
+      moderateWishes: c.rsvp.moderateWishes !== false,
+      telegramOnly: c.rsvp.telegramOnly === true,
     },
     theme: { primaryColor: c.theme?.primaryColor ?? '', accentColor: c.theme?.accentColor ?? '' },
     seo: { title: loc(c.seo?.title), description: loc(c.seo?.description) },
@@ -272,6 +277,8 @@ export function buildInput(v: FormValue): BuildResult {
       maxGuestsPerReply: Number(v.rsvp.maxGuestsPerReply),
       askPhone: v.rsvp.askPhone,
       askWish: v.rsvp.askWish,
+      moderateWishes: v.rsvp.moderateWishes,
+      telegramOnly: v.rsvp.telegramOnly,
     },
     theme: {
       primaryColor: v.theme.primaryColor || undefined,

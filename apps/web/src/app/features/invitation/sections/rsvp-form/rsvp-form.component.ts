@@ -21,6 +21,7 @@ import { normalizeUzPhone } from '@taklifnoma/shared/phone';
 import { errorKey, toApiError } from '../../../../core/api/api-error';
 import { RsvpApi } from '../../../../core/api/rsvp-api.service';
 import { LangService } from '../../../../core/i18n/lang.service';
+import { TelegramWebAppService } from '../../../../core/telegram/telegram-webapp.service';
 import { EventDatePipe } from '../../../../shared/date/event-date.pipe';
 import { WishesStore } from '../../wishes.store';
 
@@ -51,7 +52,7 @@ function phoneRequired(control: AbstractControl<string>): ValidationErrors | nul
 type State =
   | { kind: 'form' }
   | { kind: 'submitting' }
-  | { kind: 'done'; result: RsvpSubmitResult['status']; attending: boolean; name: string };
+  | { kind: 'done'; result: RsvpSubmitResult['status']; attending: boolean; name: string; wishPending: boolean };
 
 @Component({
   selector: 'tk-rsvp-form',
@@ -68,11 +69,20 @@ export class RsvpFormComponent {
   readonly rules = input.required<RsvpConfig>();
   readonly open = input.required<boolean>();
   readonly timezone = input.required<string>();
+  /** "Faqat Telegram orqali" rejimida brauzerdagi mehmonga ko'rsatiladigan Mini App havolasi. */
+  readonly telegramAppUrl = input<string | undefined>(undefined);
 
   protected readonly lang = inject(LangService).lang;
   private readonly api = inject(RsvpApi);
   private readonly wishes = inject(WishesStore, { optional: true });
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly tg = inject(TelegramWebAppService);
+
+  protected readonly inTelegram = this.tg.inTelegram;
+  /** Javob faqat Telegram orqali qabul qilinadi, mehmon esa oddiy brauzerda. */
+  protected readonly needsTelegram = computed(() => !!this.rules().telegramOnly && !this.tg.inTelegram());
+  /** Mini App ichida: Telegram akkaunti (formaning tepasida ko'rsatiladi). */
+  protected readonly tgUser = signal<{ name: string; username: string | null } | null>(null);
 
   protected readonly limits = { nameMin: NAME_MIN, nameMax: NAME_MAX, wishMax: WISH_MAX };
 
@@ -90,6 +100,23 @@ export class RsvpFormComponent {
   /** Xato matnining i18n kaliti. */
   protected readonly error = signal<string | null>(null);
   protected readonly submitted = signal(false);
+
+  /** Mehmon allaqachon javob bergan (shu qurilmada yoki Telegram akkaunti bo'yicha). */
+  private readonly replied = signal(false);
+  /** Yana tilak qo'shish mumkinmi: muallif Telegram yoki server bergan kalit bilan aniqlanadi. */
+  protected readonly canAddWish = computed(
+    () => !!this.rules().askWish && !!this.wishes && (this.tg.inTelegram() || !!this.wishes.guestToken()),
+  );
+  /** Javobni tahrirlashda tilak maydoni ko'rsatilmaydi: tilaklar alohida qo'shiladi (eskilari o'chmaydi). */
+  protected readonly showWishField = computed(() => !!this.rules().askWish && !(this.replied() && this.canAddWish()));
+
+  // --- "Yana tilak yozish" ---
+  protected readonly extraOpen = signal(false);
+  protected readonly extraText = signal('');
+  protected readonly extraSending = signal(false);
+  protected readonly extraError = signal<string | null>(null);
+  /** Oxirgi qo'shilgan tilak holati: muvaffaqiyat xabari uchun. */
+  protected readonly extraDone = signal<'PENDING' | 'APPROVED' | null>(null);
 
   private readonly attendingValue = toSignal(this.form.controls.attending.valueChanges, {
     initialValue: this.form.controls.attending.value,
@@ -112,8 +139,10 @@ export class RsvpFormComponent {
       phone.setValidators(rules.askPhone ? [phoneRequired, phoneValidator] : [phoneValidator]);
       phone.updateValueAndValidity({ emitEvent: false });
 
-      if (this.open()) {
-        this.restore();
+      if (this.open() && !this.needsTelegram()) {
+        const initData = this.tg.initData();
+        if (initData) void this.restoreFromTelegram(initData);
+        else this.restore();
         this.token = this.api.token(this.slug());
         // Xatoni shu yerda "yutamiz"; submit paytida qayta olinadi.
         this.token.catch(() => (this.token = null));
@@ -157,14 +186,27 @@ export class RsvpFormComponent {
         phone: phoneDigits.length > 3 ? v.phone : undefined,
         attending,
         guestCount: attending ? v.guestCount : 0,
-        wish: this.rules().askWish ? v.wish.trim() || undefined : undefined,
+        wish: this.showWishField() ? v.wish.trim() || undefined : undefined,
         locale: this.lang(),
         formToken,
         website: v.website || undefined,
+        tgInitData: this.tg.initData() ?? undefined,
       });
       this.save({ name: v.name.trim(), phone: v.phone, attending, guestCount: v.guestCount });
-      if (v.wish.trim()) this.wishes?.bump();
-      this.state.set({ kind: 'done', result: res.status, attending, name: v.name.trim() });
+      // O'z tilagini faqat shu mehmon ko'radi (tasdiqlangunga qadar).
+      if (res.wish) this.wishes?.addOwn(this.slug(), { ...res.wish, name: v.name.trim() });
+      if (res.guestToken) this.wishes?.setGuestToken(this.slug(), res.guestToken);
+      if (res.wish) this.wishes?.bump();
+      this.form.controls.wish.setValue('');
+      this.replied.set(true);
+      this.state.set({
+        kind: 'done',
+        result: res.status,
+        attending,
+        name: v.name.trim(),
+        wishPending: res.wish?.status === 'PENDING',
+      });
+      this.extraDone.set(null);
     } catch (err) {
       const code = toApiError(err).code;
       // Eskirgan token: yangisini olamiz, foydalanuvchi qayta bosadi.
@@ -178,7 +220,40 @@ export class RsvpFormComponent {
   }
 
   protected edit(): void {
+    this.extraOpen.set(false);
     this.state.set({ kind: 'form' });
+  }
+
+  protected openExtra(): void {
+    this.extraText.set('');
+    this.extraError.set(null);
+    this.extraDone.set(null);
+    this.extraOpen.set(true);
+  }
+
+  /** Javob bergan mehmon yana tilak yozadi: muallif sifatida aynan u ko'rsatiladi. */
+  protected async sendExtra(): Promise<void> {
+    const text = this.extraText().trim();
+    const store = this.wishes;
+    if (text.length < 2 || !store) return;
+    this.extraSending.set(true);
+    this.extraError.set(null);
+    try {
+      const wish = await this.api.addWish(this.slug(), {
+        text,
+        tgInitData: this.tg.initData() ?? undefined,
+        guestToken: store.guestToken() ?? undefined,
+      });
+      const s = this.state();
+      store.addOwn(this.slug(), { ...wish, name: s.kind === 'done' ? s.name : this.form.controls.name.value });
+      store.bump();
+      this.extraDone.set(wish.status);
+      this.extraOpen.set(false);
+    } catch (err) {
+      this.extraError.set(errorKey(toApiError(err).code));
+    } finally {
+      this.extraSending.set(false);
+    }
   }
 
   private storageKey(): string {
@@ -192,9 +267,53 @@ export class RsvpFormComponent {
       if (!raw) return;
       const saved = JSON.parse(raw) as SavedReply;
       this.form.patchValue(saved);
-      this.state.set({ kind: 'done', result: 'created', attending: saved.attending, name: saved.name });
+      this.wishes?.load(this.slug());
+      this.replied.set(true);
+      this.state.set({
+        kind: 'done',
+        result: 'created',
+        attending: saved.attending,
+        name: saved.name,
+        wishPending: !!this.wishes?.own().some((w) => w.status === 'PENDING'),
+      });
     } catch {
       /* localStorage mavjud emas yoki buzilgan */
+    }
+  }
+
+  /**
+   * Mini App: mehmon Telegram akkaunti bo'yicha taniladi. Avval javob bergan bo'lsa, istalgan
+   * qurilmadan kirganda ham natijasi ko'rinadi; bo'lmasa ism Telegram profilidan to'ldiriladi.
+   */
+  private async restoreFromTelegram(initData: string): Promise<void> {
+    try {
+      const session = await this.api.telegramSession(this.slug(), initData);
+      this.tgUser.set(session.user);
+      const reply = session.reply;
+      if (!reply) {
+        if (!this.form.controls.name.value) this.form.patchValue({ name: session.user.name });
+        return;
+      }
+      this.form.patchValue({
+        name: reply.name,
+        phone: reply.phone ?? '+998 ',
+        attending: reply.attending,
+        guestCount: Math.max(1, reply.guestCount),
+      });
+      this.wishes?.setOwn(
+        this.slug(),
+        reply.wishes.map((w) => ({ ...w, name: reply.name })),
+      );
+      this.replied.set(true);
+      this.state.set({
+        kind: 'done',
+        result: 'created',
+        attending: reply.attending,
+        name: reply.name,
+        wishPending: reply.wishes.some((w) => w.status === 'PENDING'),
+      });
+    } catch {
+      /* initData eskirgan yoki tarmoq xatosi: oddiy forma qoladi, yuborishda server tekshiradi */
     }
   }
 

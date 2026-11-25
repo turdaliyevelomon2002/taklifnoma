@@ -20,6 +20,7 @@ import { routes } from './app.routes';
 import { apiUrlInterceptor } from './core/api/api-url.interceptor';
 import { LangService } from './core/i18n/lang.service';
 import { provideI18n } from './core/i18n/transloco.provider';
+import { TelegramWebAppService } from './core/telegram/telegram-webapp.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,5 +38,7 @@ export const appConfig: ApplicationConfig = {
     provideI18n(),
     // Standart til render'dan oldin yuklanadi (SSR'da bo'sh matnlar chiqmasligi uchun).
     provideAppInitializer(() => inject(LangService).use(DEFAULT_LOCALE)),
+    // Telegram Mini App initData'si birinchi navigatsiya fragmentni o'chirishidan oldin olinadi.
+    provideAppInitializer(() => inject(TelegramWebAppService).capture()),
   ],
 };

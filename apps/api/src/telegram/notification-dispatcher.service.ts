@@ -14,6 +14,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { buildRsvpMessage } from './rsvp-message';
 import { coupleNames } from '../common/localize';
 import { TelegramApi, TelegramApiError } from './telegram-api.service';
+import { wishKeyboard } from './wish-keyboard';
 
 const POLL_INTERVAL_MS = 5_000;
 const BATCH_SIZE = 20;
@@ -26,7 +27,7 @@ const MAX_ATTEMPTS = BACKOFF_MS.length + 1;
 class PermanentFailure extends Error {}
 
 type NotificationWithRsvp = Prisma.NotificationGetPayload<{
-  include: { rsvp: { include: { invitation: true } } };
+  include: { rsvp: { include: { invitation: true } }; wish: true };
 }>;
 
 /**
@@ -107,7 +108,7 @@ export class NotificationDispatcher implements OnApplicationBootstrap, OnApplica
   private async process(id: string): Promise<void> {
     const n = await this.prisma.notification.findUnique({
       where: { id },
-      include: { rsvp: { include: { invitation: true } } },
+      include: { rsvp: { include: { invitation: true } }, wish: true },
     });
     if (!n) return;
 
@@ -123,7 +124,7 @@ export class NotificationDispatcher implements OnApplicationBootstrap, OnApplica
   }
 
   private async send(n: NotificationWithRsvp): Promise<void> {
-    const { rsvp } = n;
+    const { rsvp, wish } = n;
     const inv = rsvp.invitation;
     const config = inv.config as InvitationConfig;
     const stats = await this.stats.forInvitation(inv.id);
@@ -132,7 +133,10 @@ export class NotificationDispatcher implements OnApplicationBootstrap, OnApplica
       phone: rsvp.phone,
       attending: rsvp.attending,
       guestCount: rsvp.guestCount,
-      wish: rsvp.wish,
+      wish: wish?.text ?? null,
+      wishStatus: wish?.status,
+      wishFlagged: wish?.flagged,
+      telegramUsername: rsvp.telegramUsername,
     };
 
     if (n.target === 'COUPLE') {
@@ -142,15 +146,18 @@ export class NotificationDispatcher implements OnApplicationBootstrap, OnApplica
       const text = buildRsvpMessage({
         locale,
         isUpdate: n.isUpdate,
+        wishOnly: n.wishOnly,
         coupleNames: coupleNames(config, locale),
         guest,
         stats,
       });
+      const panel = {
+        text: t(locale, 'telegram.rsvp.openPanel'),
+        url: `${this.presenter.publicUrl(inv.slug)}/admin`,
+      };
+      // Tilak bo'lsa: shu yerning o'zida tasdiqlash/yashirish tugmalari.
       await this.api.sendMessage(inv.coupleChatId, text, {
-        button: {
-          text: t(locale, 'telegram.rsvp.openPanel'),
-          url: `${this.presenter.publicUrl(inv.slug)}/admin`,
-        },
+        keyboard: wish ? wishKeyboard(locale, wish.id, wish.status, panel) : [[panel]],
       });
       return;
     }
@@ -163,12 +170,14 @@ export class NotificationDispatcher implements OnApplicationBootstrap, OnApplica
     const text = buildRsvpMessage({
       locale: 'uz',
       isUpdate: n.isUpdate,
+      wishOnly: n.wishOnly,
       coupleNames: coupleNames(config, 'uz'),
       slug: inv.slug,
       guest,
       stats,
     });
-    for (const owner of owners) await this.api.sendMessage(owner.telegramChatId!, text);
+    const keyboard = wish ? wishKeyboard('uz', wish.id, wish.status) : undefined;
+    for (const owner of owners) await this.api.sendMessage(owner.telegramChatId!, text, { keyboard });
   }
 
   private async fail(n: Notification, err: unknown): Promise<void> {

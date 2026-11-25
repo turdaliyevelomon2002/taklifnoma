@@ -154,6 +154,28 @@
     }
   }
 
+  // Izohli belgi: matn ostida kichik tushuntirish
+  .check--hinted {
+    align-items: flex-start;
+    grid-column: 1 / -1;
+
+    input {
+      flex: none;
+      margin-top: 0.15rem;
+    }
+
+    span {
+      display: grid;
+      gap: 0.15rem;
+    }
+  }
+
+  .check__hint {
+    color: var(--tk-muted);
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;

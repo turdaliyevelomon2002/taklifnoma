@@ -44,6 +44,23 @@ export class RsvpTokenService {
     return 'ok';
   }
 
+  /**
+   * Mehmon kaliti: "<rsvpId>.<hmac>". RSVP yuborilganda beriladi va brauzerda saqlanadi;
+   * u bilan faqat shu javobga yangi tilak qo'shish mumkin (javobni o'zgartirish/o'qish emas).
+   */
+  guestToken(rsvpId: string): string {
+    return `${rsvpId}.${this.sign(`guest:${rsvpId}`)}`;
+  }
+
+  /** To'g'ri bo'lsa rsvpId, aks holda null. */
+  verifyGuestToken(token: string): string | null {
+    const [rsvpId, signature] = token.split('.');
+    if (!rsvpId || !signature || !/^[0-9a-f-]{36}$/.test(rsvpId)) return null;
+    const expected = Buffer.from(this.sign(`guest:${rsvpId}`));
+    const given = Buffer.from(signature);
+    return expected.length === given.length && timingSafeEqual(expected, given) ? rsvpId : null;
+  }
+
   /** IP manzil xom holda saqlanmaydi: faqat kalitli xesh (bir xil IP'ni solishtirish uchun yetarli). */
   hashIp(ip: string): string {
     return createHmac('sha256', this.secret).update(`ip:${ip}`).digest('hex');

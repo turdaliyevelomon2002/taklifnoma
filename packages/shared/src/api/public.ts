@@ -22,6 +22,8 @@ export interface PublicInvitation {
     ogImageUrl?: string;
     canonicalUrl: string;
   };
+  /** Telegram Mini App havolasi: https://t.me/<bot>/<ilova>?startapp=<slug> (sozlanmagan bo'lsa yo'q). */
+  telegramAppUrl?: string;
   /** RSVP hali qabul qilinadimi (status + deadline + feature). */
   rsvpOpen: boolean;
 }

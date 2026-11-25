@@ -298,6 +298,67 @@
   to { transform: rotate(360deg); }
 }
 
+// --- Faqat Telegram orqali ---
+.rsvp__tg-only {
+  @extend %card;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.rsvp__tg-icon {
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 50%;
+  background: #2aabee;
+  color: #fff;
+  box-shadow: 0 12px 24px -12px #2aabee;
+
+  svg {
+    margin-left: -2px;
+  }
+}
+
+.rsvp__tg-title {
+  margin: 0.4rem 0 0;
+  font-family: var(--tk-font-heading);
+  font-size: 1.35rem;
+  color: var(--tk-primary);
+}
+
+.rsvp__tg-text {
+  margin: 0;
+  max-width: 22rem;
+  line-height: 1.5;
+}
+
+.rsvp__tg-text--muted {
+  color: var(--tk-muted);
+  font-size: 0.9rem;
+}
+
+.rsvp__tg-btn {
+  margin-top: 0.5rem;
+  background: #2aabee;
+  border-color: #2aabee;
+  color: #fff;
+}
+
+.rsvp__tg-user {
+  justify-self: center;
+  margin: 0.6rem 0 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #2aabee 12%, transparent);
+  color: var(--tk-text);
+  font-size: 0.85rem;
+}
+
 // --- Yopiq va yuborildi holatlari ---
 .rsvp__closed,
 .rsvp__done {
@@ -387,6 +448,37 @@
 .rsvp__done-text {
   margin: 0 auto 1.25rem;
   max-width: 22rem;
+}
+
+.rsvp__done-pending {
+  margin: -0.5rem auto 1.25rem;
+  max-width: 22rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--tk-radius);
+  background: color-mix(in srgb, var(--tk-accent) 12%, transparent);
+  color: var(--tk-text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+// "Yana tilak yozish"
+.rsvp__extra-open {
+  display: flex;
+  margin: 0 auto 0.75rem;
+}
+
+.rsvp__extra {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 auto 1rem;
+  max-width: 26rem;
+  text-align: left;
+}
+
+.rsvp__extra-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .rsvp__done-note {

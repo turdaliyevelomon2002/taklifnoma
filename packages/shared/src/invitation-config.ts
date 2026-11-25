@@ -82,6 +82,13 @@ export const rsvpConfigSchema = z.object({
   maxGuestsPerReply: z.number().int().min(1).max(20).default(5),
   askPhone: z.boolean().default(true),
   askWish: z.boolean().default(true),
+  /** Tilaklar juftlik tasdiqlagandan keyingina devorda ko'rinadi. Eski config'larda yo'q: yoqiq deb hisoblanadi. */
+  moderateWishes: z.boolean().default(true),
+  /**
+   * Javob va tilak faqat Telegram Mini App orqali (mehmon Telegram akkaunti bilan aniqlanadi).
+   * Sahifaning o'zi hammaga ochiq qoladi.
+   */
+  telegramOnly: z.boolean().default(false),
 });
 
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/);
@@ -180,4 +187,12 @@ function isValidTimeZone(tz: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Tilaklarni oldindan tekshirish yoqiqmi. DB'dagi eski config'larda maydon bo'lmaydi
+ * (Zod default'i faqat parse qilinganda ishlaydi), shuning uchun "false emas" = yoqiq.
+ */
+export function wishModerationEnabled(rsvp: { moderateWishes?: boolean } | undefined): boolean {
+  return rsvp?.moderateWishes !== false;
 }

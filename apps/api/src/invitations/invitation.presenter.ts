@@ -88,6 +88,7 @@ export class InvitationPresenter {
       updatedAt: iso(inv.updatedAt),
       coupleTelegramLinked: !!inv.coupleChatId,
       telegramLinkUrl: this.telegram.coupleLink(inv.telegramLinkCode),
+      telegramAppUrl: this.telegram.miniAppLink(inv.slug),
       pinEnabled: !!inv.adminPinHash,
       media: this.sortMedia(inv.media).map((m) => this.media(m)),
       publicUrl: this.publicUrl(inv.slug),
@@ -126,6 +127,7 @@ export class InvitationPresenter {
         music: music ? this.media(music) : undefined,
       },
       seo: { ogImageUrl, canonicalUrl: this.publicUrl(inv.slug) },
+      telegramAppUrl: this.telegram.miniAppLink(inv.slug) ?? undefined,
       rsvpOpen,
     };
   }

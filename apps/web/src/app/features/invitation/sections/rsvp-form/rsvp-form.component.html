@@ -27,12 +27,81 @@
     @if (s.result === 'updated') {
       <p class="rsvp__done-note">{{ 'invitation.rsvp.updated' | transloco }}</p>
     }
+    @if (s.wishPending) {
+      <p class="rsvp__done-pending">
+        <span aria-hidden="true">⏳</span> {{ 'invitation.rsvp.wishPending' | transloco }}
+      </p>
+    }
+    @if (extraDone(); as st) {
+      <p class="rsvp__done-pending" role="status">
+        {{ (st === 'PENDING' ? 'invitation.rsvp.extraPending' : 'invitation.rsvp.extraAdded') | transloco }}
+      </p>
+    }
+    @if (canAddWish()) {
+      @if (extraOpen()) {
+        <div class="rsvp__extra">
+          <label class="field__label" for="rsvp-extra">
+            {{ 'invitation.rsvp.extraLabel' | transloco: { name: s.name } }}
+          </label>
+          <textarea
+            id="rsvp-extra"
+            class="field__input field__input--area"
+            rows="3"
+            [attr.maxlength]="limits.wishMax"
+            [value]="extraText()"
+            (input)="extraText.set($any($event.target).value)"
+            [placeholder]="'invitation.rsvp.wishPlaceholder' | transloco"
+          ></textarea>
+          @if (extraError(); as key) {
+            <p class="rsvp__error" role="alert">{{ key | transloco }}</p>
+          }
+          <div class="rsvp__extra-actions">
+            <button type="button" class="tk-btn tk-btn--ghost" (click)="extraOpen.set(false)" [disabled]="extraSending()">
+              {{ 'invitation.rsvp.extraCancel' | transloco }}
+            </button>
+            <button
+              type="button"
+              class="tk-btn tk-btn--primary"
+              (click)="sendExtra()"
+              [disabled]="extraSending() || extraText().trim().length < 2"
+            >
+              {{ 'invitation.rsvp.extraSend' | transloco }}
+            </button>
+          </div>
+        </div>
+      } @else {
+        <button type="button" class="tk-btn tk-btn--primary rsvp__extra-open" (click)="openExtra()">
+          ✍️ {{ 'invitation.rsvp.extraOpen' | transloco }}
+        </button>
+      }
+    }
     <button type="button" class="tk-btn tk-btn--ghost" (click)="edit()">
       {{ 'invitation.rsvp.change' | transloco }}
     </button>
   </div>
+} @else if (needsTelegram()) {
+  <div class="rsvp__tg-only">
+    <span class="rsvp__tg-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30"><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.3 13 1.5 11.5c-1-.3-1-1 .2-1.5L20.6 2.8c.9-.3 1.6.2 1.3 1.5z"/></svg>
+    </span>
+    <h3 class="rsvp__tg-title">{{ 'invitation.rsvp.telegramOnly.title' | transloco }}</h3>
+    <p class="rsvp__tg-text">{{ 'invitation.rsvp.telegramOnly.text' | transloco }}</p>
+    @if (telegramAppUrl(); as url) {
+      <a class="tk-btn tk-btn--primary rsvp__tg-btn" [href]="url" target="_blank" rel="noopener">
+        {{ 'invitation.rsvp.telegramOnly.open' | transloco }}
+      </a>
+    } @else {
+      <p class="rsvp__tg-text rsvp__tg-text--muted">{{ 'invitation.rsvp.telegramOnly.askLink' | transloco }}</p>
+    }
+  </div>
 } @else {
   <form class="rsvp" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (tgUser(); as u) {
+      <p class="rsvp__tg-user">
+        <span aria-hidden="true">✈️</span>
+        {{ 'invitation.rsvp.telegramAs' | transloco: { name: u.username ? '@' + u.username : u.name } }}
+      </p>
+    }
     <div class="rsvp__head" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" />
@@ -85,7 +154,7 @@
           [attr.aria-invalid]="showError('phone')"
           aria-describedby="rsvp-phone-error rsvp-phone-hint"
         />
-        <p id="rsvp-phone-hint" class="field__hint">{{ 'invitation.rsvp.phoneHint' | transloco }}</p>
+        <p id="rsvp-phone-hint" class="field__hint">{{ (inTelegram() ? 'invitation.rsvp.phoneHintTelegram' : 'invitation.rsvp.phoneHint') | transloco }}</p>
         @if (showError('phone')) {
           <p id="rsvp-phone-error" class="field__error">
             {{
@@ -159,7 +228,7 @@
     }
 
     <!-- Tilak -->
-    @if (r.askWish) {
+    @if (showWishField()) {
       <div class="field">
         <label class="field__label" for="rsvp-wish">{{ 'invitation.rsvp.wish' | transloco }}</label>
         <textarea

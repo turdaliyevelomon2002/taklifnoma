@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import type { TelegramLinkInfo } from '@taklifnoma/shared';
 import { randomCode } from '../common/crypto';
+import { AppConfig } from '../config/app-config.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { TelegramApi } from './telegram-api.service';
 
@@ -19,6 +20,7 @@ export class TelegramLinkService implements OnApplicationBootstrap {
   constructor(
     private readonly api: TelegramApi,
     private readonly prisma: PrismaService,
+    private readonly config: AppConfig,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -55,6 +57,13 @@ export class TelegramLinkService implements OnApplicationBootstrap {
       url: this.link(START_PREFIX.owner, owner.telegramLinkCode),
       linked: !!owner.telegramChatId,
     };
+  }
+
+  /** Mehmonlar uchun Mini App havolasi: https://t.me/<bot>/<ilova>?startapp=<slug> */
+  miniAppLink(slug: string): string | null {
+    const app = this.config.get('TELEGRAM_MINIAPP_NAME');
+    if (!this.username || !app) return null;
+    return `https://t.me/${this.username}/${app}?startapp=${slug}`;
   }
 
   private link(prefix: string, code: string | null): string | null {

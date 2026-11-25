@@ -220,6 +220,20 @@
       </label>
       <label class="check"><input type="checkbox" formControlName="askPhone" /> {{ 'panel.form.askPhone' | transloco }}</label>
       <label class="check"><input type="checkbox" formControlName="askWish" /> {{ 'panel.form.askWish' | transloco }}</label>
+      <label class="check check--hinted">
+        <input type="checkbox" formControlName="moderateWishes" />
+        <span>
+          {{ 'panel.form.moderateWishes' | transloco }}
+          <small class="check__hint">{{ 'panel.form.moderateWishesHint' | transloco }}</small>
+        </span>
+      </label>
+      <label class="check check--hinted">
+        <input type="checkbox" formControlName="telegramOnly" />
+        <span>
+          {{ 'panel.form.telegramOnly' | transloco }}
+          <small class="check__hint">{{ 'panel.form.telegramOnlyHint' | transloco }}</small>
+        </span>
+      </label>
     </div>
 
     <h3 class="card__subtitle">{{ 'panel.form.sections.design' | transloco }}</h3>

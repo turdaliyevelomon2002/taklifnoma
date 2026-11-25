@@ -15,14 +15,14 @@ import {
 import {
   guestExportQuerySchema,
   guestListQuerySchema,
-  wishVisibilitySchema,
+  wishStatusSchema,
   type GuestListQueryParsed,
   type GuestPage,
   type GuestView,
   type InvitationConfig,
   type Locale,
   type OwnerDashboard,
-  type WishVisibilityInput,
+  type WishStatusInput,
 } from '@taklifnoma/shared';
 import { OwnerGuard } from '../auth/owner/owner.guard';
 import { ApiError } from '../common/api-error';
@@ -66,13 +66,13 @@ export class OwnerController {
     return this.guests.list(id, query);
   }
 
-  @Patch('invitations/:id/guests/:rsvpId/wish')
-  setWishHidden(
+  @Patch('invitations/:id/wishes/:wishId')
+  setWishStatus(
     @Param('id', uuid) id: string,
-    @Param('rsvpId', uuid) rsvpId: string,
-    @Body(new ZodValidationPipe(wishVisibilitySchema)) body: WishVisibilityInput,
+    @Param('wishId', uuid) wishId: string,
+    @Body(new ZodValidationPipe(wishStatusSchema)) body: WishStatusInput,
   ): Promise<GuestView> {
-    return this.guests.setWishHidden(id, rsvpId, body.hidden);
+    return this.guests.setWishStatus(id, wishId, body.status);
   }
 
   @Delete('invitations/:id/guests/:rsvpId')

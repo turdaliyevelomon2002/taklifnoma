@@ -9,7 +9,10 @@ import { AppConfig } from '../config/app-config.service';
 import { coupleNames } from '../common/localize';
 import { escapeHtml, t } from '../i18n/translator';
 import { PrismaService } from '../prisma/prisma.service';
-import { TelegramApi, type TgMessage, type TgUpdate } from './telegram-api.service';
+import type { Locale } from '@taklifnoma/shared';
+import { InvitationPresenter } from '../invitations/invitation.presenter';
+import { TelegramApi, type TgCallbackQuery, type TgMessage, type TgUpdate } from './telegram-api.service';
+import { WISH_CALLBACK_RE, wishKeyboard } from './wish-keyboard';
 import { START_PREFIX } from './telegram-link.service';
 
 const START_RE = /^\/start(?:@\w+)?(?:\s+([A-Za-z0-9_-]{1,64}))?\s*$/;
@@ -20,6 +23,7 @@ const STOP_RE = /^\/stop(?:@\w+)?\s*$/;
  *   /start c_<kod>  juftlik chatini taklifnomaga ulaydi
  *   /start o_<kod>  owner chatini ulaydi
  *   /stop           shu chatga ulangan bildirishnomalarni o'chiradi
+ *   tugmalar        tilakni tasdiqlash / yashirish (callback_query, w:a:<id> / w:h:<id>)
  *
  * Yangilanishlar dev'da long polling, production'da webhook orqali keladi.
  */
@@ -33,6 +37,7 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
     private readonly api: TelegramApi,
     private readonly prisma: PrismaService,
     private readonly config: AppConfig,
+    private readonly presenter: InvitationPresenter,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -43,7 +48,7 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
         await this.api.call('setWebhook', {
           url: this.config.get('TELEGRAM_WEBHOOK_URL'),
           secret_token: this.config.get('TELEGRAM_WEBHOOK_SECRET'),
-          allowed_updates: ['message'],
+          allowed_updates: ['message', 'callback_query'],
         });
         this.logger.log('Telegram webhook o\'rnatildi');
       } else if (mode === 'polling') {
@@ -64,6 +69,7 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
   }
 
   async handleUpdate(update: TgUpdate): Promise<void> {
+    if (update.callback_query) return this.onCallback(update.callback_query);
     const message = update.message;
     if (!message?.text) return;
     const text = message.text.trim();
@@ -122,6 +128,51 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
     );
   }
 
+  /**
+   * Tilak tugmalari. Faqat shu taklifnoma juftligining chati yoki owner chati bosishi mumkin:
+   * xabar boshqa joyga forward qilinsa ham begona odam tilakni o'zgartira olmaydi.
+   */
+  private async onCallback(q: TgCallbackQuery): Promise<void> {
+    const match = WISH_CALLBACK_RE.exec(q.data ?? '');
+    const chat = q.message?.chat.id;
+    if (!match || match[1] === 'n' || !match[2] || chat === undefined) {
+      await this.api.answerCallback(q.id);
+      return;
+    }
+    const [, action, wishId] = match;
+    const chatId = String(chat);
+
+    const wish = await this.prisma.wish.findUnique({
+      where: { id: wishId },
+      select: { id: true, invitation: { select: { slug: true, config: true, coupleChatId: true } } },
+    });
+    if (!wish) {
+      await this.api.answerCallback(q.id, t('uz', 'telegram.wish.notFound'));
+      return;
+    }
+
+    const isCouple = wish.invitation.coupleChatId === chatId;
+    const isOwner = !isCouple && (await this.prisma.owner.count({ where: { telegramChatId: chatId } })) > 0;
+    const config = wish.invitation.config as InvitationConfig;
+    const locale: Locale = isCouple ? config.defaultLocale : 'uz';
+    if (!isCouple && !isOwner) {
+      await this.api.answerCallback(q.id, t(locale, 'telegram.wish.forbidden'));
+      return;
+    }
+
+    const status = action === 'a' ? ('APPROVED' as const) : ('HIDDEN' as const);
+    await this.prisma.wish.update({ where: { id: wish.id }, data: { status } });
+    await this.api.answerCallback(
+      q.id,
+      t(locale, status === 'APPROVED' ? 'telegram.wish.approvedToast' : 'telegram.wish.hiddenToast'),
+    );
+    const panel = isCouple
+      ? { text: t(locale, 'telegram.rsvp.openPanel'), url: `${this.presenter.publicUrl(wish.invitation.slug)}/admin` }
+      : undefined;
+    if (q.message) await this.api.editKeyboard(chat, q.message.message_id, wishKeyboard(locale, wish.id, status, panel));
+    this.logger.log(`Tilak ${wish.id}: ${status} (${isCouple ? 'juftlik' : 'owner'}, Telegram)`);
+  }
+
   private async onStop(message: TgMessage): Promise<void> {
     const chatId = String(message.chat.id);
     const [invitations, owners] = await this.prisma.$transaction([
@@ -138,7 +189,7 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
       try {
         const updates = await this.api.call<TgUpdate[]>(
           'getUpdates',
-          { offset, timeout: 25, allowed_updates: ['message'] },
+          { offset, timeout: 25, allowed_updates: ['message', 'callback_query'] },
           35_000,
           this.abort.signal,
         );

@@ -1,7 +1,12 @@
 @let st = stats();
 @let l = lang();
 @let tz = timezone();
-@let counts = { all: st.replies, attending: st.attendingReplies, declined: st.notAttendingReplies };
+@let counts = {
+  all: st.replies,
+  attending: st.attendingReplies,
+  declined: st.notAttendingReplies,
+  pendingWishes: st.pendingWishes,
+};
 
 <section class="list">
   <div class="list__head">
@@ -29,12 +34,13 @@
   }
 
   <div class="filters" role="tablist" [attr.aria-label]="'admin.guests.filter.label' | transloco">
-    @for (f of filters; track f) {
+    @for (f of filters(); track f) {
       <button
         type="button"
         role="tab"
         class="filters__btn"
         [class.filters__btn--active]="filter() === f"
+        [class.filters__btn--alert]="f === 'pendingWishes' && counts[f] > 0"
         [attr.aria-selected]="filter() === f"
         (click)="filter.set(f)"
       >
@@ -90,12 +96,64 @@
               {{ phone(g.phone) }}
             </a>
           }
-
-          @if (g.wish) {
-            <blockquote class="guest__wish" [class.guest__wish--hidden]="g.wishHidden">{{ g.wish }}</blockquote>
-            @if (g.wishHidden) {
-              <p class="guest__note">{{ 'admin.guests.wishHidden' | transloco }}</p>
+          @if (g.telegram; as tg) {
+            @if (tg.username) {
+              <a class="guest__tg" [href]="'https://t.me/' + tg.username" target="_blank" rel="noopener">✈️ @{{ tg.username }}</a>
+            } @else {
+              <span class="guest__tg" [attr.title]="'admin.guests.viaTelegramHint' | transloco">✈️ {{ 'admin.guests.viaTelegram' | transloco }}</span>
             }
+          }
+
+          @if (g.wishes.length) {
+            <ul class="wishes" [attr.aria-label]="'admin.guests.wishesOf' | transloco: { name: g.name }">
+              @for (w of g.wishes; track w.id) {
+                @let wBusy = busyId() === w.id;
+                <li
+                  class="wish"
+                  [class.wish--hidden]="w.status === 'HIDDEN'"
+                  [class.wish--pending]="w.status === 'PENDING'"
+                >
+                  <blockquote class="wish__text">{{ w.text }}</blockquote>
+                  <div class="wish__meta">
+                    @if (wishModeration() || w.flagged) {
+                      @switch (w.status) {
+                        @case ('PENDING') {
+                          <span class="badge badge--pending">⏳ {{ 'admin.guests.wishPending' | transloco }}</span>
+                        }
+                        @case ('HIDDEN') {
+                          <span class="badge badge--hidden">🚫 {{ 'admin.guests.wishHidden' | transloco }}</span>
+                        }
+                        @case ('APPROVED') {
+                          <span class="badge badge--approved">✓ {{ 'admin.guests.wishApproved' | transloco }}</span>
+                        }
+                      }
+                      @if (w.flagged) {
+                        <span class="badge badge--flagged" [attr.title]="'admin.guests.wishFlaggedHint' | transloco">
+                          ⚠️ {{ 'admin.guests.wishFlagged' | transloco }}
+                        </span>
+                      }
+                    }
+                    <span class="wish__date">
+                      {{ (w.createdAt | eventDate: 'short' : tz : l) + ' ' + (w.createdAt | eventDate: 'time' : tz : l) }}
+                    </span>
+                    @if (wishModeration()) {
+                      <span class="wish__actions">
+                        @if (w.status !== 'APPROVED') {
+                          <button type="button" class="link link--ok" (click)="setWish(w.id, 'APPROVED')" [disabled]="wBusy">
+                            {{ (w.status === 'PENDING' ? 'admin.guests.approveWish' : 'admin.guests.showWish') | transloco }}
+                          </button>
+                        }
+                        @if (w.status !== 'HIDDEN') {
+                          <button type="button" class="link" (click)="setWish(w.id, 'HIDDEN')" [disabled]="wBusy">
+                            {{ 'admin.guests.hideWish' | transloco }}
+                          </button>
+                        }
+                      </span>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
           }
 
           <div class="guest__foot">
@@ -109,11 +167,6 @@
                   {{ 'admin.guests.confirmDelete' | transloco }}
                 </button>
               } @else {
-                @if (g.wish && wishModeration()) {
-                  <button type="button" class="link" (click)="toggleWish(g)" [disabled]="busy">
-                    {{ (g.wishHidden ? 'admin.guests.showWish' : 'admin.guests.hideWish') | transloco }}
-                  </button>
-                }
                 <button type="button" class="link link--danger" (click)="confirmDeleteId.set(g.id)" [disabled]="busy">
                   {{ 'admin.guests.delete' | transloco }}
                 </button>

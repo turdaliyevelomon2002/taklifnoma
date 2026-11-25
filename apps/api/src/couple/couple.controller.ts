@@ -17,14 +17,14 @@ import type { Invitation } from '@prisma/client';
 import {
   guestExportQuerySchema,
   guestListQuerySchema,
-  wishVisibilitySchema,
+  wishStatusSchema,
   type CoupleSessionInfo,
   type GuestListQueryParsed,
   type GuestPage,
   type GuestView,
   type InvitationConfig,
   type Locale,
-  type WishVisibilityInput,
+  type WishStatusInput,
 } from '@taklifnoma/shared';
 import { CoupleGuard, CoupleInvitationId } from '../auth/couple/couple.guard';
 import { ApiError } from '../common/api-error';
@@ -82,14 +82,14 @@ export class CoupleController {
     return this.guests.list(invitationId, query);
   }
 
-  /** Tilakni ommaviy "Tilaklar" devoridan yashirish yoki qaytarish. */
-  @Patch('guests/:id/wish')
-  setWishHidden(
+  /** Tilakni tasdiqlash (devorga chiqadi) yoki yashirish. */
+  @Patch('wishes/:id')
+  setWishStatus(
     @CoupleInvitationId() invitationId: string,
     @Param('id', new ParseUUIDPipe({ exceptionFactory: () => ApiError.notFound() })) id: string,
-    @Body(new ZodValidationPipe(wishVisibilitySchema)) body: WishVisibilityInput,
+    @Body(new ZodValidationPipe(wishStatusSchema)) body: WishStatusInput,
   ): Promise<GuestView> {
-    return this.guests.setWishHidden(invitationId, id, body.hidden);
+    return this.guests.setWishStatus(invitationId, id, body.status);
   }
 
   @Delete('guests/:id')

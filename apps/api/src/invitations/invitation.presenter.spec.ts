@@ -7,7 +7,7 @@ import { InvitationPresenter } from './invitation.presenter';
 
 const storage = { publicUrl: (k: string) => `https://cdn.test/${k}` } as StorageService;
 const config = { get: () => 'https://toy.uz' } as unknown as AppConfig;
-const telegram = { coupleLink: () => null } as unknown as TelegramLinkService;
+const telegram = { coupleLink: () => null, miniAppLink: () => null } as unknown as TelegramLinkService;
 const presenter = new InvitationPresenter(storage, config, telegram);
 
 const future = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();

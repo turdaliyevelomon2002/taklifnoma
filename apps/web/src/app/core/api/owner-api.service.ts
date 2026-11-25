@@ -20,6 +20,7 @@ import type {
   PublicInvitation,
   TelegramLinkInfo,
   UpdateInvitationInput,
+  WishStatusInput,
 } from '@taklifnoma/shared';
 import { firstValueFrom, type Observable } from 'rxjs';
 import { request, toApiError } from './api-error';
@@ -117,8 +118,8 @@ export class OwnerApi {
     return {
       listGuests: (query: GuestListQuery) =>
         this.run(this.http.get<GuestPage>(base, { params: toParams(query) })),
-      setWishHidden: (rsvpId: string, hidden: boolean) =>
-        this.run(this.http.patch<GuestView>(`${base}/${rsvpId}/wish`, { hidden })),
+      setWishStatus: (wishId: string, status: WishStatusInput['status']) =>
+        this.run(this.http.patch<GuestView>(`${BASE}/invitations/${id}/wishes/${wishId}`, { status })),
       removeGuest: (rsvpId: string) => this.run(this.http.delete<void>(`${base}/${rsvpId}`)),
       exportExcel: (lang: Locale) => this.download(`${base}/export`, { lang }),
     };

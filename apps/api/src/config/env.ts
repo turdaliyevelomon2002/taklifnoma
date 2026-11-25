@@ -49,6 +49,11 @@ export const envSchema = z.object({
   TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
   /** Telegram har so'rovda X-Telegram-Bot-Api-Secret-Token sarlavhasida yuboradi. */
   TELEGRAM_WEBHOOK_SECRET: z.string().regex(/^[A-Za-z0-9_-]{32,256}$/).optional(),
+  /**
+   * BotFather /newapp bilan yaratilgan Mini App'ning qisqa nomi (t.me/<bot>/<NOM>).
+   * Mini App URL'i: https://domen.uz/tg. Berilmasa "faqat Telegram orqali" rejimi ishlamaydi.
+   */
+  TELEGRAM_MINIAPP_NAME: z.string().regex(/^[A-Za-z0-9_]{3,30}$/).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

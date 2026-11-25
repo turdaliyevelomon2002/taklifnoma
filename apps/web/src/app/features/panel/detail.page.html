@@ -115,6 +115,22 @@
             }
           </section>
 
+          <section class="card">
+            <h2 class="card__title">{{ 'panel.access.miniAppTitle' | transloco }}</h2>
+            @if (d.telegramAppUrl; as url) {
+              <p class="muted">{{ 'panel.access.miniAppHint' | transloco }}</p>
+              <div class="row">
+                <code class="code">{{ url }}</code>
+                <button type="button" class="btn" (click)="copy(url)">{{ 'panel.access.copy' | transloco }}</button>
+              </div>
+              @if (!d.config.rsvp.telegramOnly) {
+                <p class="hint">{{ 'panel.access.miniAppOptional' | transloco }}</p>
+              }
+            } @else {
+              <p class="hint">{{ 'panel.access.miniAppNotConfigured' | transloco }}</p>
+            }
+          </section>
+
           <section class="card danger">
             <h2 class="card__title">{{ 'panel.detail.deleteTitle' | transloco }}</h2>
             <p class="muted">{{ 'panel.detail.deleteHint' | transloco: { slug: d.slug } }}</p>

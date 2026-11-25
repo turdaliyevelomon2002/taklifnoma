@@ -13,6 +13,11 @@ export const routes: Routes = [
     path: 'panel',
     loadChildren: () => import('./features/panel/panel.routes').then((m) => m.PANEL_ROUTES),
   },
+  // Telegram Mini App kirishi ("tg" ham RESERVED_SLUGS da).
+  {
+    path: 'tg',
+    loadComponent: () => import('./features/telegram/telegram-entry.page').then((m) => m.TelegramEntryPage),
+  },
   {
     path: ':slug',
     loadChildren: () =>

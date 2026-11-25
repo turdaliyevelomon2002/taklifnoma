@@ -75,7 +75,10 @@ export async function buildGuestsWorkbook(input: GuestsExcelInput): Promise<Buff
       phone: g.phone ? formatUzPhone(g.phone) : '',
       answer: t(l, g.attending ? 'export.yes' : 'export.no'),
       guests: g.attending ? g.guestCount : 0,
-      wish: g.wish ? safeCell(g.wish) : '',
+      // Bir nechta tilak bo'lsa raqamlanadi, har biri yangi qatordan.
+      wish: safeCell(
+        g.wishes.map((w, n) => (g.wishes.length > 1 ? `${n + 1}) ${w.text}` : w.text)).join('\n\n'),
+      ),
       lang: g.locale.toUpperCase(),
       date: formatDate(g.createdAt, timezone),
     });

@@ -361,12 +361,29 @@
         "minlength": "Kamida {{n}} ta harf kiriting",
         "phone": "Raqamni to'liq kiriting, masalan: 90 123 45 67",
         "attending": "Iltimos, javobingizni tanlang"
-      }
+      },
+      "wishPending": "Tilakingiz juftlik tasdiqlagandan keyin tilaklar devorida hammaga ko'rinadi.",
+      "telegramOnly": {
+        "title": "Javob Telegram orqali",
+        "text": "Juftlik javob va tilaklarni faqat Telegram orqali qabul qiladi. Taklifnomani Telegram'da oching: sizni avtomatik taniymiz, javobingizni keyin ham o'zgartira olasiz.",
+        "open": "Telegram'da ochish",
+        "askLink": "Taklifnomaning Telegram havolasini sizni taklif qilgan kishidan so'rang."
+      },
+      "telegramAs": "Telegram orqali: {{name}}",
+      "phoneHintTelegram": "Javobingiz Telegram akkauntingizga bog'lanadi: keyin shu yerdan o'zgartira olasiz.",
+      "extraOpen": "Yana tilak yozish",
+      "extraLabel": "Yangi tilak ({{name}} nomidan)",
+      "extraSend": "Yuborish",
+      "extraCancel": "Bekor qilish",
+      "extraAdded": "✓ Tilakingiz devorga qo'shildi.",
+      "extraPending": "⏳ Tilakingiz qabul qilindi: juftlik tasdiqlagach, devorda hammaga ko'rinadi."
     },
     "wishes": {
       "title": "Tilaklar",
       "empty": "Birinchi bo'lib tilak qoldiring!",
-      "count": "{{n}} ta tilak"
+      "count": "{{n}} ta tilak",
+      "pending": "Tasdiqlanishi kutilmoqda",
+      "pendingHint": "Tilakingizni hozircha faqat siz ko'ryapsiz. Juftlik tasdiqlagach, hamma ko'radi."
     },
     "cta": {
       "rsvp": "Javob berish"
@@ -393,7 +410,12 @@
     "GALLERY_LIMIT_REACHED": "Galereya limiti tugadi",
     "UNSUPPORTED_FILE_TYPE": "Bu fayl turi qo'llab-quvvatlanmaydi",
     "FILE_TOO_LARGE": "Fayl juda katta",
-    "FILE_REQUIRED": "Faylni tanlang"
+    "FILE_REQUIRED": "Faylni tanlang",
+    "TELEGRAM_REQUIRED": "Javob faqat Telegram orqali qabul qilinadi. Taklifnomani Telegram'da oching.",
+    "TELEGRAM_AUTH_INVALID": "Telegram sessiyasi eskirgan. Taklifnomani Telegram'da qayta oching.",
+    "PHONE_TAKEN": "Bu telefon raqami bilan boshqa javob berilgan. Raqamsiz yuboring yoki juftlikka murojaat qiling.",
+    "REPLY_REQUIRED": "Tilak qo'shishdan oldin taklifga javob bering.",
+    "WISH_LIMIT_REACHED": "Siz yozishingiz mumkin bo'lgan tilaklar soni tugadi."
   },
   "admin": {
     "title": "Juftlik paneli",
@@ -440,7 +462,8 @@
         "label": "Filtr",
         "all": "Hammasi",
         "attending": "Keladi",
-        "declined": "Kelmaydi"
+        "declined": "Kelmaydi",
+        "pendingWishes": "Kutilayotgan tilaklar"
       },
       "sort": {
         "label": "Saralash",
@@ -454,14 +477,22 @@
       "more": "Yana ko'rsatish",
       "attending": "Keladi · {{count}} kishi",
       "declined": "Kelmaydi",
-      "wishHidden": "Tilaklar devorida yashirilgan",
+      "wishHidden": "Yashirilgan",
       "hideWish": "Devordan yashirish",
       "showWish": "Devorda ko'rsatish",
       "delete": "O'chirish",
       "confirmDelete": "Ha, o'chirish",
       "cancel": "Bekor qilish",
       "answeredAt": "Javob berilgan: {{date}}",
-      "call": "Qo'ng'iroq qilish"
+      "call": "Qo'ng'iroq qilish",
+      "wishPending": "Tasdiq kutmoqda",
+      "wishApproved": "Devorda ko'rinadi",
+      "wishFlagged": "Nojo'ya so'z bo'lishi mumkin",
+      "wishFlaggedHint": "Avtomatik filtr tilak yoki ismda so'kinish yoki haqorat bo'lishi mumkin bo'lgan so'z topdi. Diqqat bilan o'qib chiqing.",
+      "approveWish": "Tasdiqlash",
+      "viaTelegram": "Telegram orqali",
+      "viaTelegramHint": "Mehmon Telegram akkaunti bilan javob bergan (username yo'q)",
+      "wishesOf": "{{name}} tilaklari"
     },
     "export": {
       "button": "Excel'ga yuklash",
@@ -544,7 +575,11 @@
       "regenerateConfirm": "Ha, yangisini yaratish",
       "telegramLinked": "Juftlik Telegram botga ulangan",
       "telegramHint": "Bu havolani juftlikka yuboring: ochib «Start» bosishsa, yangi javoblar Telegramga keladi.",
-      "botNotConfigured": "Telegram bot sozlanmagan (TELEGRAM_BOT_TOKEN)."
+      "botNotConfigured": "Telegram bot sozlanmagan (TELEGRAM_BOT_TOKEN).",
+      "miniAppTitle": "Mehmonlar uchun Telegram havola",
+      "miniAppHint": "Shu havolani mehmonlarga Telegram orqali yuboring: taklifnoma Telegram ichida ochiladi va mehmon akkaunti bo'yicha taniladi.",
+      "miniAppOptional": "\"Faqat Telegram orqali javob\" o'chiq: brauzer orqali ham javob berish mumkin.",
+      "miniAppNotConfigured": "Mini App sozlanmagan (server .env: TELEGRAM_MINIAPP_NAME). Yo'riqnoma: docs/DEPLOY.md, 4-qism."
     },
     "media": {
       "cover": "Muqova rasmi",
@@ -674,7 +709,11 @@
       "save": "Saqlash",
       "saving": "Saqlanmoqda…",
       "saved": "Saqlandi",
-      "fixErrors": "Belgilangan maydonlarni to'g'rilang"
+      "fixErrors": "Belgilangan maydonlarni to'g'rilang",
+      "moderateWishes": "Tilaklarni tekshirib chiqarish",
+      "moderateWishesHint": "Yoqiq bo'lsa, tilak juftlik yoki siz tasdiqlagandan keyingina devorda ko'rinadi. Nojo'ya so'z topilgan tilaklar har doim tekshiruvga tushadi.",
+      "telegramOnly": "Faqat Telegram orqali javob",
+      "telegramOnlyHint": "Mehmonlar javob va tilakni faqat Telegram Mini App orqali yuboradi: har bir Telegram akkaunt bitta javob beradi va keyin qayta kirsa taniladi. Sahifaning o'zini hamma ko'ra oladi. Bot va Mini App sozlangan bo'lishi kerak."
     },
     "validation": {
       "required": "Bu maydonni to'ldiring",

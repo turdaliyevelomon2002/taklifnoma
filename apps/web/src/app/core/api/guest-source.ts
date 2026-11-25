@@ -1,4 +1,4 @@
-import type { GuestListQuery, GuestPage, GuestView, Locale } from '@taklifnoma/shared';
+import type { GuestListQuery, GuestPage, GuestView, Locale, WishStatusInput } from '@taklifnoma/shared';
 
 /**
  * Mehmonlar ro'yxati uchun ma'lumot manbai. Juftlik paneli (CoupleApi) va owner paneli
@@ -6,7 +6,8 @@ import type { GuestListQuery, GuestPage, GuestView, Locale } from '@taklifnoma/s
  */
 export interface GuestSource {
   listGuests(query: GuestListQuery): Promise<GuestPage>;
-  setWishHidden(id: string, hidden: boolean): Promise<GuestView>;
+  /** id: tilak ID'si. Muallif (mehmon) kartasi qaytadi. */
+  setWishStatus(id: string, status: WishStatusInput['status']): Promise<GuestView>;
   removeGuest(id: string): Promise<void>;
   exportExcel(lang: Locale): Promise<{ blob: Blob; fileName: string }>;
 }

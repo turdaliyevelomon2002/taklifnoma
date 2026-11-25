@@ -7,6 +7,7 @@ export const EMPTY_STATS: Readonly<RsvpStats> = {
   attendingReplies: 0,
   attendingGuests: 0,
   notAttendingReplies: 0,
+  pendingWishes: 0,
 };
 
 @Injectable()
@@ -25,6 +26,12 @@ export class RsvpStatsService {
       _sum: { guestCount: true },
     });
 
+    const pending = await this.prisma.wish.groupBy({
+      by: ['invitationId'],
+      where: { invitationId: { in: ids }, status: 'PENDING' },
+      _count: { _all: true },
+    });
+
     for (const row of rows) {
       const stats = result.get(row.invitationId) ?? { ...EMPTY_STATS };
       stats.replies += row._count._all;
@@ -34,6 +41,11 @@ export class RsvpStatsService {
       } else {
         stats.notAttendingReplies += row._count._all;
       }
+      result.set(row.invitationId, stats);
+    }
+    for (const row of pending) {
+      const stats = result.get(row.invitationId) ?? { ...EMPTY_STATS };
+      stats.pendingWishes = row._count._all;
       result.set(row.invitationId, stats);
     }
     return result;

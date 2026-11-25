@@ -1,6 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import type { RsvpFormToken, RsvpSubmitInput, RsvpSubmitResult } from '@taklifnoma/shared';
+import type {
+  RsvpFormToken,
+  RsvpSubmitInput,
+  RsvpSubmitResult,
+  OwnWishView,
+  TelegramGuestSession,
+  WishAddInput,
+} from '@taklifnoma/shared';
 import { firstValueFrom } from 'rxjs';
 import { request } from './api-error';
 
@@ -21,6 +28,18 @@ export class RsvpApi {
 
   submit(slug: string, body: RsvpSubmitInput): Promise<RsvpSubmitResult> {
     return request(firstValueFrom(this.http.post<RsvpSubmitResult>(`${this.base(slug)}/rsvp`, body)));
+  }
+
+  /** Mini App: Telegram foydalanuvchisi va uning avvalgi javobi. */
+  telegramSession(slug: string, initData: string): Promise<TelegramGuestSession> {
+    return request(
+      firstValueFrom(this.http.post<TelegramGuestSession>(`${this.base(slug)}/tg-session`, { initData })),
+    );
+  }
+
+  /** Javob bergan mehmon yana tilak qo'shadi. */
+  addWish(slug: string, body: WishAddInput): Promise<OwnWishView> {
+    return request(firstValueFrom(this.http.post<OwnWishView>(`${this.base(slug)}/wishes`, body)));
   }
 
   wishesUrl(slug: string, version: number): string {

@@ -99,6 +99,7 @@ model Invitation {
 
   media            MediaAsset[]
   rsvps            Rsvp[]
+  wishes           Wish[]
 
   @@index([status, eventDate])
   @@index([createdAt])
@@ -125,6 +126,12 @@ model MediaAsset {
   @@map("media_assets")
 }
 
+enum WishStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
 model Rsvp {
   id           String         @id @default(uuid()) @db.Uuid
   invitationId String         @db.Uuid
@@ -134,9 +141,9 @@ model Rsvp {
   phone        String?        @db.VarChar(20)
   attending    Boolean
   guestCount   Int            @default(1)
-  wish         String?        @db.VarChar(1000)
-  /// Juftlik tilakni sahifadagi tilaklar devoridan yashirishi mumkin.
-  wishHidden   Boolean        @default(false)
+  /// Javob Telegram Mini App orqali berilgan bo'lsa: mehmonning Telegram ID'si (bitta akkaunt = bitta javob).
+  telegramUserId   BigInt?
+  telegramUsername String?   @db.VarChar(64)
   locale       String         @db.VarChar(5)
   /// Spam tahlili uchun IP xeshi (xom IP saqlanmaydi).
   ipHash       String?        @db.Char(64)
@@ -145,12 +152,37 @@ model Rsvp {
   updatedAt    DateTime       @updatedAt
 
   notifications Notification[]
+  /// Mehmonning tilaklari (bir nechta bo'lishi mumkin; muallif = shu javob).
+  wishes        Wish[]
 
   /// Bir raqamdan qayta yuborilsa, eski javob yangilanadi.
   @@unique([invitationId, phone])
   @@index([invitationId, createdAt])
   @@index([invitationId, ipHash, createdAt])
+  @@unique([invitationId, telegramUserId])
   @@map("rsvps")
+}
+
+/// Mehmon tilagi. Har biri muallifiga (Rsvp) bog'langan: kim yozgani doim aniq.
+model Wish {
+  id           String     @id @default(uuid()) @db.Uuid
+  invitationId String     @db.Uuid
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  rsvpId       String     @db.Uuid
+  rsvp         Rsvp       @relation(fields: [rsvpId], references: [id], onDelete: Cascade)
+  text         String     @db.VarChar(1000)
+  /// PENDING (tasdiq kutmoqda), APPROVED (devorda), HIDDEN (yashirilgan).
+  status       WishStatus @default(PENDING)
+  /// So'kinish filtri matnda yoki muallif ismida shubhali so'z topgan.
+  flagged      Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  notifications Notification[]
+
+  @@index([invitationId, status, createdAt])
+  @@index([rsvpId, createdAt])
+  @@map("wishes")
 }
 
 /// Telegram bildirishnomalari uchun outbox (retry bilan).
@@ -158,6 +190,11 @@ model Notification {
   id          String       @id @default(uuid()) @db.Uuid
   rsvpId      String       @db.Uuid
   rsvp        Rsvp         @relation(fields: [rsvpId], references: [id], onDelete: Cascade)
+  /// Xabardagi tilak (javob bilan birga yoki keyin alohida yozilgan).
+  wishId      String?      @db.Uuid
+  wish        Wish?        @relation(fields: [wishId], references: [id], onDelete: Cascade)
+  /// Faqat yangi tilak haqida (javob o'zgarmagan): "Yangi tilak" xabari.
+  wishOnly    Boolean      @default(false)
   target      NotifyTarget
   /// Mavjud javob yangilangan (yangi javob emas).
   isUpdate    Boolean      @default(false)

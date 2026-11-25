@@ -111,6 +111,7 @@ Har bir maxfiy qiymat uchun alohida yangi qator yarating: `openssl rand -hex 32`
 | `OWNER_EMAIL`, `OWNER_PASSWORD` | panelga kirish (parol kamida 10 belgi, kuchli) |
 | `TELEGRAM_BOT_TOKEN` | 4-qismdagi **production** bot tokeni |
 | `TELEGRAM_WEBHOOK_SECRET` | `openssl rand -hex 32` |
+| `TELEGRAM_MINIAPP_NAME` | Mini App qisqa nomi (4-qism, 4-qadam); "faqat Telegram orqali javob" uchun |
 
 Saqlash: `Ctrl+O`, Enter, `Ctrl+X`.
 
@@ -145,6 +146,13 @@ Migratsiyalar avtomatik qo'llanadi.
 2. Tokenni serverdagi `.env` ga, `TELEGRAM_WEBHOOK_SECRET` ni ham yozing → `docker compose up -d api`. Webhook avtomatik o'rnatiladi (`docker compose logs api`).
 3. Ixtiyoriy (BotFather): `/setuserpic` (rasm), `/setdescription`, `/setabouttext`.
 4. Panelda **"Telegram'ni ulash"** → Start.
+5. **Mini App** (mehmonlarni Telegram akkaunti bilan tanish uchun):
+   - @BotFather → `/newapp` → botni tanlang → nom, tavsif, 640×360 rasm.
+   - **Web App URL**: `https://domen.uz/tg`
+   - **Short name**: masalan `taklif` → havola `https://t.me/taklifnoma_bot/taklif` bo'ladi.
+   - Short name'ni `.env` dagi `TELEGRAM_MINIAPP_NAME` ga yozing → `docker compose up -d api`.
+   - Panel → taklifnoma → "Kirish va sozlamalar": mehmonlar uchun havola (`...?startapp=<slug>`) shu yerda.
+   - Taklifnoma "Javob formasi" bo'limida **"Faqat Telegram orqali javob"** belgisini yoqing.
 
 ---
 

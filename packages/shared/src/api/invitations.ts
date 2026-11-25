@@ -65,6 +65,8 @@ export interface RsvpStats {
   /** Keladigan mehmonlar soni (guestCount yig'indisi). */
   attendingGuests: number;
   notAttendingReplies: number;
+  /** Tasdiqlashni kutayotgan tilaklar soni. */
+  pendingWishes: number;
 }
 
 export interface InvitationListItem {
@@ -102,6 +104,8 @@ export interface InvitationDetail extends InvitationListItem {
   coupleTelegramLinked: boolean;
   /** Juftlik botga ulanishi uchun deep link (bot sozlanmagan bo'lsa null). */
   telegramLinkUrl: string | null;
+  /** Mehmonlarga tarqatiladigan Mini App havolasi (bot yoki ilova sozlanmagan bo'lsa null). */
+  telegramAppUrl: string | null;
   pinEnabled: boolean;
   media: MediaView[];
   publicUrl: string;
