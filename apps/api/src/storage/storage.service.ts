@@ -1,18 +1,20 @@
 import {
+  CreateBucketCommand,
   DeleteObjectsCommand,
   HeadBucketCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 import { AppConfig } from '../config/app-config.service';
 
 /**
- * S3-mos storage (AWS S3, MinIO, Cloudflare R2, Yandex Object Storage ...).
+ * S3-mos storage (SeaweedFS, AWS S3, Cloudflare R2, Yandex Object Storage ...).
+ * Bucket yo'q bo'lsa ilova ishga tushganda o'zi yaratadi (alohida init konteyner kerak emas).
  * Fayllar unikal kalit bilan yoziladi va o'zgarmaydi, shuning uchun uzoq muddatli kesh qo'yiladi.
  */
 @Injectable()
-export class StorageService implements OnModuleDestroy {
+export class StorageService implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(StorageService.name);
   private readonly client: S3Client;
   private readonly bucket: string;
@@ -30,6 +32,36 @@ export class StorageService implements OnModuleDestroy {
         secretAccessKey: config.get('S3_SECRET_KEY'),
       },
     });
+  }
+
+  /** Ishga tushishni to'xtatmaydi: storage kechikib ko'tarilsa, bir necha marta qayta urinadi. */
+  onApplicationBootstrap(): void {
+    void this.ensureBucket();
+  }
+
+  private async ensureBucket(attempts = 10): Promise<void> {
+    for (let i = 1; i <= attempts; i++) {
+      try {
+        await this.client.send(new HeadBucketCommand({ Bucket: this.bucket }));
+        return;
+      } catch (err) {
+        const status = (err as { $metadata?: { httpStatusCode?: number } }).$metadata?.httpStatusCode;
+        if (status === 404) {
+          try {
+            await this.client.send(new CreateBucketCommand({ Bucket: this.bucket }));
+            this.logger.log(`S3 bucket yaratildi: ${this.bucket}`);
+            return;
+          } catch (createErr) {
+            this.logger.warn(`S3 bucket yaratib bo'lmadi: ${String(createErr)}`);
+          }
+        }
+        if (i === attempts) {
+          this.logger.error(`S3 storage'ga ulanib bo'lmadi (${this.bucket}): ${String(err)}`);
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
   }
 
   async put(key: string, body: Buffer, contentType: string): Promise<void> {

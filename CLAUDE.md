@@ -5,13 +5,12 @@ Foydalanuvchi bilan **o'zbek tilida** muloqot qilinadi.
 
 ## Holat
 1–6 bosqichlar tugagan: API+DB, 3 ta shablon, RSVP+Telegram, juftlik paneli, owner paneli, Docker/deploy.
-Docker image'lar hali haqiqiy Docker'da build qilinmagan (ishlab chiqish kompyuterida Docker Engine ishlamagan):
-birinchi `docker compose up -d --build` da xato chiqsa, shu yerdan boshlang.
+Lokal Docker infra (PostgreSQL :5434, SeaweedFS :8333) bilan to'liq sinalgan. Production image'lari (`docker compose up -d --build`) hali build qilinmagan: xato chiqsa, shu yerdan boshlang.
 
 ## Stack
 - npm workspaces: `packages/shared` (Zod sxemalar, tiplar, enumlar; CJS+ESM), `apps/api` (NestJS 11 + Prisma 6 + PostgreSQL), `apps/web` (Angular 22 standalone, signals, zoneless, SSR, Transloco).
-- Fayllar: S3/MinIO (sharp bilan webp variantlar). Telegram Bot API (polling dev / webhook prod, outbox dispatcher).
-- Production: `docker-compose.yml` (Caddy HTTPS → web/api, PostgreSQL, MinIO). Batafsil: README.
+- Fayllar: S3 API, lokal va prod'da SeaweedFS (MinIO image'lari endi ochiq emas); bucket'ni API o'zi yaratadi; sharp bilan webp variantlar. Telegram Bot API (polling dev / webhook prod, outbox dispatcher).
+- Production: `docker-compose.yml` (Caddy HTTPS → web/api, PostgreSQL, SeaweedFS). Batafsil: README.
 
 ## Qoidalar (foydalanuvchi talab qilgan)
 - Ish bosqichma-bosqich; har bosqichdan keyin to'xtab, o'zbekcha qisqa ishga tushirish/tekshirish yo'riqnomasi beriladi.

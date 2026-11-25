@@ -5,7 +5,7 @@ Har bir juftlik uchun `domen.uz/{slug}` manzilida taklifnoma sayti. Saytlar shab
 ## Tuzilma
 
 ```
-apps/api          NestJS + Prisma (PostgreSQL), S3 (MinIO)
+apps/api          NestJS + Prisma (PostgreSQL), S3 (SeaweedFS)
 apps/web          Angular 22 SSR: mehmon sahifasi, shablonlar, i18n (Transloco)
 packages/shared   Umumiy tiplar va Zod sxemalari: InvitationConfig, FeatureFlags, API kontraktlari
 ```
@@ -17,7 +17,7 @@ Talablar: Node.js 24.15+ (`.nvmrc`), Docker Desktop.
 ```bash
 npm install
 cp apps/api/.env.example apps/api/.env      # kerak bo'lsa qiymatlarni o'zgartiring
-npm run dev:infra                           # PostgreSQL :5433, MinIO :9000 (konsol :9001)
+npm run dev:infra                           # PostgreSQL :5434, SeaweedFS S3 :8333
 npm run db:migrate                          # migratsiyalarni qo'llaydi
 npm run db:seed                             # owner akkaunti + demo "ali-madina"
 npm run dev:api                             # http://localhost:3000/api
@@ -205,12 +205,12 @@ To'liq bosqichma-bosqich yo'riqnoma (lokal sinash, domen, server, Telegram): [do
 
 ```
 Internet ──► Caddy :443 (HTTPS, Let's Encrypt)
-               ├─ /api/*    ──► api  (NestJS, :3000) ──► postgres, minio
-               ├─ /media/*  ──► minio (faqat GET, uzoq kesh)
+               ├─ /api/*    ──► api  (NestJS, :3000) ──► postgres, seaweedfs
+               ├─ /media/*  ──► seaweedfs (faqat GET, uzoq kesh)
                └─ qolgani   ──► web  (Angular SSR, :4000) ──► api (ichki tarmoq)
 ```
 
-Faqat 80/443 portlar ochiq; PostgreSQL va MinIO tashqariga chiqmaydi. API konteyneri har ishga tushganda `prisma migrate deploy` bajaradi (`RUN_MIGRATIONS=false` bilan o'chiriladi).
+Faqat 80/443 portlar ochiq; PostgreSQL va SeaweedFS tashqariga chiqmaydi. Fayl ombori: SeaweedFS (S3 API; MinIO o'z Docker image'larini ochiq registrlardan olib tashlagan). Bucket'ni API ishga tushganda o'zi yaratadi. API konteyneri har ishga tushganda `prisma migrate deploy` bajaradi (`RUN_MIGRATIONS=false` bilan o'chiriladi).
 
 ### Server'ga deploy (Ubuntu 22.04/24.04, 2 GB RAM yetarli)
 
@@ -252,8 +252,8 @@ docker image prune -f
 docker compose exec -T postgres pg_dump -U taklifnoma -Fc taklifnoma > backup-$(date +%F).dump
 # Tiklash
 docker compose exec -T postgres pg_restore -U taklifnoma -d taklifnoma --clean < backup-YYYY-MM-DD.dump
-# Fayllar (MinIO volume)
-docker run --rm -v taklifnoma_minio-data:/data -v "$PWD":/backup alpine tar czf /backup/media-$(date +%F).tgz -C /data .
+# Fayllar (SeaweedFS volume)
+docker run --rm -v taklifnoma_seaweed-data:/data -v "$PWD":/backup alpine tar czf /backup/media-$(date +%F).tgz -C /data .
 ```
 
 Kunlik zaxira uchun cron: `0 3 * * * cd /root/taklifnoma && docker compose exec -T postgres pg_dump -U taklifnoma -Fc taklifnoma > /root/backups/db-$(date +\%F).dump`

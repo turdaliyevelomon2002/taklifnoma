@@ -18,11 +18,14 @@ API 3000-portni ishlatadi. Uni boshqa dastur egallagan bo'lsa, o'sha dasturni yo
 - `apps/api/.env`: `PORT=3000` → `PORT=3010`
 - `apps/web/proxy.conf.json`: `localhost:3000` → `localhost:3010`
 
+### 1.2.1. Port band bo'lsa (5434, 8333)
+Boshqa loyiha shu portlarni ishlatsa, `docker-compose.dev.yml` dagi chap tomondagi portni va `apps/api/.env` dagi mos manzilni (`DATABASE_URL` yoki `S3_ENDPOINT`/`S3_PUBLIC_URL`) birga o'zgartiring.
+
 ### 1.3. Ishga tushirish
 Loyiha papkasida:
 ```bash
 npm install
-npm run dev:infra       # PostgreSQL + MinIO (Docker)
+npm run dev:infra       # PostgreSQL :5434 + SeaweedFS S3 :8333 (Docker)
 npm run db:migrate      # jadvallar
 npm run db:seed         # owner akkaunti + demo "ali-madina"
 ```
@@ -103,7 +106,7 @@ Har bir maxfiy qiymat uchun alohida yangi qator yarating: `openssl rand -hex 32`
 |---|---|
 | `DOMAIN` | `domen.uz` (`https://` siz) |
 | `ACME_EMAIL` | emailingiz (SSL sertifikati xabarlari) |
-| `POSTGRES_PASSWORD`, `MINIO_ROOT_PASSWORD`, `S3_SECRET_KEY` | `openssl rand -hex 32` |
+| `POSTGRES_PASSWORD`, `S3_SECRET_KEY` | `openssl rand -hex 32` |
 | `OWNER_JWT_SECRET`, `COUPLE_JWT_SECRET`, `RSVP_SECRET` | `openssl rand -hex 32` |
 | `OWNER_EMAIL`, `OWNER_PASSWORD` | panelga kirish (parol kamida 10 belgi, kuchli) |
 | `TELEGRAM_BOT_TOKEN` | 4-qismdagi **production** bot tokeni |
@@ -162,7 +165,7 @@ Migratsiyalar avtomatik qo'llanadi.
 | `docker info` javob bermaydi | Docker Desktop'ni qayta oching, `wsl --update`, kompyuterni qayta yoqing |
 | `EADDRINUSE :3000` | 3000-port band: 1.2-bandga qarang |
 | Panel login: "Email yoki parol noto'g'ri" | `db:seed` (lokal) yoki `seed.js` (server) bajarilganmi, `.env` dagi email/parol to'g'rimi |
-| Rasm yuklanmaydi | MinIO ishlayaptimi: `docker compose ps`, `/api/health` dagi `storage` |
+| Rasm yuklanmaydi | SeaweedFS ishlayaptimi: `docker compose ps`, `/api/health` dagi `storage` |
 | Telegram xabari kelmaydi | Token to'g'rimi, botda Start bosilganmi, lokal va server bir xil botni ishlatmayaptimi |
 | `https` ochilmaydi | DNS A yozuvlari, 80/443 portlar ochiqmi (`ufw status`), `docker compose logs caddy` |
 | Build paytida server qotib qoladi | RAM yetmayapti: swap qo'shing (3.2) |
