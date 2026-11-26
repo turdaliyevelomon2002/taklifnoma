@@ -1,120 +1,287 @@
 @let l = lang();
+@let s = summary();
 
-<div class="page">
-  <div class="page__head">
-    <h1 class="page__title">{{ 'panel.dashboard.title' | transloco }}</h1>
-    <a class="btn btn--primary" routerLink="/panel/new">+ {{ 'panel.nav.new' | transloco }}</a>
-  </div>
+<div class="page dash">
+  <header class="page__head">
+    <div>
+      <h1 class="page__title">{{ 'panel.dashboard.title' | transloco }}</h1>
+      <p class="page__subtitle">{{ 'panel.dashboard.subtitle' | transloco }}</p>
+    </div>
+    <button type="button" class="btn btn--primary" (click)="quick.open()">
+      <tk-icon name="plus" /> {{ 'panel.quick.open' | transloco }}
+    </button>
+  </header>
 
-  @if (summary(); as s) {
-    <section class="kpis">
-      <div class="kpi">
-        <span class="kpi__value">{{ s.counts.ACTIVE }}</span>
+  <!-- KPI -->
+  <section class="kpis" [attr.aria-busy]="!s">
+    <div class="kpi">
+      <div class="kpi__top">
         <span class="kpi__label">{{ 'panel.dashboard.active' | transloco }}</span>
+        <span class="kpi__icon kpi__icon--ok"><tk-icon name="globe" /></span>
       </div>
-      <div class="kpi">
-        <span class="kpi__value">{{ s.counts.DRAFT }}</span>
+      @if (s) {
+        <span class="kpi__value">{{ s.counts.ACTIVE }}</span>
+        <span class="kpi__hint">{{ 'panel.dashboard.totalHint' | transloco: { count: s.counts.total } }}</span>
+      } @else {
+        <span class="skeleton kpi__sk"></span>
+      }
+    </div>
+    <div class="kpi">
+      <div class="kpi__top">
         <span class="kpi__label">{{ 'panel.dashboard.drafts' | transloco }}</span>
+        <span class="kpi__icon"><tk-icon name="pencil" /></span>
       </div>
-      <div class="kpi">
-        <span class="kpi__value">{{ s.revenue.thisMonth | money: l }}</span>
+      @if (s) {
+        <span class="kpi__value">{{ s.counts.DRAFT }}</span>
+        <span class="kpi__hint">{{ 'panel.dashboard.draftsHint' | transloco }}</span>
+      } @else {
+        <span class="skeleton kpi__sk"></span>
+      }
+    </div>
+    <div class="kpi">
+      <div class="kpi__top">
         <span class="kpi__label">{{ 'panel.dashboard.revenueMonth' | transloco }}</span>
+        <span class="kpi__icon kpi__icon--accent"><tk-icon name="banknote" /></span>
       </div>
-      <div class="kpi" [class.kpi--warn]="s.unpaid > 0">
-        <span class="kpi__value">{{ s.unpaid }}</span>
+      @if (s) {
+        <span class="kpi__value kpi__value--money">{{ s.revenue.thisMonth | money: l }}</span>
+        <span class="kpi__hint">{{ 'panel.dashboard.revenueTotal' | transloco: { amount: (s.revenue.total | money: l) } }}</span>
+      } @else {
+        <span class="skeleton kpi__sk"></span>
+      }
+    </div>
+    <div class="kpi" [class.kpi--warn]="(s?.unpaid ?? 0) > 0">
+      <div class="kpi__top">
         <span class="kpi__label">{{ 'panel.dashboard.unpaid' | transloco }}</span>
+        <span class="kpi__icon kpi__icon--warn"><tk-icon name="alert-triangle" /></span>
       </div>
-    </section>
+      @if (s) {
+        <span class="kpi__value">{{ s.unpaid }}</span>
+        <span class="kpi__hint">{{ 'panel.dashboard.unpaidHint' | transloco }}</span>
+      } @else {
+        <span class="skeleton kpi__sk"></span>
+      }
+    </div>
+  </section>
 
-    @if (s.upcoming.length) {
-      <section class="card upcoming">
-        <h2 class="card__title">{{ 'panel.dashboard.upcoming' | transloco }}</h2>
-        <ul class="upcoming__list">
-          @for (u of s.upcoming; track u.id) {
-            <li>
-              <a [routerLink]="['/panel/i', u.id]" class="upcoming__item">
-                <span class="upcoming__date">{{ u.eventDate | eventDate: 'short' : tz : l }}</span>
-                <span class="upcoming__names">{{ u.coupleNames }}</span>
-                <span class="muted upcoming__stats">{{ 'panel.dashboard.guestsShort' | transloco: { count: u.stats.attendingGuests } }}</span>
-              </a>
-            </li>
-          }
-        </ul>
-      </section>
-    }
+  <!-- Yaqin to'ylar -->
+  @if (s?.upcoming?.length) {
+    <section class="card">
+      <div class="card__head">
+        <h2 class="card__title"><tk-icon name="calendar" /> {{ 'panel.dashboard.upcoming' | transloco }}</h2>
+      </div>
+      <ul class="upcoming">
+        @for (u of s!.upcoming; track u.id) {
+          @let d = dateParts(u.eventDate);
+          @let left = daysLeft(u.eventDate);
+          <li>
+            <a [routerLink]="['/panel/i', u.id]" class="up">
+              <span class="up__date">
+                <b>{{ d.day }}</b>
+                <small>{{ 'panel.months.' + d.month | transloco }}</small>
+              </span>
+              <span class="up__body">
+                <span class="up__names">{{ u.coupleNames }}</span>
+                <span class="up__meta">
+                  <tk-icon name="users" /> {{ 'panel.dashboard.guestsShort' | transloco: { count: u.stats.attendingGuests } }}
+                </span>
+              </span>
+              <span class="up__left" [class.up__left--soon]="left <= 3">
+                @switch (left) {
+                  @case (0) { {{ 'panel.dashboard.today' | transloco }} }
+                  @case (1) { {{ 'panel.dashboard.tomorrow' | transloco }} }
+                  @default { {{ 'panel.dashboard.inDays' | transloco: { count: left } }} }
+                }
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
   }
 
-  <section class="card">
-    <div class="filters">
-      <input
-        class="input filters__search"
-        type="search"
-        maxlength="100"
-        [placeholder]="'panel.dashboard.search' | transloco"
-        [attr.aria-label]="'panel.dashboard.search' | transloco"
-        (input)="onSearch($any($event.target).value)"
-      />
-      <select class="input input--sm" [value]="status()" (change)="setStatus($any($event.target).value)" [attr.aria-label]="'panel.dashboard.status' | transloco">
-        <option value="">{{ 'panel.dashboard.allStatuses' | transloco }}</option>
-        @for (st of statuses; track st) {
-          <option [value]="st">{{ 'admin.status.' + st | transloco }}</option>
-        }
-      </select>
-      <select class="input input--sm" [value]="pkg()" (change)="setPackage($any($event.target).value)" [attr.aria-label]="'panel.form.package' | transloco">
+  <!-- Ro'yxat -->
+  <section class="card list">
+    <div class="list__tabs" role="tablist">
+      @for (st of ['', 'ACTIVE', 'DRAFT', 'ARCHIVED']; track st) {
+        <button type="button" role="tab" class="tab" [class.is-active]="status() === st" [attr.aria-selected]="status() === st" (click)="setStatus($any(st))">
+          {{ (st ? 'admin.status.' + st : 'panel.list.all') | transloco }}
+          @if (s) { <span class="tab__count">{{ statusCount(s, $any(st)) }}</span> }
+        </button>
+      }
+    </div>
+
+    <div class="list__toolbar">
+      <label class="input-icon list__search">
+        <tk-icon name="search" />
+        <input class="input input--sm" type="search" maxlength="100" [value]="searchText()"
+          [placeholder]="'panel.dashboard.search' | transloco" [attr.aria-label]="'panel.dashboard.search' | transloco"
+          (input)="onSearch($any($event.target).value)" />
+      </label>
+      <select class="input input--sm list__select" [value]="pkg()" (change)="setPackage($any($event.target).value)" [attr.aria-label]="'panel.form.package' | transloco">
         <option value="">{{ 'panel.dashboard.allPackages' | transloco }}</option>
         @for (p of packages; track p) {
           <option [value]="p">{{ 'admin.package.' + p | transloco }}</option>
         }
       </select>
-      <select class="input input--sm" [value]="sort()" (change)="setSort($any($event.target).value)" [attr.aria-label]="'admin.guests.sort.label' | transloco">
+      <select class="input input--sm list__select" [value]="sort()" (change)="setSort($any($event.target).value)" [attr.aria-label]="'admin.guests.sort.label' | transloco">
         <option value="createdAt">{{ 'panel.dashboard.sortCreated' | transloco }}</option>
         <option value="eventDate">{{ 'panel.dashboard.sortEvent' | transloco }}</option>
       </select>
+      @if (hasFilters()) {
+        <button type="button" class="btn btn--ghost btn--sm" (click)="clearFilters()">
+          <tk-icon name="x" /> {{ 'panel.list.clear' | transloco }}
+        </button>
+      }
     </div>
 
     @if (error(); as key) {
-      <p class="alert" role="alert">{{ key | transloco }}</p>
+      <p class="alert list__alert" role="alert"><tk-icon name="alert-triangle" /> {{ key | transloco }}</p>
     }
 
-    <p class="muted found">{{ 'panel.dashboard.found' | transloco: { count: total() } }}</p>
+    <div class="table" role="table" [attr.aria-busy]="loading()" [class.is-loading]="loading() && items().length">
+      <div class="tr tr--head" role="row">
+        <span role="columnheader">{{ 'panel.list.couple' | transloco }}</span>
+        <span role="columnheader" class="col-customer">{{ 'panel.list.customer' | transloco }}</span>
+        <span role="columnheader">{{ 'panel.list.date' | transloco }}</span>
+        <span role="columnheader" class="col-guests">{{ 'panel.list.guests' | transloco }}</span>
+        <span role="columnheader">{{ 'panel.list.status' | transloco }}</span>
+        <span role="columnheader" class="col-price">{{ 'panel.list.price' | transloco }}</span>
+        <span role="columnheader"><span class="sr-only">{{ 'panel.list.actions' | transloco }}</span></span>
+      </div>
 
-    @if (items().length) {
-      <ul class="orders" [attr.aria-busy]="loading()">
-        @for (o of items(); track o.id) {
-          <li>
-            <a class="order" [routerLink]="['/panel/i', o.id]">
-              <div class="order__main">
-                <span class="order__names">{{ o.coupleNames }}</span>
-                <span class="muted order__slug">/{{ o.slug }} · {{ o.customerName }}</span>
-              </div>
-              <div class="order__date">
-                <span>{{ o.eventDate | eventDate: 'short' : tz : l }}</span>
-                <span class="muted">{{ 'panel.dashboard.replies' | transloco: { guests: o.stats.attendingGuests, replies: o.stats.replies } }}</span>
-              </div>
-              <div class="order__badges">
-                <span class="badge badge--{{ o.status }}">{{ 'admin.status.' + o.status | transloco }}</span>
-                <span class="badge">{{ 'admin.package.' + o.package | transloco }}</span>
-                @if (isUnpaid(o)) {
-                  <span class="badge badge--unpaid">{{ 'panel.dashboard.notPaid' | transloco }}</span>
-                }
-              </div>
-              <div class="order__price">{{ o.price | money: l }}</div>
-            </a>
-          </li>
+      @if (loading() && !items().length) {
+        @for (i of skeletonRows; track i) {
+          <div class="tr" role="row" aria-hidden="true">
+            <span class="cell-couple"><span class="skeleton sk-avatar"></span><span class="skeleton sk-line"></span></span>
+            <span class="col-customer"><span class="skeleton sk-line sk-line--sm"></span></span>
+            <span><span class="skeleton sk-line sk-line--sm"></span></span>
+            <span class="col-guests"><span class="skeleton sk-line sk-line--xs"></span></span>
+            <span><span class="skeleton sk-line sk-line--xs"></span></span>
+            <span class="col-price"><span class="skeleton sk-line sk-line--sm"></span></span>
+            <span></span>
+          </div>
         }
-      </ul>
-
-      @if (pages() > 1) {
-        <nav class="pager">
-          <button type="button" class="btn" (click)="page.set(page() - 1)" [disabled]="page() <= 1 || loading()">←</button>
-          <span class="muted">{{ page() }} / {{ pages() }}</span>
-          <button type="button" class="btn" (click)="page.set(page() + 1)" [disabled]="page() >= pages() || loading()">→</button>
-        </nav>
       }
-    } @else if (!loading()) {
-      <p class="empty muted">{{ 'panel.dashboard.empty' | transloco }}</p>
-    } @else {
-      <p class="loading">{{ 'admin.loading' | transloco }}</p>
+
+      @for (o of items(); track o.id) {
+        <div class="tr tr--row" role="row" tabindex="0" (click)="open(o)" (keydown.enter)="open(o)">
+          <span class="cell-couple" role="cell">
+            <span class="cpl cpl--{{ o.templateKey }}" aria-hidden="true">{{ initials(o.coupleNames) }}</span>
+            <span class="cell-stack">
+              <a class="cell-title" [routerLink]="['/panel/i', o.id]" (click)="$event.stopPropagation()">{{ o.coupleNames }}</a>
+              <span class="cell-sub">/{{ o.slug }}</span>
+            </span>
+          </span>
+          <span class="cell-stack col-customer" role="cell">
+            <span>{{ o.customerName }}</span>
+            <span class="cell-sub">{{ phone(o.customerPhone) }}</span>
+          </span>
+          <span class="cell-stack" role="cell">
+            <span>{{ o.eventDate | eventDate: 'short' : tz : l }}</span>
+            @if (o.status !== 'ARCHIVED') {
+              @let left = daysLeft(o.eventDate);
+              @if (left >= 0) {
+                <span class="cell-sub">{{ (left === 0 ? 'panel.dashboard.today' : 'panel.dashboard.inDays') | transloco: { count: left } }}</span>
+              } @else {
+                <span class="cell-sub">{{ 'panel.list.past' | transloco }}</span>
+              }
+            }
+          </span>
+          <span class="cell-stack col-guests" role="cell">
+            <span><b>{{ o.stats.attendingGuests }}</b></span>
+            <span class="cell-sub">{{ 'panel.list.replies' | transloco: { count: o.stats.replies } }}</span>
+          </span>
+          <span class="cell-badges" role="cell">
+            <span class="badge badge--{{ o.status }}">{{ 'admin.status.' + o.status | transloco }}</span>
+            <span class="badge">{{ 'admin.package.' + o.package | transloco }}</span>
+          </span>
+          <span class="cell-stack col-price" role="cell">
+            <span>{{ o.price | money: l }}</span>
+            @if (isUnpaid(o)) {
+              <span class="cell-sub cell-sub--warn">{{ 'panel.dashboard.notPaid' | transloco }}</span>
+            } @else if (o.paidAt) {
+              <span class="cell-sub cell-sub--ok">{{ 'panel.list.paid' | transloco }}</span>
+            }
+          </span>
+          <span class="cell-actions" role="cell">
+            <button type="button" class="btn btn--ghost btn--icon btn--sm" [cdkMenuTriggerFor]="rowMenu" [cdkMenuPosition]="menuPositions"
+              [attr.aria-label]="'panel.list.actions' | transloco" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+              [disabled]="busyId() === o.id">
+              <tk-icon [name]="busyId() === o.id ? 'loader' : 'ellipsis'" [class.spin]="busyId() === o.id" />
+            </button>
+          </span>
+
+          <ng-template #rowMenu>
+            <div class="menu" cdkMenu>
+              <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="open(o)">
+                <tk-icon name="pencil" /> {{ 'panel.list.openEdit' | transloco }}
+              </button>
+              @if (o.status === 'ACTIVE') {
+                <a class="menu__item" cdkMenuItem [href]="publicUrl(o)" target="_blank" rel="noopener">
+                  <tk-icon name="external-link" /> {{ 'panel.list.viewPage' | transloco }}
+                </a>
+              }
+              <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="copyLink(o)">
+                <tk-icon name="copy" /> {{ 'panel.list.copyLink' | transloco }}
+              </button>
+              <div class="menu__sep"></div>
+              @switch (o.status) {
+                @case ('DRAFT') {
+                  <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="changeStatus(o, 'ACTIVE')">
+                    <tk-icon name="send" /> {{ 'panel.detail.publish' | transloco }}
+                  </button>
+                }
+                @case ('ACTIVE') {
+                  <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="changeStatus(o, 'DRAFT')">
+                    <tk-icon name="eye-off" /> {{ 'panel.detail.unpublish' | transloco }}
+                  </button>
+                  <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="changeStatus(o, 'ARCHIVED')">
+                    <tk-icon name="archive" /> {{ 'panel.detail.archive' | transloco }}
+                  </button>
+                }
+                @case ('ARCHIVED') {
+                  <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="changeStatus(o, 'ACTIVE')">
+                    <tk-icon name="globe" /> {{ 'panel.detail.reactivate' | transloco }}
+                  </button>
+                }
+              }
+            </div>
+          </ng-template>
+        </div>
+      }
+    </div>
+
+    @if (!loading() && !items().length && !error()) {
+      <div class="empty">
+        <span class="empty__icon"><tk-icon [name]="hasFilters() ? 'search' : 'heart'" /></span>
+        @if (hasFilters()) {
+          <h3>{{ 'panel.list.noResults' | transloco }}</h3>
+          <p>{{ 'panel.list.noResultsHint' | transloco }}</p>
+          <button type="button" class="btn btn--outline btn--sm" (click)="clearFilters()">{{ 'panel.list.clear' | transloco }}</button>
+        } @else {
+          <h3>{{ 'panel.list.emptyTitle' | transloco }}</h3>
+          <p>{{ 'panel.list.emptyHint' | transloco }}</p>
+          <button type="button" class="btn btn--primary btn--sm" (click)="quick.open()"><tk-icon name="plus" /> {{ 'panel.quick.open' | transloco }}</button>
+        }
+      </div>
+    }
+
+    @if (total() > 0) {
+      <footer class="list__foot">
+        <span class="muted">{{ 'panel.list.range' | transloco: range() }}</span>
+        @if (pages() > 1) {
+          <nav class="pager" [attr.aria-label]="'panel.list.pagination' | transloco">
+            <button type="button" class="btn btn--outline btn--icon btn--sm" (click)="page.set(page() - 1)" [disabled]="page() <= 1 || loading()" [attr.aria-label]="'panel.list.prev' | transloco">
+              <tk-icon name="chevron-left" />
+            </button>
+            <span class="pager__info">{{ page() }} / {{ pages() }}</span>
+            <button type="button" class="btn btn--outline btn--icon btn--sm" (click)="page.set(page() + 1)" [disabled]="page() >= pages() || loading()" [attr.aria-label]="'panel.list.next' | transloco">
+              <tk-icon name="chevron-right" />
+            </button>
+          </nav>
+        }
+      </footer>
     }
   </section>
 </div>

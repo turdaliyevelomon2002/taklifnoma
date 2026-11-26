@@ -1,19 +1,687 @@
-// Owner paneli uchun umumiy uslublar (PanelShell ViewEncapsulation.None bilan ulaydi).
-// Hammasi .panel ichida: mehmon sahifalariga ta'sir qilmaydi.
+// Owner paneli dizayn tizimi (PanelShell ViewEncapsulation.None bilan ulaydi).
+// Tokenlar workspace (shadcn) bilan bir xil. Hammasi html.tk-panel ostida: klassni PanelTheme
+// faqat panel ochiq turganda qo'yadi, mehmon sahifalariga ta'sir qilmaydi.
+@use '@angular/cdk' as cdk;
+
+@include cdk.overlay();
+@include cdk.a11y-visually-hidden();
+
+// Figtree'da kirill yo'q: ruscha matn tizim shriftiga tushadi (unicode-range shuni ta'minlaydi).
+@font-face {
+  font-family: 'Figtree Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url('/fonts/figtree/figtree-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Figtree Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url('/fonts/figtree/figtree-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tokenlar                                                           */
+/* ------------------------------------------------------------------ */
+
+html.tk-panel {
+  --radius: 0.875rem;
+  --font-sans: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --background: oklch(0.985 0.002 265);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.2423 0.0752 268.43);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.96 0.004 265);
+  --accent-foreground: oklch(0.205 0 0);
+  --brand-accent: oklch(0.53 0.083 205);
+  --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.55 0.13 152);
+  --warning: oklch(0.62 0.13 70);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(0.955 0.004 265);
+  --sidebar-border: oklch(0.922 0 0);
+  --band: oklch(0.2423 0.0752 268.43);
+  --band-foreground: oklch(0.985 0 0);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 16px -4px oklch(0 0 0 / 0.12), 0 1px 3px oklch(0 0 0 / 0.06);
+  --shadow-lg: 0 16px 48px -12px oklch(0 0 0 / 0.25);
+
+  // Umumiy komponentlar (guest-list va b.) --tk-* tokenlarini ishlatadi: ularni panelga moslaymiz.
+  --tk-bg: var(--background);
+  --tk-surface: var(--card);
+  --tk-text: var(--foreground);
+  --tk-muted: var(--muted-foreground);
+  --tk-primary: var(--primary);
+  --tk-primary-contrast: var(--primary-foreground);
+  --tk-accent: var(--brand-accent);
+  --tk-border: var(--border);
+  --tk-radius: var(--radius);
+  --tk-shadow: var(--shadow-md);
+  --tk-font-body: var(--font-sans);
+  --tk-font-heading: var(--font-sans);
+
+  color-scheme: light;
+}
+
+// Qavatlar pastdan yuqoriga ochilib boradi: sidebar < fon < kartochka < popover (workspace bilan bir xil).
+html.tk-panel.dark {
+  --background: oklch(0.225 0.02 265);
+  --foreground: oklch(0.96 0.006 265);
+  --card: oklch(0.27 0.022 265);
+  --card-foreground: oklch(0.96 0.006 265);
+  --popover: oklch(0.295 0.024 265);
+  --popover-foreground: oklch(0.96 0.006 265);
+  --primary: oklch(0.93 0.012 265);
+  --primary-foreground: oklch(0.225 0.03 265);
+  --secondary: oklch(0.325 0.024 265);
+  --secondary-foreground: oklch(0.96 0.006 265);
+  --muted: oklch(0.325 0.024 265);
+  --muted-foreground: oklch(0.76 0.018 265);
+  --accent: oklch(0.345 0.028 265);
+  --accent-foreground: oklch(0.96 0.006 265);
+  --brand-accent: oklch(0.78 0.088 205);
+  --destructive: oklch(0.704 0.191 22.216);
+  --success: oklch(0.75 0.14 152);
+  --warning: oklch(0.8 0.13 75);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.6 0.06 265);
+  --sidebar: oklch(0.175 0.02 265);
+  --sidebar-foreground: oklch(0.96 0.006 265);
+  --sidebar-accent: oklch(0.26 0.026 265);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --band: oklch(0.32 0.09 268.43);
+  --shadow-md: 0 4px 16px -4px oklch(0 0 0 / 0.5);
+  --shadow-lg: 0 16px 48px -12px oklch(0 0 0 / 0.7);
+
+  color-scheme: dark;
+}
+
+html.tk-panel body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+html.tk-panel :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Qobiq: sidebar + topbar + kontent                                  */
+/* ------------------------------------------------------------------ */
 
 .panel {
-  --p-bg: #f4f2ee;
-  --p-danger: #b3261e;
-  --p-ok: #1e7b34;
+  --sidebar-width: 16rem;
+  --sidebar-width-collapsed: 4rem;
+  --topbar-height: 3.5rem;
 
   min-height: 100svh;
-  background: var(--p-bg);
-  font-size: 0.95rem;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100svh;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    transition: grid-template-columns 0.2s ease;
+
+    &.is-collapsed {
+      grid-template-columns: var(--sidebar-width-collapsed) minmax(0, 1fr);
+    }
+  }
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--sidebar-width), 85vw);
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+
+  .shell.is-mobile-open & {
+    transform: none;
+    box-shadow: var(--shadow-lg);
+  }
+
+  @media (min-width: 1024px) {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    width: auto;
+    transform: none;
+    overflow: hidden;
+  }
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  height: var(--topbar-height);
+  padding: 0 0.85rem;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: calc(var(--radius) * 0.7);
+  background: var(--band);
+  color: var(--band-foreground);
+  --icon-size: 1.1rem;
+}
+
+.sidebar__brand-text {
+  display: grid;
+  line-height: 1.2;
+  min-width: 0;
+
+  strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  span {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+}
+
+.sidebar__nav {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem 0.6rem;
+  overflow-y: auto;
+}
+
+.sidebar__label {
+  padding: 0.25rem 0.6rem 0.4rem;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: calc(var(--radius) * 0.6);
+  color: var(--sidebar-foreground);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+  --icon-size: 1.1rem;
+
+  // <button> sifatida ham ishlatiladi
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  tk-icon {
+    flex: none;
+    color: var(--muted-foreground);
+  }
+
+  .nav-item__kbd {
+    margin-left: auto;
+  }
+
+  &:hover {
+    background: var(--sidebar-accent);
+  }
+
+  &.is-active {
+    background: var(--sidebar-accent);
+    font-weight: 600;
+
+    tk-icon {
+      color: var(--sidebar-foreground);
+    }
+  }
+}
+
+.sidebar__footer {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding: 0.6rem;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.tg-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--sidebar-border);
+  border-radius: calc(var(--radius) * 0.8);
+  background: var(--card);
+
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    --icon-size: 0.95rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+}
+
+.tg-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  --icon-size: 0.95rem;
+
+  tk-icon {
+    color: var(--success);
+  }
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.45rem;
+  border: 0;
+  border-radius: calc(var(--radius) * 0.6);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &[aria-expanded='true'] {
+    background: var(--sidebar-accent);
+  }
+
+  > tk-icon {
+    margin-left: auto;
+    color: var(--muted-foreground);
+    --icon-size: 0.95rem;
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: calc(var(--radius) * 0.55);
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.user-btn__text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+
+  strong,
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-size: 0.82rem;
+  }
+
+  span {
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+  }
+}
+
+// Yig'ilgan sidebar: faqat ikonkalar (desktop).
+@media (min-width: 1024px) {
+  .shell.is-collapsed {
+    .sidebar__brand-text,
+    .sidebar__label,
+    .nav-item span,
+    .nav-item__kbd,
+    .tg-card,
+    .tg-status span,
+    .user-btn__text,
+    .user-btn > tk-icon {
+      display: none;
+    }
+
+    .sidebar__brand {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .nav-item,
+    .tg-status,
+    .user-btn {
+      justify-content: center;
+      padding-inline: 0;
+    }
+  }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: oklch(0 0 0 / 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+
+  .shell.is-mobile-open & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--topbar-height);
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--background) 85%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.topbar__sep {
+  width: 1px;
+  height: 1.1rem;
+  background: var(--border);
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  --icon-size: 0.85rem;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  strong {
+    overflow: hidden;
+    color: var(--foreground);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.lang-switch {
+  display: inline-flex;
+  padding: 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--card);
+
+  button {
+    min-width: 2.1rem;
+    height: 1.75rem;
+    padding: 0 0.45rem;
+    border: 0;
+    border-radius: calc(var(--radius) * 0.45);
+    background: transparent;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    &.is-active {
+      background: var(--secondary);
+      color: var(--foreground);
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.hide-sm {
+  @media (max-width: 639px) {
+    display: none !important;
+  }
+}
+
+.only-mobile {
+  @media (min-width: 1024px) {
+    display: none !important;
+  }
+}
+
+.only-desktop {
+  @media (max-width: 1023px) {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Login                                                              */
+/* ------------------------------------------------------------------ */
+
+.auth {
+  display: grid;
+  min-height: 100svh;
+
+  @media (min-width: 960px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.auth__brand {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem;
+  overflow: hidden;
+  background: var(--band);
+  color: var(--band-foreground);
+
+  @media (min-width: 960px) {
+    display: flex;
+  }
+
+  // Yengil bezak: konvert va yuraklar ishorasi, rasm yuklamasdan.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto -20% -35% auto;
+    width: 32rem;
+    height: 32rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, oklch(1 0 0 / 0.1), transparent 65%);
+  }
+}
+
+.auth__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+
+  .brand-mark {
+    background: oklch(1 0 0 / 0.12);
+  }
+}
+
+.auth__pitch {
+  position: relative;
+  z-index: 1;
+  max-width: 26rem;
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.75;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+.auth__form-wrap {
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+}
+
+.auth__form {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 22rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .auth__sub {
+    margin: -0.6rem 0 0.5rem;
+    color: var(--muted-foreground);
+  }
+
+  .field {
+    margin: 0;
+  }
+}
+
+.auth__mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+
+  @media (min-width: 960px) {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Elementlar (panel sahifalari va overlay'lar uchun umumiy)           */
+/* ------------------------------------------------------------------ */
+
+.panel,
+.cdk-overlay-container {
+  .page--wide {
+    max-width: 1560px !important;
+  }
 
   .page {
-    max-width: 1080px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem 1rem 2rem;
+    padding: 1.5rem 1rem 3rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem 2rem 3rem;
+    }
   }
 
   .page__head {
@@ -22,19 +690,29 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .page__title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .page__subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--muted-foreground);
   }
 
   .card {
-    padding: 1rem;
-    border: 1px solid var(--tk-border);
-    border-radius: var(--tk-radius);
-    background: var(--tk-surface);
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+    box-shadow: var(--shadow-sm);
     min-width: 0;
   }
 
@@ -44,23 +722,30 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1rem;
   }
 
   .card__title {
-    margin: 0 0 0.9rem;
-    font-size: 1.05rem;
-    font-weight: 700;
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
   }
 
   .card__head .card__title {
     margin: 0;
   }
 
+  .card__subtitle {
+    margin: 1.25rem 0 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+
   .grid {
     display: grid;
-    gap: 0.75rem 1rem;
-    margin-bottom: 0.75rem;
+    gap: 0.9rem 1rem;
+    margin-bottom: 0.9rem;
 
     @media (min-width: 720px) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -70,8 +755,8 @@
   .field {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    margin-bottom: 0.75rem;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
     min-width: 0;
   }
 
@@ -80,88 +765,155 @@
   }
 
   .label {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
   }
 
   .optional {
-    font-weight: 400;
+    color: var(--muted-foreground);
     font-size: 0.75rem;
-    color: var(--tk-muted);
+    font-weight: 400;
   }
 
   .hint {
+    color: var(--muted-foreground);
     font-size: 0.78rem;
-    color: var(--tk-muted);
   }
 
   .hint--ok {
-    color: var(--p-ok);
+    color: var(--success);
   }
 
   .hint--bad,
   .error-text {
-    color: var(--p-danger);
+    color: var(--destructive);
   }
 
   .warn {
+    color: var(--warning);
     font-size: 0.8rem;
-    color: #8a5a00;
   }
 
   .input {
     width: 100%;
-    min-height: 2.6rem;
-    padding: 0.5rem 0.7rem;
-    border: 1px solid var(--tk-border);
-    border-radius: 8px;
-    background: var(--tk-bg);
-    color: var(--tk-text);
+    min-height: 2.5rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--input);
+    border-radius: calc(var(--radius) * 0.6);
+    background: var(--card);
+    color: var(--foreground);
     font: inherit;
-    font-size: 16px;
+    font-size: 16px; // iOS kattalashtirmasin
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    @media (min-width: 768px) {
+      font-size: 0.875rem;
+    }
+
+    &::placeholder {
+      color: var(--muted-foreground);
+      opacity: 0.8;
+    }
 
     &:focus {
       outline: none;
-      border-color: var(--tk-primary);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--tk-primary) 15%, transparent);
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    &[aria-invalid='true'],
+    &.ng-invalid.ng-touched {
+      border-color: var(--destructive);
     }
   }
 
+  select.input {
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 1rem;
+  }
+
   .input--area {
-    min-height: 4.5rem;
+    min-height: 5rem;
     resize: vertical;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .input--sm {
     width: auto;
-    min-height: 2.2rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.85rem;
+    min-height: 2.15rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  select.input--sm {
+    padding-right: 1.9rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .input-icon {
+    position: relative;
+
+    > tk-icon {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      color: var(--muted-foreground);
+      transform: translateY(-50%);
+      pointer-events: none;
+      --icon-size: 1rem;
+    }
+
+    > .input {
+      padding-left: 2.25rem;
+    }
+
+    > .input-icon__end {
+      position: absolute;
+      top: 50%;
+      right: 0.3rem;
+      transform: translateY(-50%);
+    }
   }
 
   .check {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    font-size: 0.9rem;
+    gap: 0.55rem;
+    font-size: 0.875rem;
     cursor: pointer;
 
     input {
-      width: 1.05rem;
-      height: 1.05rem;
-      accent-color: var(--tk-primary);
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--primary);
     }
   }
 
-  // Izohli belgi: matn ostida kichik tushuntirish
   .check--hinted {
     align-items: flex-start;
     grid-column: 1 / -1;
 
     input {
       flex: none;
-      margin-top: 0.15rem;
+      margin-top: 0.2rem;
     }
 
     span {
@@ -171,66 +923,173 @@
   }
 
   .check__hint {
-    color: var(--tk-muted);
+    color: var(--muted-foreground);
     font-size: 0.78rem;
-    line-height: 1.4;
+    line-height: 1.45;
+  }
+
+  // Switch: <label class="switch"><input type="checkbox"><span class="switch__track"></span> Matn</label>
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    input:checked + .switch__track {
+      background: var(--primary);
+    }
+
+    input:checked + .switch__track::after {
+      transform: translateX(0.95rem);
+      background: var(--primary-foreground);
+    }
+
+    input:focus-visible + .switch__track {
+      outline: 2px solid var(--ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .switch__track {
+    position: relative;
+    flex: none;
+    width: 2.25rem;
+    height: 1.3rem;
+    border-radius: 999px;
+    background: var(--input);
+    transition: background 0.15s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0.15rem;
+      left: 0.15rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background: var(--card);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease;
+    }
+
   }
 
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
-    min-height: 2.5rem;
-    padding: 0.45rem 1rem;
-    border: 1px solid var(--tk-border);
-    border-radius: 999px;
-    background: var(--tk-surface);
-    color: var(--tk-text);
+    gap: 0.45rem;
+    min-height: 2.35rem;
+    padding: 0.4rem 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 0.6);
+    background: var(--card);
+    color: var(--foreground);
     font: inherit;
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
     white-space: nowrap;
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease;
+    --icon-size: 1rem;
+
+    &:hover:not(:disabled) {
+      background: var(--accent);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px);
+    }
 
     &:disabled {
-      opacity: 0.55;
+      opacity: 0.5;
       cursor: default;
     }
   }
 
   .btn--primary {
-    border-color: var(--tk-primary);
-    background: var(--tk-primary);
-    color: var(--tk-primary-contrast);
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+
+    &:hover:not(:disabled) {
+      background: color-mix(in oklch, var(--primary) 88%, var(--background));
+    }
   }
 
   .btn--ghost {
-    border-color: var(--tk-primary);
-    color: var(--tk-primary);
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .btn--outline {
     background: transparent;
   }
 
   .btn--danger {
-    border-color: var(--p-danger);
-    color: var(--p-danger);
+    border-color: color-mix(in oklch, var(--destructive) 40%, transparent);
     background: transparent;
+    color: var(--destructive);
+
+    &:hover:not(:disabled) {
+      background: color-mix(in oklch, var(--destructive) 10%, transparent);
+    }
   }
 
   .btn--danger-solid {
-    border-color: var(--p-danger);
-    background: var(--p-danger);
-    color: #fff;
+    border-color: var(--destructive);
+    background: var(--destructive);
+    color: oklch(0.985 0 0);
+
+    &:hover:not(:disabled) {
+      background: color-mix(in oklch, var(--destructive) 88%, black);
+    }
   }
 
+  .btn--sm {
+    min-height: 2rem;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .btn--lg {
+    min-height: 2.75rem;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.92rem;
+  }
+
+  .btn--block {
+    width: 100%;
+  }
+
+  .btn--icon,
   .icon-btn {
-    width: 2.1rem;
-    height: 2.1rem;
-    border: 1px solid var(--tk-border);
-    border-radius: 8px;
-    background: var(--tk-surface);
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    min-height: 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: calc(var(--radius) * 0.6);
+    background: transparent;
+    color: var(--foreground);
+    box-shadow: none;
     cursor: pointer;
+    --icon-size: 1.05rem;
+
+    &:hover:not(:disabled) {
+      background: var(--accent);
+    }
 
     &:disabled {
       opacity: 0.35;
@@ -238,70 +1097,437 @@
     }
   }
 
+  .icon-btn {
+    border-color: var(--border);
+    background: var(--card);
+  }
+
   .icon-btn--danger {
-    color: var(--p-danger);
+    color: var(--destructive);
   }
 
   .link {
     padding: 0;
     border: 0;
     background: none;
-    color: var(--tk-primary);
+    color: var(--brand-accent);
     font: inherit;
     font-size: 0.85rem;
+    font-weight: 500;
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-underline-offset: 3px;
     cursor: pointer;
   }
 
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.1rem 0.55rem;
+    gap: 0.3rem;
+    padding: 0.12rem 0.55rem;
+    border: 1px solid var(--border);
     border-radius: 999px;
-    background: #ece8e1;
-    color: var(--tk-muted);
+    background: var(--secondary);
+    color: var(--secondary-foreground);
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
   }
 
+  // Holat nuqtasi bilan
+  .badge--ACTIVE,
+  .badge--DRAFT,
+  .badge--ARCHIVED,
+  .badge--unpaid {
+    &::before {
+      content: '';
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  }
+
   .badge--ACTIVE {
-    background: #e8f5ec;
-    color: var(--p-ok);
+    border-color: color-mix(in oklch, var(--success) 30%, transparent);
+    background: color-mix(in oklch, var(--success) 12%, transparent);
+    color: var(--success);
   }
 
   .badge--DRAFT {
-    background: #fff4dc;
-    color: #8a5a00;
+    border-color: color-mix(in oklch, var(--warning) 30%, transparent);
+    background: color-mix(in oklch, var(--warning) 12%, transparent);
+    color: var(--warning);
   }
 
   .badge--ARCHIVED {
-    background: #ece8e1;
-    color: #6b665f;
+    color: var(--muted-foreground);
   }
 
   .badge--unpaid {
-    background: #fdecea;
-    color: var(--p-danger);
+    border-color: color-mix(in oklch, var(--destructive) 30%, transparent);
+    background: color-mix(in oklch, var(--destructive) 10%, transparent);
+    color: var(--destructive);
   }
 
   .alert {
+    display: flex;
+    gap: 0.6rem;
     margin: 0 0 1rem;
-    padding: 0.7rem 0.9rem;
-    border-radius: 8px;
-    background: #fdecea;
-    color: #8c1d18;
-    font-size: 0.875rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid color-mix(in oklch, var(--destructive) 35%, transparent);
+    border-radius: calc(var(--radius) * 0.7);
+    background: color-mix(in oklch, var(--destructive) 8%, transparent);
+    color: var(--destructive);
+    font-size: 0.85rem;
+  }
+
+  .alert--info {
+    border-color: var(--border);
+    background: var(--muted);
+    color: var(--foreground);
   }
 
   .muted {
-    color: var(--tk-muted);
+    color: var(--muted-foreground);
   }
 
   .loading {
     padding: 3rem 0;
+    color: var(--muted-foreground);
     text-align: center;
-    color: var(--tk-muted);
+  }
+
+  .skeleton {
+    border-radius: calc(var(--radius) * 0.5);
+    background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
+    background-size: 200% 100%;
+    animation: tk-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 0.3rem;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-family: ui-monospace, monospace;
+    font-size: 0.7rem;
+    line-height: 1.4;
+  }
+
+  .spin {
+    animation: tk-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes tk-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes tk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Ikonka, menyu, dialog, toast                                        */
+/* ------------------------------------------------------------------ */
+
+.tk-icon {
+  display: inline-flex;
+  flex: none;
+  width: var(--icon-size, 1em);
+  height: var(--icon-size, 1em);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.menu {
+  display: grid;
+  min-width: 13rem;
+  padding: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.75);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  animation: tk-pop 0.12s ease-out;
+}
+
+.menu__label {
+  padding: 0.4rem 0.6rem 0.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.menu__header {
+  display: grid;
+  padding: 0.45rem 0.6rem;
+  line-height: 1.3;
+
+  span {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+}
+
+.menu__sep {
+  height: 1px;
+  margin: 0.3rem -0.3rem;
+  background: var(--border);
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.6rem;
+  border: 0;
+  border-radius: calc(var(--radius) * 0.45);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  --icon-size: 1rem;
+
+  > tk-icon {
+    color: var(--muted-foreground);
+  }
+
+  &:hover,
+  &:focus,
+  &.cdk-menu-item-active {
+    outline: none;
+    background: var(--accent);
+  }
+
+  &[aria-checked='true']::after {
+    content: '✓';
+    margin-left: auto;
+    color: var(--muted-foreground);
+  }
+}
+
+.menu__item--danger {
+  color: var(--destructive);
+
+  > tk-icon {
+    color: currentColor;
+  }
+}
+
+.tk-dialog-backdrop {
+  background: oklch(0 0 0 / 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.tk-dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  animation: tk-pop 0.15s ease-out;
+}
+
+.dialog__head {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem 1.25rem 0.5rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 650;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted-foreground);
+  }
+}
+
+.dialog__body {
+  padding: 0.75rem 1.25rem;
+}
+
+.dialog__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+.tk-dialog--lg {
+  width: min(40rem, calc(100vw - 2rem));
+}
+
+/* Segment tanlagich (radio guruh) */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: fit-content;
+  padding: 3px;
+  border-radius: calc(var(--radius) * 0.7);
+  background: var(--muted);
+
+  label {
+    position: relative;
+    padding: 0.3rem 0.8rem;
+    border-radius: calc(var(--radius) * 0.5);
+    color: var(--muted-foreground);
+    font-size: 0.8rem;
+    font-weight: 550;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &.is-active {
+      background: var(--background);
+      color: var(--foreground);
+      box-shadow: var(--shadow-sm);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid var(--ring);
+      outline-offset: 1px;
+    }
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Shablon mini-ko'rinishi */
+.tpl-swatch {
+  display: block;
+  height: 2.6rem;
+  border-radius: calc(var(--radius) * 0.5);
+  border: 1px solid var(--border);
+}
+
+.tpl-swatch--classic-gold {
+  background: linear-gradient(135deg, #f8f3ea 0 55%, #c9a24b 55% 62%, #f8f3ea 62%);
+}
+
+.tpl-swatch--minimal-white {
+  background: linear-gradient(#fff 0 70%, #1f1d1a 70% 73%, #fff 73%);
+}
+
+.tpl-swatch--national-pattern {
+  background: repeating-linear-gradient(45deg, #1b3a6b 0 8px, #c9a24b 8px 10px, #1b3a6b 10px 18px);
+}
+
+@keyframes tk-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.toasts {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1100;
+  display: grid;
+  gap: 0.5rem;
+  width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.6rem 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.75);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: var(--shadow-md);
+  font-size: 0.85rem;
+  pointer-events: auto;
+  animation: tk-toast-in 0.2s ease-out;
+  --icon-size: 1.1rem;
+}
+
+.toast__icon {
+  .toast--success & {
+    color: var(--success);
+  }
+
+  .toast--error & {
+    color: var(--destructive);
+  }
+
+  .toast--info & {
+    color: var(--brand-accent);
+  }
+}
+
+.toast__text {
+  flex: 1;
+}
+
+.toast__close {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  --icon-size: 0.9rem;
+
+  &:hover {
+    background: var(--accent);
+  }
+}
+
+@keyframes tk-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel *,
+  .menu,
+  .tk-dialog,
+  .toast {
+    animation: none !important;
+    transition: none !important;
   }
 }

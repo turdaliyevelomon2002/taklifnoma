@@ -1,106 +1,181 @@
 @let f = features();
+@let b = busy();
 
-@if (error(); as key) {
-  <p class="alert" role="alert">{{ key | transloco }}</p>
-}
-@if (progress(); as p) {
-  <p class="uploading" role="status">{{ 'panel.media.uploading' | transloco: { done: p.done, total: p.total } }}</p>
-}
+<div class="media">
+  <div class="media__top">
+    <!-- Muqova -->
+    <section class="card">
+      <div class="m-head">
+        <span class="m-head__icon"><tk-icon name="image" /></span>
+        <div>
+          <h2 class="card__title">{{ 'panel.media.cover' | transloco }}</h2>
+          <p class="m-head__hint">{{ 'panel.media.coverHint' | transloco }}</p>
+        </div>
+      </div>
 
-<div class="media-grid">
-  <!-- Muqova -->
-  <section class="card">
-    <h2 class="card__title">{{ 'panel.media.cover' | transloco }}</h2>
-    <p class="hint">{{ 'panel.media.coverHint' | transloco }}</p>
-    @if (cover(); as c) {
-      <figure class="cover">
-        <img [src]="c.variants?.md ?? c.url" alt="" loading="lazy" />
-      </figure>
-    }
-    <div class="row">
-      <label class="btn btn--ghost" [class.is-busy]="busy() === 'cover'">
-        {{ (cover() ? 'panel.media.replace' : 'panel.media.upload') | transloco }}
-        <input #coverInput type="file" class="visually-hidden" [accept]="imageAccept" [disabled]="!!busy()" (change)="upload('cover', coverInput)" />
+      <label class="drop drop--cover" [class.is-over]="dragOver() === 'cover'" [class.has-media]="!!cover()" [class.is-busy]="b === 'cover'"
+        (dragover)="onDragOver('cover', $event)" (dragleave)="onDragLeave('cover', $event)" (drop)="onDrop('cover', $event)">
+        @if (cover(); as c) {
+          <img [src]="c.variants?.md ?? c.url" alt="" loading="lazy" />
+          <span class="drop__overlay"><tk-icon name="upload" /> {{ 'panel.media.replaceDrop' | transloco }}</span>
+        } @else {
+          <span class="drop__empty">
+            <span class="drop__icon"><tk-icon name="upload" /></span>
+            <b>{{ 'panel.media.dropTitle' | transloco }}</b>
+            <small>{{ 'panel.media.dropImage' | transloco }}</small>
+          </span>
+        }
+        @if (b === 'cover') {
+          <span class="drop__busy"><tk-icon name="loader" class="spin" /></span>
+        }
+        <input #coverInput type="file" class="sr-only" [accept]="imageAccept" [disabled]="!!b" (change)="onPick('cover', coverInput)" />
       </label>
       @if (cover(); as c) {
-        <button type="button" class="link link--danger" (click)="remove(c)" [disabled]="!!busy()">{{ 'panel.media.delete' | transloco }}</button>
+        <div class="m-actions">
+          <button type="button" class="btn btn--ghost btn--sm m-actions__danger" (click)="remove(c)" [disabled]="!!b">
+            <tk-icon name="trash" /> {{ 'panel.media.delete' | transloco }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <!-- Musiqa -->
+    <section class="card">
+      <div class="m-head">
+        <span class="m-head__icon"><tk-icon name="music" /></span>
+        <div>
+          <h2 class="card__title">{{ 'panel.media.music' | transloco }}</h2>
+          <p class="m-head__hint">{{ (f.music ? 'panel.media.musicHint' : 'panel.media.notInPackage') | transloco }}</p>
+        </div>
+      </div>
+      @if (f.music) {
+        @if (music(); as m) {
+          <div class="track">
+            <audio class="track__audio" controls preload="none" [src]="m.url"></audio>
+            <div class="m-actions">
+              <label class="btn btn--outline btn--sm">
+                <tk-icon name="refresh-cw" /> {{ 'panel.media.replace' | transloco }}
+                <input #musicReplace type="file" class="sr-only" [accept]="audioAccept" [disabled]="!!b" (change)="onPick('music', musicReplace)" />
+              </label>
+              <button type="button" class="btn btn--ghost btn--sm m-actions__danger" (click)="remove(m)" [disabled]="!!b">
+                <tk-icon name="trash" /> {{ 'panel.media.delete' | transloco }}
+              </button>
+            </div>
+          </div>
+        } @else {
+          <label class="drop drop--small" [class.is-over]="dragOver() === 'music'" [class.is-busy]="b === 'music'"
+            (dragover)="onDragOver('music', $event)" (dragleave)="onDragLeave('music', $event)" (drop)="onDrop('music', $event)">
+            <span class="drop__empty">
+              <span class="drop__icon">
+                @if (b === 'music') { <tk-icon name="loader" class="spin" /> } @else { <tk-icon name="upload" /> }
+              </span>
+              <b>{{ 'panel.media.dropTitle' | transloco }}</b>
+              <small>{{ 'panel.media.dropAudio' | transloco }}</small>
+            </span>
+            <input #musicInput type="file" class="sr-only" [accept]="audioAccept" [disabled]="!!b" (change)="onPick('music', musicInput)" />
+          </label>
+        }
+      }
+    </section>
+  </div>
+
+  <!-- Galereya -->
+  <section class="card">
+    <div class="m-head">
+      <span class="m-head__icon"><tk-icon name="image" /></span>
+      <div class="m-head__grow">
+        <h2 class="card__title">
+          {{ 'panel.media.gallery' | transloco }}
+          @if (f.gallery) {
+            <span class="count">{{ gallery().length }} / {{ f.galleryLimit }}</span>
+          }
+        </h2>
+        <p class="m-head__hint">
+          {{ (f.gallery ? (gallery().length > 1 ? 'panel.media.dragHint' : 'panel.media.galleryHint') : 'panel.media.notInPackage') | transloco }}
+        </p>
+      </div>
+      @if (f.gallery) {
+        <label class="btn btn--outline btn--sm" [class.is-disabled]="!galleryLeft() || !!b">
+          <tk-icon name="plus" /> {{ 'panel.media.addPhotos' | transloco }}
+          <input #galleryInput type="file" class="sr-only" multiple [accept]="imageAccept" [disabled]="!galleryLeft() || !!b" (change)="onPick('gallery', galleryInput)" />
+        </label>
       }
     </div>
-  </section>
 
-  <!-- Musiqa -->
-  <section class="card">
-    <h2 class="card__title">{{ 'panel.media.music' | transloco }}</h2>
-    @if (!f.music) {
-      <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
-    } @else {
-      <p class="hint">{{ 'panel.media.musicHint' | transloco }}</p>
-      @if (music(); as m) {
-        <audio class="audio" controls preload="none" [src]="m.url"></audio>
+    @if (f.gallery) {
+      @if (progress(); as p) {
+        <div class="progress" role="progressbar" [attr.aria-valuenow]="progressPercent()" aria-valuemin="0" aria-valuemax="100">
+          <span class="progress__bar" [style.width.%]="progressPercent()"></span>
+          <span class="progress__text">{{ 'panel.media.uploading' | transloco: { done: p.done, total: p.total } }}</span>
+        </div>
       }
-      <div class="row">
-        <label class="btn btn--ghost">
-          {{ (music() ? 'panel.media.replace' : 'panel.media.upload') | transloco }}
-          <input #musicInput type="file" class="visually-hidden" [accept]="audioAccept" [disabled]="!!busy()" (change)="upload('music', musicInput)" />
-        </label>
-        @if (music(); as m) {
-          <button type="button" class="link link--danger" (click)="remove(m)" [disabled]="!!busy()">{{ 'panel.media.delete' | transloco }}</button>
+
+      <div class="gallery-zone" [class.is-over]="dragOver() === 'gallery'"
+        (dragover)="onDragOver('gallery', $event)" (dragleave)="onDragLeave('gallery', $event)" (drop)="onDrop('gallery', $event)">
+        <ul class="gallery" cdkDropList cdkDropListOrientation="mixed" [cdkDropListData]="gallery()" (cdkDropListDropped)="drop($event)">
+          @for (m of gallery(); track m.id; let i = $index, first = $first, last = $last) {
+            <li class="thumb" cdkDrag [cdkDragData]="m" [cdkDragDisabled]="!!b">
+              <img [src]="m.variants?.sm ?? m.url" alt="" loading="lazy" draggable="false" />
+              <span class="thumb__num">{{ i + 1 }}</span>
+              <div class="thumb__tools">
+                <button type="button" class="thumb__btn" (click)="move(i, -1)" [disabled]="first || !!b" [attr.aria-label]="'panel.media.moveLeft' | transloco"><tk-icon name="chevron-left" /></button>
+                <button type="button" class="thumb__btn" (click)="move(i, 1)" [disabled]="last || !!b" [attr.aria-label]="'panel.media.moveRight' | transloco"><tk-icon name="chevron-right" /></button>
+                <button type="button" class="thumb__btn thumb__btn--danger" (click)="remove(m)" [disabled]="!!b" [attr.aria-label]="'panel.media.delete' | transloco"><tk-icon name="trash" /></button>
+              </div>
+              <div class="thumb thumb--placeholder" *cdkDragPlaceholder></div>
+            </li>
+          }
+          @if (galleryLeft()) {
+            <li class="thumb thumb--add">
+              <label class="thumb__add" [class.is-disabled]="!!b">
+                <tk-icon name="plus" />
+                <small>{{ 'panel.media.dropShort' | transloco }}</small>
+                <input #galleryAdd type="file" class="sr-only" multiple [accept]="imageAccept" [disabled]="!!b" (change)="onPick('gallery', galleryAdd)" />
+              </label>
+            </li>
+          }
+        </ul>
+        @if (dragOver() === 'gallery') {
+          <div class="gallery-zone__overlay"><tk-icon name="upload" /> {{ 'panel.media.dropHere' | transloco: { count: galleryLeft() } }}</div>
         }
       </div>
     }
   </section>
-</div>
 
-<!-- Galereya -->
-<section class="card gallery-card">
-  <div class="card__head">
-    <h2 class="card__title">
-      {{ 'panel.media.gallery' | transloco }}
-      @if (f.gallery) {
-        <span class="muted count">{{ gallery().length }} / {{ f.galleryLimit }}</span>
-      }
-    </h2>
-    @if (f.gallery) {
-      <label class="btn btn--ghost" [class.is-disabled]="!galleryLeft() || !!busy()">
-        + {{ 'panel.media.addPhotos' | transloco }}
-        <input #galleryInput type="file" class="visually-hidden" multiple [accept]="imageAccept" [disabled]="!galleryLeft() || !!busy()" (change)="upload('gallery', galleryInput)" />
+  <!-- OG rasm -->
+  <section class="card">
+    <div class="m-head">
+      <span class="m-head__icon"><tk-icon name="globe" /></span>
+      <div class="m-head__grow">
+        <h2 class="card__title">{{ 'panel.media.og' | transloco }}</h2>
+        <p class="m-head__hint">{{ 'panel.media.ogHint' | transloco }}</p>
+      </div>
+    </div>
+    <div class="og-row">
+      <label class="drop drop--og" [class.is-over]="dragOver() === 'og-image'" [class.has-media]="!!(ogImage() ?? cover())" [class.is-busy]="b === 'og-image'"
+        (dragover)="onDragOver('og-image', $event)" (dragleave)="onDragLeave('og-image', $event)" (drop)="onDrop('og-image', $event)">
+        @if (ogImage() ?? cover(); as og) {
+          <img [src]="og.ogUrl ?? og.url" alt="" loading="lazy" />
+          <span class="drop__overlay"><tk-icon name="upload" /> {{ 'panel.media.replaceDrop' | transloco }}</span>
+        } @else {
+          <span class="drop__empty">
+            <span class="drop__icon"><tk-icon name="upload" /></span>
+            <small>{{ 'panel.media.dropImage' | transloco }}</small>
+          </span>
+        }
+        @if (b === 'og-image') {
+          <span class="drop__busy"><tk-icon name="loader" class="spin" /></span>
+        }
+        <input #ogInput type="file" class="sr-only" [accept]="imageAccept" [disabled]="!!b" (change)="onPick('og-image', ogInput)" />
       </label>
-    }
-  </div>
-  @if (!f.gallery) {
-    <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
-  } @else if (gallery().length) {
-    <ul class="gallery">
-      @for (m of gallery(); track m.id; let i = $index, first = $first, last = $last) {
-        <li class="thumb">
-          <img [src]="m.variants?.sm ?? m.url" alt="" loading="lazy" />
-          <div class="thumb__tools">
-            <button type="button" class="icon-btn" (click)="move(i, -1)" [disabled]="first" [attr.aria-label]="'panel.form.moveUp' | transloco">←</button>
-            <button type="button" class="icon-btn" (click)="move(i, 1)" [disabled]="last" [attr.aria-label]="'panel.form.moveDown' | transloco">→</button>
-            <button type="button" class="icon-btn icon-btn--danger" (click)="remove(m)" [attr.aria-label]="'panel.media.delete' | transloco">✕</button>
-          </div>
-        </li>
-      }
-    </ul>
-  } @else {
-    <p class="hint">{{ 'panel.media.galleryEmpty' | transloco }}</p>
-  }
-</section>
-
-<!-- OG rasm -->
-<details class="card og-card">
-  <summary class="card__title">{{ 'panel.media.og' | transloco }}</summary>
-  <p class="hint">{{ 'panel.media.ogHint' | transloco }}</p>
-  @if (ogImage() ?? cover(); as og) {
-    <img class="og" [src]="og.ogUrl ?? og.url" alt="" loading="lazy" />
-  }
-  <div class="row">
-    <label class="btn btn--ghost">
-      {{ 'panel.media.uploadOg' | transloco }}
-      <input #ogInput type="file" class="visually-hidden" [accept]="imageAccept" [disabled]="!!busy()" (change)="upload('og-image', ogInput)" />
-    </label>
-    @if (ogImage(); as og) {
-      <button type="button" class="link link--danger" (click)="remove(og)">{{ 'panel.media.delete' | transloco }}</button>
-    }
-  </div>
-</details>
+      <div class="og-info">
+        <p class="m-head__hint">{{ (ogImage() ? 'panel.media.ogCustom' : 'panel.media.ogAuto') | transloco }}</p>
+        @if (ogImage(); as og) {
+          <button type="button" class="btn btn--ghost btn--sm m-actions__danger" (click)="remove(og)" [disabled]="!!b">
+            <tk-icon name="trash" /> {{ 'panel.media.delete' | transloco }}
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+</div>

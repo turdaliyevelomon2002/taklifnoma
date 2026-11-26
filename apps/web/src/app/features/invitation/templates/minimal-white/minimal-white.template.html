@@ -91,7 +91,9 @@
       <section class="section reveal">
         <h2 class="section__title">{{ 'invitation.sections.location' | transloco }}</h2>
         <p class="venue-name">{{ main.venue.name | loc: l }}</p>
-        <tk-venue-map [venue]="main.venue" />
+        @if (main.venue.location || main.venue.yandexOrgId) {
+          <tk-venue-map [venue]="main.venue" />
+        }
       </section>
     }
 

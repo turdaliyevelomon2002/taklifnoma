@@ -45,6 +45,11 @@ export const envSchema = z.object({
   TELEGRAM_API_URL: z.string().url().default('https://api.telegram.org').transform(noTrailingSlash),
   /** polling: lokal dev; webhook: production; off: o'chiq. */
   TELEGRAM_MODE: z.enum(['off', 'polling', 'webhook']).optional(),
+  /**
+   * Polling rejimida bot'da webhook (masalan, production) o'rnatilgan bo'lsa, uni o'chirib botni olish.
+   * false (default): webhook'ga tegilmaydi, lokal faqat xabar yuboradi (bitta botni prod bilan bo'lishganda).
+   */
+  TELEGRAM_POLLING_TAKEOVER: bool.default(false),
   /** Webhook rejimida: https://domen.uz/api/telegram/webhook */
   TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
   /** Telegram har so'rovda X-Telegram-Bot-Api-Secret-Token sarlavhasida yuboradi. */

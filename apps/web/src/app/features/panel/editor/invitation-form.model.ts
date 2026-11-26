@@ -4,10 +4,9 @@ import {
   createInvitationSchema,
   type ApiErrorIssue,
   type CreateInvitationInput,
-  type EventItem,
   type FeatureFlags,
   type FeatureOverrides,
-  type InvitationConfigInput,
+  type InvitationDraftConfigInput,
   type InvitationDetail,
   type LocalizedText,
   type PackageType,
@@ -193,7 +192,9 @@ export function patchFromDetail(form: InvitationForm, fb: NonNullableFormBuilder
   });
 }
 
-function eventValue(e: EventItem, tz: string) {
+type DetailEvent = InvitationDetail['config']['events'][number];
+
+function eventValue(e: DetailEvent, tz: string) {
   return {
     id: e.id,
     title: loc(e.title),
@@ -201,7 +202,7 @@ function eventValue(e: EventItem, tz: string) {
     endsAt: isoToZonedInput(e.endsAt, tz),
     venueName: loc(e.venue.name),
     address: loc(e.venue.address),
-    location: `${e.venue.location.lat}, ${e.venue.location.lng}`,
+    location: e.venue.location ? `${e.venue.location.lat}, ${e.venue.location.lng}` : '',
     yandexOrgId: e.venue.yandexOrgId ?? '',
     phone: e.venue.phone ? formatUzPhone(e.venue.phone) : '',
     isPrimary: e.isPrimary,
@@ -216,6 +217,9 @@ export interface BuildResult {
   input: CreateInvitationInput | null;
   /** path -> i18n kaliti */
   errors: Map<string, string>;
+  /** Tekshirilmagan config: jonli preview uchun (u o'zi qoralama sxemasi bilan tekshiradi). */
+  config: InvitationDraftConfigInput;
+  templateKey: TemplateKey;
 }
 
 /** Forma qiymatini API kontraktiga aylantiradi va umumiy Zod sxemasi bilan tekshiradi. */
@@ -237,17 +241,18 @@ export function buildInput(v: FormValue): BuildResult {
 
   const events = v.events.map((e, i) => {
     const path = `config.events.${i}`;
-    const location = parseLocation(e.location);
-    if (!location) errors.set(`${path}.venue.location`, 'panel.validation.invalidLocation');
+    // Qoralamada lokatsiya bo'sh bo'lishi mumkin (chop etishda server talab qiladi).
+    const location = e.location.trim() ? parseLocation(e.location) : undefined;
+    if (location === null) errors.set(`${path}.venue.location`, 'panel.validation.invalidLocation');
     return {
       id: e.id,
       title: text(e.title),
       startsAt: date(e.startsAt, `${path}.startsAt`) ?? '',
       endsAt: date(e.endsAt, `${path}.endsAt`),
       venue: {
-        name: text(e.venueName),
-        address: text(e.address),
-        location: location ?? { lat: 0, lng: 0 },
+        name: optional(e.venueName),
+        address: optional(e.address),
+        location: location ?? undefined,
         yandexOrgId: e.yandexOrgId.trim() || undefined,
         phone: e.phone.trim() || undefined,
       },
@@ -261,7 +266,7 @@ export function buildInput(v: FormValue): BuildResult {
     parents: optional(p.parents),
   });
 
-  const config: InvitationConfigInput = {
+  const config: InvitationDraftConfigInput = {
     version: CONFIG_VERSION,
     locales: withRu ? ['uz', 'ru'] : ['uz'],
     defaultLocale: withRu ? v.settings.defaultLocale : 'uz',
@@ -315,7 +320,12 @@ export function buildInput(v: FormValue): BuildResult {
       if (!errors.has(path)) errors.set(path, issueKey(issue.code, issue.message));
     }
   }
-  return { input: parsed.success && errors.size === 0 ? parsed.data : null, errors };
+  return {
+    input: parsed.success && errors.size === 0 ? parsed.data : null,
+    errors,
+    config,
+    templateKey: v.order.templateKey,
+  };
 }
 
 /** "YYYY-MM-DD" -> ISO (taklifnoma vaqt mintaqasida kun boshi). */

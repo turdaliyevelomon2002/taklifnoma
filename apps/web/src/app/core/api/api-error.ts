@@ -54,6 +54,7 @@ const TRANSLATED: ReadonlySet<ClientErrorCode> = new Set<ClientErrorCode>([
   'PHONE_TAKEN',
   'REPLY_REQUIRED',
   'WISH_LIMIT_REACHED',
+  'INVITATION_INCOMPLETE',
   'NETWORK',
   'INTERNAL_ERROR',
 ]);

@@ -11,7 +11,7 @@ import { escapeHtml, t } from '../i18n/translator';
 import { PrismaService } from '../prisma/prisma.service';
 import type { Locale } from '@taklifnoma/shared';
 import { InvitationPresenter } from '../invitations/invitation.presenter';
-import { TelegramApi, type TgCallbackQuery, type TgMessage, type TgUpdate } from './telegram-api.service';
+import { TelegramApi, TelegramApiError, type TgCallbackQuery, type TgMessage, type TgUpdate } from './telegram-api.service';
 import { WISH_CALLBACK_RE, wishKeyboard } from './wish-keyboard';
 import { START_PREFIX } from './telegram-link.service';
 
@@ -52,7 +52,16 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
         });
         this.logger.log('Telegram webhook o\'rnatildi');
       } else if (mode === 'polling') {
-        // Webhook o'rnatilgan bo'lsa getUpdates ishlamaydi.
+        // Webhook o'rnatilgan bo'lsa getUpdates ishlamaydi. Bot production bilan bo'lishilgan bo'lsa,
+        // uning webhook'ini jimgina o'chirib qo'ymaymiz: faqat ruxsat berilganda (TAKEOVER) olamiz.
+        const info = await this.api.call<{ url?: string }>('getWebhookInfo');
+        if (info.url && !this.config.get('TELEGRAM_POLLING_TAKEOVER')) {
+          this.logger.warn(
+            `Bot'da webhook o'rnatilgan (${new URL(info.url).host}): polling boshlanmadi, faqat xabar yuboriladi. ` +
+              `Botni lokalga olish uchun TELEGRAM_POLLING_TAKEOVER=true (production keyingi ishga tushishida qaytarib oladi).`,
+          );
+          return;
+        }
         await this.api.call('deleteWebhook', { drop_pending_updates: false });
         this.polling = true;
         void this.pollLoop();
@@ -201,6 +210,12 @@ export class TelegramBotService implements OnApplicationBootstrap, OnApplication
         }
       } catch (err) {
         if (!this.polling) return;
+        // 409: boshqa joyda (production) webhook qayta o'rnatildi. Talashmaymiz, polling'ni to'xtatamiz.
+        if (err instanceof TelegramApiError && err.errorCode === 409) {
+          this.polling = false;
+          this.logger.warn("Bot'ni webhook (production) qaytarib oldi: polling to'xtatildi, faqat xabar yuboriladi.");
+          return;
+        }
         this.logger.warn(`getUpdates xatosi, 5 soniyadan keyin qayta: ${String(err)}`);
         await new Promise((r) => setTimeout(r, 5_000));
       }

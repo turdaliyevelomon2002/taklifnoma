@@ -1,9 +1,12 @@
-import { computed, Directive, DOCUMENT, effect, inject, input, signal } from '@angular/core';
+import { computed, Directive, DOCUMENT, effect, inject, InjectionToken, input, signal } from '@angular/core';
 import type { PublicInvitation } from '@taklifnoma/shared';
 import { LangService } from '../../../core/i18n/lang.service';
 import { MusicPlayer } from '../music-player.service';
 import { zonedParts } from '../../../shared/date/datetime';
 import { coupleNames, primaryEvent } from '../utils/config';
+
+/** Panel muharriridagi jonli preview: kirish (intro) darhol ochiq turadi. */
+export const SKIP_INTRO = new InjectionToken<boolean>('SKIP_INTRO');
 
 /**
  * Barcha shablonlar uchun umumiy kontrakt va hisoblangan qiymatlar.
@@ -38,7 +41,7 @@ export abstract class InvitationTemplateBase {
   protected readonly musicUrl = computed(() => this.media().music?.url ?? null);
 
   /** Kirish "darvozasi" (intro) ochilganmi. */
-  protected readonly opened = signal(false);
+  protected readonly opened = signal(inject(SKIP_INTRO, { optional: true }) ?? false);
   /** Ochilish animatsiyasi ketyapti (masalan, konvert ochilmoqda). */
   protected readonly opening = signal(false);
 

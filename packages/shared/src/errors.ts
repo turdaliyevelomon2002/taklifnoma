@@ -33,6 +33,8 @@ export const ERROR_CODES = [
   'REPLY_REQUIRED',
   /** Bitta mehmon uchun tilaklar chegarasi. */
   'WISH_LIMIT_REACHED',
+  /** Chop etish uchun majburiy ma'lumotlar to'liq emas (issues'da qaysilari). */
+  'INVITATION_INCOMPLETE',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

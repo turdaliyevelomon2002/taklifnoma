@@ -3,36 +3,79 @@ import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { errorKey, toApiError } from '../../core/api/api-error';
 import { OwnerSession } from './owner-session.service';
+import { IconComponent } from './ui/icon.component';
 
 @Component({
   selector: 'tk-panel-login',
-  imports: [TranslocoPipe],
+  imports: [TranslocoPipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <form class="login card" (submit)="$event.preventDefault(); submit(email.value, password.value)" novalidate>
-      <h1 class="login__title">Taklifnoma · {{ 'panel.title' | transloco }}</h1>
-      <p class="muted login__text">{{ 'panel.login.subtitle' | transloco }}</p>
-      <label class="field">
-        <span class="label">{{ 'panel.login.email' | transloco }}</span>
-        <input #email class="input" type="email" autocomplete="username" required maxlength="200" />
-      </label>
-      <label class="field">
-        <span class="label">{{ 'panel.login.password' | transloco }}</span>
-        <input #password class="input" type="password" autocomplete="current-password" required maxlength="200" />
-      </label>
-      @if (error(); as key) {
-        <p class="alert" role="alert">{{ key | transloco }}</p>
-      }
-      <button type="submit" class="btn btn--primary login__submit" [disabled]="busy()">
-        {{ (busy() ? 'panel.login.submitting' : 'panel.login.submit') | transloco }}
-      </button>
-    </form>
-  `,
-  styles: `
-    .login { max-width: 24rem; margin: 12vh auto 0; padding: 1.75rem 1.5rem; box-shadow: var(--tk-shadow); }
-    .login__title { margin: 0 0 0.25rem; font-size: 1.35rem; }
-    .login__text { margin: 0 0 1.25rem; font-size: 0.9rem; }
-    .login__submit { width: 100%; margin-top: 0.5rem; }
+    <div class="auth">
+      <aside class="auth__brand">
+        <div class="auth__logo">
+          <span class="brand-mark"><tk-icon name="heart" /></span>
+          Taklifnoma
+        </div>
+        <div class="auth__pitch">
+          <h2>{{ 'panel.login.brandTitle' | transloco }}</h2>
+          <p>{{ 'panel.login.brandText' | transloco }}</p>
+        </div>
+        <span></span>
+      </aside>
+
+      <div class="auth__form-wrap">
+        <form class="auth__form" (submit)="$event.preventDefault(); submit(email.value, password.value)" novalidate>
+          <div class="auth__mobile-logo">
+            <span class="brand-mark"><tk-icon name="heart" /></span>
+            Taklifnoma
+          </div>
+          <h1>{{ 'panel.login.welcome' | transloco }}</h1>
+          <p class="auth__sub">{{ 'panel.login.subtitle' | transloco }}</p>
+
+          <label class="field">
+            <span class="label">{{ 'panel.login.email' | transloco }}</span>
+            <span class="input-icon">
+              <tk-icon name="mail" />
+              <input #email class="input" type="email" autocomplete="username" required maxlength="200" autofocus />
+            </span>
+          </label>
+          <label class="field">
+            <span class="label">{{ 'panel.login.password' | transloco }}</span>
+            <span class="input-icon">
+              <tk-icon name="lock" />
+              <input
+                #password
+                class="input"
+                [type]="showPassword() ? 'text' : 'password'"
+                autocomplete="current-password"
+                required
+                maxlength="200"
+              />
+              <button
+                type="button"
+                class="btn btn--icon btn--sm input-icon__end"
+                (click)="showPassword.set(!showPassword())"
+                [attr.aria-label]="(showPassword() ? 'panel.login.hidePassword' : 'panel.login.showPassword') | transloco"
+                [attr.aria-pressed]="showPassword()"
+              >
+                <tk-icon [name]="showPassword() ? 'eye-off' : 'eye'" />
+              </button>
+            </span>
+          </label>
+
+          @if (error(); as key) {
+            <p class="alert" role="alert"><tk-icon name="alert-triangle" /> {{ key | transloco }}</p>
+          }
+
+          <button type="submit" class="btn btn--primary btn--lg btn--block" [disabled]="busy()">
+            @if (busy()) {
+              <tk-icon name="loader" class="spin" />
+            }
+            {{ (busy() ? 'panel.login.submitting' : 'panel.login.submit') | transloco }}
+          </button>
+        </form>
+      </div>
+    </div>
   `,
 })
 export class PanelLoginPage {
@@ -43,6 +86,7 @@ export class PanelLoginPage {
   private readonly router = inject(Router);
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly showPassword = signal(false);
 
   protected async submit(email: string, password: string): Promise<void> {
     if (!email.trim() || !password) {

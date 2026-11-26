@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { CreateInvitationResult } from '@taklifnoma/shared';
 import { LangService } from '../../core/i18n/lang.service';
 import { CredentialsCardComponent } from './credentials-card.component';
 import { InvitationEditorComponent } from './editor/invitation-editor.component';
+import type { HasUnsavedChanges } from './editor/unsaved-changes.guard';
 
 @Component({
   selector: 'tk-panel-new',
@@ -36,7 +37,13 @@ import { InvitationEditorComponent } from './editor/invitation-editor.component'
     .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
   `,
 })
-export class PanelNewPage {
+export class PanelNewPage implements HasUnsavedChanges {
+  private readonly editor = viewChild(InvitationEditorComponent);
+
+  hasUnsavedChanges(): boolean {
+    return !this.result() && (this.editor()?.dirty() ?? false);
+  }
+
   private readonly i18n = inject(LangService);
   protected readonly result = signal<CreateInvitationResult | null>(null);
 

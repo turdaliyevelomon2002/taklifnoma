@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   invitationConfigSchema,
+  invitationDraftConfigSchema,
   normalizeUzPhone,
   resolveFeatures,
   slugSchema,
@@ -78,6 +79,25 @@ describe('invitationConfigSchema', () => {
   it('defaultLocale yoqilgan tillar ichida bo\'lishi kerak', () => {
     const cfg = { ...validConfig(), locales: ['uz' as const], defaultLocale: 'ru' as const };
     assert.equal(invitationConfigSchema.safeParse(cfg).success, false);
+  });
+});
+
+describe('invitationDraftConfigSchema', () => {
+  it("to'yxona ma'lumotlarisiz qoralamani qabul qiladi, to'liq sxema esa rad etadi", () => {
+    const cfg = validConfig();
+    cfg.events[0]!.venue = {};
+    assert.equal(invitationDraftConfigSchema.safeParse(cfg).success, true);
+    const strict = invitationConfigSchema.safeParse(cfg);
+    assert.equal(strict.success, false);
+    const paths = strict.error?.issues.map((i) => i.path.join('.')) ?? [];
+    assert.ok(paths.includes('events.0.venue.name'));
+    assert.ok(paths.includes('events.0.venue.location'));
+  });
+  it("qoralamada ham boshqa qoidalar o'zgarmaydi", () => {
+    const cfg = validConfig();
+    cfg.events[0]!.venue = {};
+    cfg.couple.groom.firstName.uz = '';
+    assert.equal(invitationDraftConfigSchema.safeParse(cfg).success, false);
   });
 });
 

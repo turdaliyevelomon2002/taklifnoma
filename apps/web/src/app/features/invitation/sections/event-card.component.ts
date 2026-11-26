@@ -5,7 +5,7 @@ import { LangService } from '../../../core/i18n/lang.service';
 import { localize, LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { EventDatePipe } from '../../../shared/date/event-date.pipe';
 import { googleCalendarUrl } from '../utils/calendar';
-import { yandexDirectionsUrl, yandexPlaceUrl } from '../utils/maps';
+import { hasMapPoint, yandexDirectionsUrl, yandexPlaceUrl } from '../utils/maps';
 
 /** Bitta tadbir: nomi, sana, vaqt, to'yxona va amallar (yo'nalish, xarita, kalendar, qo'ng'iroq). */
 @Component({
@@ -54,6 +54,7 @@ import { yandexDirectionsUrl, yandexPlaceUrl } from '../utils/maps';
       </div>
 
       <div class="event__actions">
+        @if (e.venue.location) {
         <a class="tk-btn event__main-action" [href]="directionsUrl()" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -61,7 +62,9 @@ import { yandexDirectionsUrl, yandexPlaceUrl } from '../utils/maps';
           </svg>
           {{ 'invitation.event.directions' | transloco }}
         </a>
+        }
         <div class="event__icons">
+          @if (hasPoint()) {
           <a class="icon-btn" [href]="placeUrl()" target="_blank" rel="noopener"
             [attr.aria-label]="'invitation.event.openMap' | transloco"
             [attr.title]="'invitation.event.openMap' | transloco">
@@ -70,6 +73,7 @@ import { yandexDirectionsUrl, yandexPlaceUrl } from '../utils/maps';
               <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" /><path d="M9 4v14M15 6v14" />
             </svg>
           </a>
+          }
           <a class="icon-btn" [href]="calendarUrl()" target="_blank" rel="noopener"
             [attr.aria-label]="'invitation.event.addToCalendar' | transloco"
             [attr.title]="'invitation.event.addToCalendar' | transloco">
@@ -218,6 +222,7 @@ export class EventCardComponent {
   protected readonly lang = inject(LangService).lang;
   protected readonly directionsUrl = computed(() => yandexDirectionsUrl(this.event().venue));
   protected readonly placeUrl = computed(() => yandexPlaceUrl(this.event().venue));
+  protected readonly hasPoint = computed(() => hasMapPoint(this.event().venue));
   protected readonly calendarUrl = computed(() => {
     const e = this.event();
     const l = this.lang();

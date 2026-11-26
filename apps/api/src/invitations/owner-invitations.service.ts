@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import {
   getPrimaryEvent,
+  invitationConfigSchema,
   isValidSlug,
   type ChangeStatusInput,
   type CoupleAccessCredentials,
   type CreateInvitationInput,
   type CreateInvitationResult,
-  type InvitationConfig,
   type InvitationDetail,
+  type InvitationDraftConfig,
   type InvitationListItem,
   type ListInvitationsQuery,
   type Paginated,
@@ -118,8 +119,10 @@ export class OwnerInvitationsService {
   }
 
   async update(id: string, input: UpdateInvitationInput): Promise<InvitationDetail> {
-    const current = await this.prisma.invitation.findUnique({ where: { id }, select: { id: true } });
+    const current = await this.prisma.invitation.findUnique({ where: { id }, select: { status: true } });
     if (!current) throw ApiError.notFound();
+    // Ommaviy sahifa ochiq turganda uni chala holatga tushirib bo'lmaydi.
+    if (input.config && current.status === 'ACTIVE') this.assertPublishable(input.config);
     if (input.slug && !(await this.isSlugAvailable(input.slug, id))) {
       throw ApiError.conflict('SLUG_TAKEN');
     }
@@ -149,9 +152,10 @@ export class OwnerInvitationsService {
   async changeStatus(id: string, input: ChangeStatusInput): Promise<InvitationDetail> {
     const inv = await this.prisma.invitation.findUnique({
       where: { id },
-      select: { publishedAt: true },
+      select: { publishedAt: true, config: true },
     });
     if (!inv) throw ApiError.notFound();
+    if (input.status === 'ACTIVE') this.assertPublishable(inv.config);
     await this.prisma.invitation.update({
       where: { id },
       data: {
@@ -199,7 +203,23 @@ export class OwnerInvitationsService {
     return this.presenter.publicView(inv);
   }
 
-  private datesFromConfig(config: InvitationConfig): { eventDate: Date; expiresAt: Date } {
+  /**
+   * Qoralama chala bo'lishi mumkin (tezkor yaratish), chop etilgan taklifnoma esa yo'q.
+   * Yo'l "config." bilan boshlanadi: forma xatolarni shu yo'llar bo'yicha maydonlarga bog'laydi.
+   */
+  private assertPublishable(config: unknown): void {
+    const result = invitationConfigSchema.safeParse(config);
+    if (result.success) return;
+    throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, 'INVITATION_INCOMPLETE', {
+      issues: result.error.issues.map((issue) => ({
+        path: ['config', ...issue.path].join('.'),
+        code: issue.code,
+        message: issue.message,
+      })),
+    });
+  }
+
+  private datesFromConfig(config: InvitationDraftConfig): { eventDate: Date; expiresAt: Date } {
     const eventDate = new Date(getPrimaryEvent(config).startsAt);
     const lastEvent = Math.max(
       ...config.events.map((e) => Date.parse(e.endsAt ?? e.startsAt)),

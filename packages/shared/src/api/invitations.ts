@@ -3,8 +3,8 @@ import { INVITATION_STATUSES, PACKAGE_TYPES, TEMPLATE_KEYS } from '../enums';
 import type { InvitationStatus, PackageType, TemplateKey } from '../enums';
 import { featureOverridesSchema } from '../features';
 import type { FeatureFlags, FeatureOverrides } from '../features';
-import { invitationConfigSchema } from '../invitation-config';
-import type { InvitationConfig } from '../invitation-config';
+import { invitationDraftConfigSchema } from '../invitation-config';
+import type { InvitationDraftConfig } from '../invitation-config';
 import { uzPhoneSchema } from '../phone';
 import { slugSchema } from '../slug';
 import type { MediaView } from './media';
@@ -17,7 +17,8 @@ export const createInvitationSchema = z.object({
   customerPhone: uzPhoneSchema,
   price: z.number().int().min(0).max(1_000_000_000).optional(),
   notes: z.string().trim().max(2000).optional(),
-  config: invitationConfigSchema,
+  // Qoralama sifatida saqlanadi; to'liqlik chop etishda (ACTIVE) tekshiriladi.
+  config: invitationDraftConfigSchema,
   featureOverrides: featureOverridesSchema.optional(),
 });
 export type CreateInvitationInput = z.infer<typeof createInvitationSchema>;
@@ -32,7 +33,7 @@ export const updateInvitationSchema = z
     price: z.number().int().min(0).max(1_000_000_000).nullable(),
     paidAt: z.string().datetime({ offset: true }).nullable(),
     notes: z.string().trim().max(2000).nullable(),
-    config: invitationConfigSchema,
+    config: invitationDraftConfigSchema,
     featureOverrides: featureOverridesSchema.nullable(),
   })
   .partial()
@@ -94,7 +95,8 @@ export interface Paginated<T> {
 }
 
 export interface InvitationDetail extends InvitationListItem {
-  config: InvitationConfig;
+  /** Qoralamada to'yxona ma'lumotlari to'liq bo'lmasligi mumkin. */
+  config: InvitationDraftConfig;
   featureOverrides: FeatureOverrides | null;
   features: FeatureFlags;
   notes: string | null;

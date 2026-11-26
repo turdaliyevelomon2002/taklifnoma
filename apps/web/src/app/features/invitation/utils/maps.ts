@@ -1,8 +1,16 @@
-import type { Venue } from '@taklifnoma/shared';
+import type { DraftVenue } from '@taklifnoma/shared';
+
+type Venue = Pick<DraftVenue, 'location' | 'yandexOrgId'>;
+
+/** Qoralama preview'da to'yxona hali tanlanmagan bo'lishi mumkin: xarita faqat nuqta bo'lsa chiziladi. */
+export function hasMapPoint(venue: Venue): boolean {
+  return !!venue.location || !!venue.yandexOrgId;
+}
 
 /** Koordinatalar backend'da Zod bilan tekshirilgan; bu yerda ham faqat raqam sifatida ishlatiladi. */
 function coords(venue: Venue): { lat: string; lng: string } {
-  return { lat: Number(venue.location.lat).toFixed(6), lng: Number(venue.location.lng).toFixed(6) };
+  const p = venue.location ?? { lat: 0, lng: 0 };
+  return { lat: Number(p.lat).toFixed(6), lng: Number(p.lng).toFixed(6) };
 }
 
 /** Sahifaga joylanadigan Yandex xarita vidjeti (API kalit talab qilmaydi). */

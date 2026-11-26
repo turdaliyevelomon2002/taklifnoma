@@ -415,7 +415,8 @@
     "TELEGRAM_AUTH_INVALID": "Telegram sessiyasi eskirgan. Taklifnomani Telegram'da qayta oching.",
     "PHONE_TAKEN": "Bu telefon raqami bilan boshqa javob berilgan. Raqamsiz yuboring yoki juftlikka murojaat qiling.",
     "REPLY_REQUIRED": "Tilak qo'shishdan oldin taklifga javob bering.",
-    "WISH_LIMIT_REACHED": "Siz yozishingiz mumkin bo'lgan tilaklar soni tugadi."
+    "WISH_LIMIT_REACHED": "Siz yozishingiz mumkin bo'lgan tilaklar soni tugadi.",
+    "INVITATION_INCOMPLETE": "Chop etish uchun ma'lumotlar to'liq emas: to'yxona nomi, manzili va xaritadagi joyini kiriting."
   },
   "admin": {
     "title": "Juftlik paneli",
@@ -507,7 +508,26 @@
       "orders": "Buyurtmalar",
       "new": "Yangi taklifnoma",
       "logout": "Chiqish",
-      "connectTelegram": "Telegram'ni ulash"
+      "connectTelegram": "Telegram'ni ulash",
+      "invitations": "Taklifnomalar"
+    },
+    "shell": {
+      "brandSub": "Boshqaruv paneli",
+      "menu": "Menyu",
+      "account": "Hisob",
+      "toggleSidebar": "Menyuni yig'ish / ochish",
+      "breadcrumb": "Joylashuv",
+      "breadcrumbRoot": "Panel",
+      "invitation": "Taklifnoma",
+      "language": "Til",
+      "theme": "Mavzu",
+      "themeLight": "Yorug'",
+      "themeDark": "Qorong'i",
+      "themeSystem": "Tizim bo'yicha",
+      "telegramTitle": "Telegram bildirishnomalari",
+      "telegramHint": "Mehmonlar javob berishi bilan xabar oling.",
+      "telegramLinked": "Telegram ulangan",
+      "close": "Yopish"
     },
     "login": {
       "subtitle": "Faqat administrator uchun",
@@ -515,7 +535,12 @@
       "password": "Parol",
       "submit": "Kirish",
       "submitting": "Tekshirilmoqda…",
-      "invalid": "Email yoki parol noto'g'ri."
+      "invalid": "Email yoki parol noto'g'ri.",
+      "welcome": "Xush kelibsiz",
+      "showPassword": "Parolni ko'rsatish",
+      "hidePassword": "Parolni yashirish",
+      "brandTitle": "Onlayn to'y taklifnomalari",
+      "brandText": "Taklifnomalarni bir necha daqiqada yarating, mehmonlar javobini kuzating va har bir yangi javobdan Telegram orqali xabardor bo'ling."
     },
     "dashboard": {
       "title": "Buyurtmalar",
@@ -534,7 +559,73 @@
       "found": "{{count}} ta buyurtma",
       "replies": "{{guests}} mehmon · {{replies}} javob",
       "notPaid": "To'lanmagan",
-      "empty": "Hech narsa topilmadi. Birinchi taklifnomani yarating!"
+      "empty": "Hech narsa topilmadi. Birinchi taklifnomani yarating!",
+      "subtitle": "Barcha buyurtmalar, holatlar va yaqin to'ylar bir joyda",
+      "totalHint": "Jami {{count}} ta taklifnoma",
+      "draftsHint": "Chop etishni kutmoqda",
+      "revenueTotal": "Jami: {{amount}}",
+      "unpaidHint": "Narxi bor, to'lov belgilanmagan",
+      "today": "Bugun",
+      "tomorrow": "Ertaga",
+      "inDays": "{{count}} kundan keyin"
+    },
+    "months": {
+      "1": "yan",
+      "2": "fev",
+      "3": "mar",
+      "4": "apr",
+      "5": "may",
+      "6": "iyn",
+      "7": "iyl",
+      "8": "avg",
+      "9": "sen",
+      "10": "okt",
+      "11": "noy",
+      "12": "dek"
+    },
+    "list": {
+      "all": "Barchasi",
+      "clear": "Filtrni tozalash",
+      "couple": "Juftlik",
+      "customer": "Mijoz",
+      "date": "To'y sanasi",
+      "guests": "Mehmonlar",
+      "status": "Holat",
+      "price": "Narx",
+      "actions": "Amallar",
+      "past": "O'tib ketgan",
+      "replies": "{{count}} javob",
+      "paid": "To'langan",
+      "openEdit": "Ochish va tahrirlash",
+      "viewPage": "Sahifani ko'rish",
+      "copyLink": "Havolani nusxalash",
+      "linkCopied": "Havola nusxalandi",
+      "copyFailed": "Nusxalab bo'lmadi",
+      "statusACTIVE": "«{{names}}» chop etildi",
+      "statusDRAFT": "«{{names}}» qoralamaga qaytarildi",
+      "statusARCHIVED": "«{{names}}» arxivlandi",
+      "noResults": "Hech narsa topilmadi",
+      "noResultsHint": "Qidiruv so'zini yoki filtrlarni o'zgartirib ko'ring.",
+      "emptyTitle": "Hali taklifnoma yo'q",
+      "emptyHint": "Birinchi taklifnomani bir daqiqada yarating: ismlar, sana va shablon kifoya. Qolganini keyin to'ldirasiz.",
+      "range": "{{from}}–{{to}} / {{total}}",
+      "pagination": "Sahifalar",
+      "prev": "Oldingi sahifa",
+      "next": "Keyingi sahifa"
+    },
+    "quick": {
+      "open": "Tezkor yaratish",
+      "title": "Yangi taklifnoma",
+      "subtitle": "Asosiy ma'lumotlar kifoya: to'yxona, rasmlar va matnlarni keyin qo'shasiz.",
+      "date": "To'y sanasi",
+      "time": "Boshlanish vaqti",
+      "slugAuto": "Bu manzil band: yaratishda raqam qo'shiladi",
+      "fullForm": "To'liq forma",
+      "create": "Qoralama yaratish",
+      "createdTitle": "Qoralama yaratildi",
+      "createdText": "«{{names}}» uchun juftlik paneli kirish ma'lumotlari. PIN faqat hozir ko'rinadi: nusxalab oling.",
+      "continue": "Tahrirlashni davom ettirish",
+      "defaultEventTitle": "Nikoh to'yi"
     },
     "new": {
       "title": "Yangi taklifnoma",
@@ -550,14 +641,55 @@
       "archive": "Arxivlash",
       "reactivate": "Qayta faollashtirish",
       "tabs": {
-        "info": "Ma'lumotlar",
+        "overview": "Umumiy",
+        "info": "Tahrirlash",
         "media": "Rasm va musiqa",
         "guests": "Mehmonlar",
         "access": "Kirish va sozlamalar"
       },
-      "deleteTitle": "Taklifnomani o'chirish",
-      "deleteHint": "Taklifnoma, barcha javoblar va rasmlar butunlay o'chiriladi. Tasdiqlash uchun slug'ni yozing: {{slug}}",
-      "delete": "Butunlay o'chirish"
+      "delete": "O'chirish",
+      "archiveTitle": "Taklifnomani arxivlaysizmi?",
+      "archiveText": "Sahifa mehmonlarga yopiladi, javoblar saqlanib qoladi. Keyin qayta faollashtirish mumkin."
+    },
+    "overview": {
+      "readiness": "Chop etishga tayyorlik",
+      "readinessMissing": "{{count}} ta majburiy narsa yetishmayapti",
+      "readinessOk": "Majburiy ma'lumotlar to'liq",
+      "recommended": "tavsiya",
+      "fill": "To'ldirish",
+      "publishBlocked": "Nashr qilish uchun avval majburiy ma'lumotlarni to'ldiring.",
+      "publishReady": "Hammasi tayyor: taklifnomani mehmonlarga ochishingiz mumkin.",
+      "share": "Ulashish",
+      "notPublic": "Taklifnoma hali nashr qilinmagan: havola mehmonlarga ochilmaydi.",
+      "shareText": "{{names}} to'yiga taklifnoma",
+      "stats": {
+        "guests": "Keladigan mehmonlar",
+        "replies": "Javoblar",
+        "declined": "Kela olmaydi",
+        "pendingWishes": "Tasdiq kutayotgan tilaklar"
+      },
+      "check": {
+        "names": "Kuyov va kelin ismlari",
+        "venue": "To'yxona nomi va manzili",
+        "location": "Xaritadagi joylashuv",
+        "cover": "Muqova rasmi",
+        "greeting": "Taklif matni",
+        "music": "Fon musiqasi",
+        "gallery": "Galereya rasmlari",
+        "telegram": "Juftlik Telegram botga ulangan"
+      }
+    },
+    "delete": {
+      "title": "«{{names}}» o'chirilsinmi?",
+      "text": "Bu amalni qaytarib bo'lmaydi.",
+      "itemPage": "Taklifnoma sahifasi va havolasi",
+      "itemGuests": "Mehmonlar javoblari va tilaklari ({{count}} ta javob)",
+      "itemMedia": "Barcha rasmlar va musiqa",
+      "typeSlug": "Tasdiqlash uchun manzilni yozing: {{slug}}",
+      "confirm": "Butunlay o'chirish",
+      "done": "«{{names}}» o'chirildi",
+      "zoneTitle": "Xavfli hudud",
+      "zoneText": "Taklifnoma, barcha javoblar va rasmlar butunlay o'chiriladi."
     },
     "access": {
       "newTitle": "Juftlik paneliga kirish",
@@ -565,7 +697,7 @@
       "link": "Maxfiy havola",
       "pin": "PIN kod",
       "copy": "Nusxa olish",
-      "copied": "Nusxa olindi ✓",
+      "copied": "Nusxa olindi",
       "copyMessage": "Juftlikka yuborish uchun matnni nusxalash",
       "shareMessage": "Assalomu alaykum! {{names}} taklifnomasi tayyor:\n{{url}}\n\nMehmonlar javoblarini ko'rish uchun panel:\n{{adminUrl}}\nPIN: {{pin}}",
       "coupleTitle": "Juftlik paneli (havola va PIN)",
@@ -579,7 +711,11 @@
       "miniAppTitle": "Mehmonlar uchun Telegram havola",
       "miniAppHint": "Shu havolani mehmonlarga Telegram orqali yuboring: taklifnoma Telegram ichida ochiladi va mehmon akkaunti bo'yicha taniladi.",
       "miniAppOptional": "\"Faqat Telegram orqali javob\" o'chiq: brauzer orqali ham javob berish mumkin.",
-      "miniAppNotConfigured": "Mini App sozlanmagan (server .env: TELEGRAM_MINIAPP_NAME). Yo'riqnoma: docs/DEPLOY.md, 4-qism."
+      "miniAppNotConfigured": "Mini App sozlanmagan (server .env: TELEGRAM_MINIAPP_NAME). Yo'riqnoma: docs/DEPLOY.md, 4-qism.",
+      "regenerateTitle": "Yangi havola va PIN yaratilsinmi?",
+      "regenerated": "Yangi havola va PIN yaratildi",
+      "pinActive": "PIN o'rnatilgan, panel himoyalangan",
+      "pinNone": "PIN hali o'rnatilmagan"
     },
     "media": {
       "cover": "Muqova rasmi",
@@ -587,16 +723,29 @@
       "music": "Fon musiqasi",
       "musicHint": "MP3 yoki M4A, 12 MB gacha.",
       "gallery": "Galereya",
-      "galleryEmpty": "Hali rasm yo'q.",
       "addPhotos": "Rasm qo'shish",
-      "upload": "Yuklash",
       "replace": "Almashtirish",
       "delete": "O'chirish",
       "uploading": "Yuklanmoqda: {{done}} / {{total}}",
       "notInPackage": "Bu imkoniyat tanlangan paketda yoqilmagan.",
       "og": "Telegram ko'rinishi uchun rasm",
       "ogHint": "Odatda muqovadan avtomatik yasaladi. Boshqa rasm kerak bo'lsa, shu yerga yuklang.",
-      "uploadOg": "Alohida rasm yuklash"
+      "replaceDrop": "Almashtirish uchun bosing yoki rasmni tashlang",
+      "dropTitle": "Faylni shu yerga tashlang",
+      "dropImage": "yoki bosib tanlang · JPG, PNG, WEBP, HEIC",
+      "dropAudio": "yoki bosib tanlang · MP3, M4A, 12 MB gacha",
+      "dragHint": "Tartibni o'zgartirish uchun rasmlarni sudrang. Birinchi rasm galereyada birinchi chiqadi.",
+      "galleryHint": "Bir nechta rasmni birdaniga tanlash yoki shu yerga tashlash mumkin.",
+      "moveLeft": "Chapga surish",
+      "moveRight": "O'ngga surish",
+      "dropShort": "Qo'shish",
+      "dropHere": "Tashlang: yana {{count}} ta rasm qo'shish mumkin",
+      "ogCustom": "Alohida rasm yuklangan.",
+      "ogAuto": "Hozir muqovadan avtomatik yasalgan.",
+      "uploaded": "{{count}} ta fayl yuklandi",
+      "deleteTitle": "Fayl o'chirilsinmi?",
+      "deleteText": "Fayl taklifnomadan va serverdan butunlay o'chiriladi.",
+      "deleted": "Fayl o'chirildi"
     },
     "preview": {
       "banner": "Ko'rib chiqish rejimi: mehmonlar bu sahifani nashr qilinganidan keyin ko'radi"
@@ -714,6 +863,34 @@
       "moderateWishesHint": "Yoqiq bo'lsa, tilak juftlik yoki siz tasdiqlagandan keyingina devorda ko'rinadi. Nojo'ya so'z topilgan tilaklar har doim tekshiruvga tushadi.",
       "telegramOnly": "Faqat Telegram orqali javob",
       "telegramOnlyHint": "Mehmonlar javob va tilakni faqat Telegram Mini App orqali yuboradi: har bir Telegram akkaunt bitta javob beradi va keyin qayta kirsa taniladi. Sahifaning o'zini hamma ko'ra oladi. Bot va Mini App sozlangan bo'lishi kerak."
+    },
+    "editor": {
+      "sections": "Muharrir bo'limlari",
+      "errorsCount": "{{count}} ta xato",
+      "desc": {
+        "order": "Mijoz, narx va paket: faqat siz ko'rasiz",
+        "couple": "Ismlar, ota-onalar va taklifnoma manzili",
+        "events": "Nikoh, to'y va boshqa marosimlar: sana va to'yxona",
+        "texts": "Taklif matni, yakuniy so'z va heshteg",
+        "design": "Shablon, ranglar, til va vaqt mintaqasi",
+        "rsvp": "Mehmonlar javob formasi qanday ishlashi"
+      },
+      "venue": "To'yxona",
+      "venueDraftHint": "Qoralamada bo'sh qoldirish mumkin, lekin nashr qilishdan oldin to'ldiring.",
+      "showErrors": "Xatolarni ko'rsatish ({{count}})",
+      "unsaved": "Saqlanmagan o'zgarishlar",
+      "savedAt": "Saqlandi, {{time}}",
+      "allSaved": "Barcha o'zgarishlar saqlangan",
+      "discard": "Bekor qilish",
+      "preview": "Jonli ko'rinish",
+      "reloadPreview": "Yangilash",
+      "openPreview": "Yangi oynada ochish",
+      "previewPaused": "Ko'rinish to'xtatildi: majburiy maydonlarni to'ldiring",
+      "previewHint": "O'zgarishlar darhol ko'rinadi, saqlash shart emas",
+      "leaveTitle": "Saqlanmagan o'zgarishlar bor",
+      "leaveText": "Hozir chiqsangiz, kiritgan o'zgarishlaringiz yo'qoladi.",
+      "leaveConfirm": "Saqlamasdan chiqish",
+      "leaveCancel": "Qolish"
     },
     "validation": {
       "required": "Bu maydonni to'ldiring",

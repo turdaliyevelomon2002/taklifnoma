@@ -60,14 +60,21 @@ export const venueSchema = z.object({
   phone: uzPhoneSchema.optional(),
 });
 
-export const eventItemSchema = z
+/**
+ * Qoralama uchun to'yxona: tezkor yaratishda nom, manzil va lokatsiya hali ma'lum emas.
+ * Chop etishda (status ACTIVE) to'liq venueSchema bilan qayta tekshiriladi.
+ */
+export const draftVenueSchema = venueSchema.partial({ name: true, address: true, location: true });
+
+const makeEventItemSchema = <V extends typeof venueSchema | typeof draftVenueSchema>(venue: V) =>
+  z
   .object({
     id: z.string().regex(/^[a-z0-9-]{1,40}$/),
     /** Masalan: "Fotiha to'yi", "Nikoh", "Nahorgi osh", "To'y". */
     title: localizedText(80),
     startsAt: isoDateTime,
     endsAt: isoDateTime.optional(),
-    venue: venueSchema,
+    venue,
     /** Hisoblagich va asosiy sana shu tadbirga qarab hisoblanadi. */
     isPrimary: z.boolean(),
   })
@@ -75,6 +82,9 @@ export const eventItemSchema = z
     message: 'ends_before_start',
     path: ['endsAt'],
   });
+
+export const eventItemSchema = makeEventItemSchema(venueSchema);
+export const draftEventItemSchema = makeEventItemSchema(draftVenueSchema);
 
 export const rsvpConfigSchema = z.object({
   /** Shu vaqtdan keyin forma yopiladi. */
@@ -104,7 +114,8 @@ export const seoConfigSchema = z.object({
   description: localizedText(200).optional(),
 });
 
-export const invitationConfigSchema = z
+const makeConfigSchema = <E extends typeof eventItemSchema | typeof draftEventItemSchema>(event: E) =>
+  z
   .object({
     version: z.literal(CONFIG_VERSION),
     locales: z.array(localeSchema).min(1).max(LOCALES.length),
@@ -125,7 +136,7 @@ export const invitationConfigSchema = z
       .regex(/^#?[\p{L}\p{N}_]{1,40}$/u)
       .optional(),
 
-    events: z.array(eventItemSchema).min(1).max(10),
+    events: z.array(event).min(1).max(10),
 
     musicTitle: optionalText(100),
     rsvp: rsvpConfigSchema,
@@ -163,18 +174,26 @@ export const invitationConfigSchema = z
     }
   });
 
+/** To'liq (chop etishga tayyor) config. Ommaviy sahifa faqat shunday config bilan ochiladi. */
+export const invitationConfigSchema = makeConfigSchema(eventItemSchema);
+/** Qoralama: to'yxona ma'lumotlari hali to'liq bo'lmasligi mumkin. */
+export const invitationDraftConfigSchema = makeConfigSchema(draftEventItemSchema);
+
 export type InvitationConfig = z.infer<typeof invitationConfigSchema>;
 /** Formalardan keladigan (transform'gacha bo'lgan) shakl. */
 export type InvitationConfigInput = z.input<typeof invitationConfigSchema>;
+export type InvitationDraftConfig = z.infer<typeof invitationDraftConfigSchema>;
+export type InvitationDraftConfigInput = z.input<typeof invitationDraftConfigSchema>;
 export type EventItem = z.infer<typeof eventItemSchema>;
 export type Venue = z.infer<typeof venueSchema>;
+export type DraftVenue = z.infer<typeof draftVenueSchema>;
 export type Person = z.infer<typeof personSchema>;
 export type GeoPoint = z.infer<typeof geoPointSchema>;
 export type RsvpConfig = z.infer<typeof rsvpConfigSchema>;
 export type ThemeOverrides = z.infer<typeof themeOverridesSchema>;
 export type SeoConfig = z.infer<typeof seoConfigSchema>;
 
-export function getPrimaryEvent(config: Pick<InvitationConfig, 'events'>): EventItem {
+export function getPrimaryEvent<T extends { isPrimary: boolean }>(config: { events: T[] }): T {
   const primary = config.events.find((e) => e.isPrimary) ?? config.events[0];
   if (!primary) throw new Error('Invitation config has no events');
   return primary;

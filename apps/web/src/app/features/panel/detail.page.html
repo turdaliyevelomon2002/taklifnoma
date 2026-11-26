@@ -1,74 +1,110 @@
 @let l = lang();
 
-<div class="page">
-  <a class="back" routerLink="/panel">← {{ 'panel.nav.orders' | transloco }}</a>
-
+<div class="page page--wide">
   @if (loadError(); as key) {
-    <p class="alert" role="alert">{{ key | transloco }}</p>
+    <p class="alert" role="alert"><tk-icon name="alert-triangle" /> {{ key | transloco }}</p>
   }
 
   @if (detail(); as d) {
     <header class="head">
       <div class="head__info">
-        <h1 class="page__title">{{ d.coupleNames }}</h1>
-        <p class="head__meta">
-          <span class="badge badge--{{ d.status }}">{{ 'admin.status.' + d.status | transloco }}</span>
-          <span class="badge">{{ 'admin.package.' + d.package | transloco }}</span>
-          <span class="muted">{{ d.eventDate | eventDate: 'full' : d.config.timezone : l }}</span>
-          <span class="muted">· {{ d.price | money: l }}</span>
-          @if (!d.paidAt && (d.price ?? 0) > 0) {
-            <span class="badge badge--unpaid">{{ 'panel.dashboard.notPaid' | transloco }}</span>
-          }
-        </p>
-        @if (d.status === 'ACTIVE') {
-          <a class="head__url" [href]="d.publicUrl" target="_blank" rel="noopener">{{ d.publicUrl }} ↗</a>
-        } @else {
-          <span class="muted head__url">{{ d.publicUrl }}</span>
-        }
+        <a class="back" routerLink="/panel"><tk-icon name="arrow-left" /> {{ 'panel.nav.invitations' | transloco }}</a>
+        <div class="head__title-row">
+          <span class="head__avatar head__avatar--{{ d.templateKey }}" aria-hidden="true">{{ d.coupleNames.charAt(0) }}</span>
+          <div class="head__titles">
+            <h1 class="page__title">{{ d.coupleNames }}</h1>
+            <p class="head__meta">
+              <span class="badge badge--{{ d.status }}">{{ 'admin.status.' + d.status | transloco }}</span>
+              <span class="badge">{{ 'admin.package.' + d.package | transloco }}</span>
+              <span class="head__dot">{{ d.eventDate | eventDate: 'full' : d.config.timezone : l }}</span>
+              @if (d.price !== null) {
+                <span class="head__dot">{{ d.price | money: l }}</span>
+              }
+              @if (!d.paidAt && (d.price ?? 0) > 0) {
+                <span class="badge badge--unpaid">{{ 'panel.dashboard.notPaid' | transloco }}</span>
+              }
+            </p>
+          </div>
+        </div>
       </div>
+
       <div class="head__actions">
-        <a class="btn" [routerLink]="['/panel/i', d.id, 'preview']" target="_blank">👁 {{ 'panel.detail.preview' | transloco }}</a>
+        <a class="btn btn--outline" [routerLink]="['/panel/i', d.id, 'preview']" target="_blank">
+          <tk-icon name="eye" /> <span class="hide-sm">{{ 'panel.detail.preview' | transloco }}</span>
+        </a>
         @switch (d.status) {
           @case ('DRAFT') {
-            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">{{ 'panel.detail.publish' | transloco }}</button>
+            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">
+              <tk-icon name="send" /> {{ 'panel.detail.publish' | transloco }}
+            </button>
           }
           @case ('ACTIVE') {
-            <button type="button" class="btn" (click)="setStatus('DRAFT')" [disabled]="busy()">{{ 'panel.detail.unpublish' | transloco }}</button>
-            <button type="button" class="btn" (click)="setStatus('ARCHIVED')" [disabled]="busy()">{{ 'panel.detail.archive' | transloco }}</button>
+            <a class="btn btn--primary" [href]="d.publicUrl" target="_blank" rel="noopener">
+              <tk-icon name="external-link" /> {{ 'panel.list.viewPage' | transloco }}
+            </a>
           }
           @case ('ARCHIVED') {
-            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">{{ 'panel.detail.reactivate' | transloco }}</button>
+            <button type="button" class="btn btn--primary" (click)="setStatus('ACTIVE')" [disabled]="busy()">
+              <tk-icon name="globe" /> {{ 'panel.detail.reactivate' | transloco }}
+            </button>
           }
         }
+        <button type="button" class="btn btn--outline btn--icon" [cdkMenuTriggerFor]="moreMenu" [cdkMenuPosition]="menuPositions"
+          [attr.aria-label]="'panel.list.actions' | transloco" [disabled]="busy()">
+          <tk-icon [name]="busy() ? 'loader' : 'ellipsis'" [class.spin]="busy()" />
+        </button>
+        <ng-template #moreMenu>
+          <div class="menu" cdkMenu>
+            <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="copy(d.publicUrl)">
+              <tk-icon name="copy" /> {{ 'panel.list.copyLink' | transloco }}
+            </button>
+            <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="regenerate()">
+              <tk-icon name="refresh-cw" /> {{ 'panel.access.regenerate' | transloco }}
+            </button>
+            @if (d.status === 'ACTIVE') {
+              <div class="menu__sep"></div>
+              <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="setStatus('DRAFT')">
+                <tk-icon name="eye-off" /> {{ 'panel.detail.unpublish' | transloco }}
+              </button>
+              <button type="button" class="menu__item" cdkMenuItem (cdkMenuItemTriggered)="setStatus('ARCHIVED')">
+                <tk-icon name="archive" /> {{ 'panel.detail.archive' | transloco }}
+              </button>
+            }
+            <div class="menu__sep"></div>
+            <button type="button" class="menu__item menu__item--danger" cdkMenuItem (cdkMenuItemTriggered)="remove()">
+              <tk-icon name="trash" /> {{ 'panel.detail.delete' | transloco }}
+            </button>
+          </div>
+        </ng-template>
       </div>
     </header>
-
-    @if (actionError(); as key) {
-      <p class="alert" role="alert">{{ key | transloco }}</p>
-    }
 
     <nav class="tabs" role="tablist">
       @for (t of tabs; track t) {
         <button type="button" role="tab" class="tabs__btn" [class.is-active]="activeTab() === t" [attr.aria-selected]="activeTab() === t" (click)="selectTab(t)">
+          <tk-icon [name]="tabIcons[t]" />
           {{ 'panel.detail.tabs.' + t | transloco }}
           @if (t === 'guests') {
             <span class="tabs__count">{{ d.stats.replies }}</span>
+          }
+          @if (t === 'guests' && d.stats.pendingWishes) {
+            <span class="tabs__dot" [attr.title]="'panel.overview.stats.pendingWishes' | transloco"></span>
           }
         </button>
       }
     </nav>
 
     @switch (activeTab()) {
+      @case ('overview') {
+        <tk-detail-overview [invitation]="d" [busy]="busy()" (go)="goTo($event)" (publish)="setStatus('ACTIVE')" />
+      }
       @case ('info') {
-        <tk-invitation-editor [detail]="d" (saved)="onSaved($event)" />
+        <tk-invitation-editor [detail]="d" [initialSection]="section()" (saved)="onSaved($event)" />
       }
       @case ('media') {
         <tk-media-manager [invitation]="d" (changed)="load()" />
       }
       @case ('guests') {
-        <div class="guest-stats muted">
-          {{ 'panel.dashboard.replies' | transloco: { guests: d.stats.attendingGuests, replies: d.stats.replies } }}
-        </div>
         <tk-guest-list
           [source]="guestSource()"
           [stats]="d.stats"
@@ -84,67 +120,77 @@
             <tk-credentials-card [credentials]="c" [messageText]="shareText(d, c)" />
           }
 
-          <section class="card">
-            <h2 class="card__title">{{ 'panel.access.coupleTitle' | transloco }}</h2>
-            <p class="muted">{{ 'panel.access.coupleHint' | transloco }}</p>
-            @if (confirmRegenerate()) {
-              <p class="warn">{{ 'panel.access.regenerateWarn' | transloco }}</p>
-              <div class="row">
-                <button type="button" class="btn btn--danger-solid" (click)="regenerate()" [disabled]="busy()">{{ 'panel.access.regenerateConfirm' | transloco }}</button>
-                <button type="button" class="btn" (click)="confirmRegenerate.set(false)">{{ 'admin.guests.cancel' | transloco }}</button>
-              </div>
-            } @else {
-              <button type="button" class="btn btn--ghost" (click)="confirmRegenerate.set(true)">{{ 'panel.access.regenerate' | transloco }}</button>
-            }
-          </section>
-
-          <section class="card">
-            <h2 class="card__title">{{ 'admin.telegram.title' | transloco }}</h2>
-            @if (!d.features.telegramNotify) {
-              <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
-            } @else if (d.coupleTelegramLinked) {
-              <p class="hint hint--ok">✓ {{ 'panel.access.telegramLinked' | transloco }}</p>
-            } @else if (d.telegramLinkUrl; as url) {
-              <p class="muted">{{ 'panel.access.telegramHint' | transloco }}</p>
-              <div class="row">
-                <code class="code">{{ url }}</code>
-                <button type="button" class="btn" (click)="copy(url)">{{ 'panel.access.copy' | transloco }}</button>
-              </div>
-            } @else {
-              <p class="hint">{{ 'panel.access.botNotConfigured' | transloco }}</p>
-            }
-          </section>
-
-          <section class="card">
-            <h2 class="card__title">{{ 'panel.access.miniAppTitle' | transloco }}</h2>
-            @if (d.telegramAppUrl; as url) {
-              <p class="muted">{{ 'panel.access.miniAppHint' | transloco }}</p>
-              <div class="row">
-                <code class="code">{{ url }}</code>
-                <button type="button" class="btn" (click)="copy(url)">{{ 'panel.access.copy' | transloco }}</button>
-              </div>
-              @if (!d.config.rsvp.telegramOnly) {
-                <p class="hint">{{ 'panel.access.miniAppOptional' | transloco }}</p>
-              }
-            } @else {
-              <p class="hint">{{ 'panel.access.miniAppNotConfigured' | transloco }}</p>
-            }
-          </section>
-
-          <section class="card danger">
-            <h2 class="card__title">{{ 'panel.detail.deleteTitle' | transloco }}</h2>
-            <p class="muted">{{ 'panel.detail.deleteHint' | transloco: { slug: d.slug } }}</p>
-            <div class="row">
-              <input class="input" [value]="deleteConfirmText()" (input)="deleteConfirmText.set($any($event.target).value)" [placeholder]="d.slug" [attr.aria-label]="'panel.detail.deleteTitle' | transloco" />
-              <button type="button" class="btn btn--danger-solid" (click)="remove()" [disabled]="busy() || deleteConfirmText() !== d.slug">
-                {{ 'panel.detail.delete' | transloco }}
-              </button>
+          <section class="card acc">
+            <span class="acc__icon"><tk-icon name="lock" /></span>
+            <div class="acc__body">
+              <h2 class="card__title">{{ 'panel.access.coupleTitle' | transloco }}</h2>
+              <p class="muted">{{ 'panel.access.coupleHint' | transloco }}</p>
+              <p class="acc__state">
+                <tk-icon [name]="d.pinEnabled ? 'circle-check' : 'info'" />
+                {{ (d.pinEnabled ? 'panel.access.pinActive' : 'panel.access.pinNone') | transloco }}
+              </p>
             </div>
+            <button type="button" class="btn btn--outline acc__action" (click)="regenerate()" [disabled]="busy()">
+              <tk-icon name="refresh-cw" /> {{ 'panel.access.regenerate' | transloco }}
+            </button>
+          </section>
+
+          <section class="card acc">
+            <span class="acc__icon"><tk-icon name="send" /></span>
+            <div class="acc__body">
+              <h2 class="card__title">{{ 'admin.telegram.title' | transloco }}</h2>
+              @if (!d.features.telegramNotify) {
+                <p class="hint hint--bad">{{ 'panel.media.notInPackage' | transloco }}</p>
+              } @else if (d.coupleTelegramLinked) {
+                <p class="acc__state acc__state--ok"><tk-icon name="circle-check" /> {{ 'panel.access.telegramLinked' | transloco }}</p>
+              } @else if (d.telegramLinkUrl; as url) {
+                <p class="muted">{{ 'panel.access.telegramHint' | transloco }}</p>
+                <div class="copy-row">
+                  <code class="code">{{ url }}</code>
+                  <button type="button" class="btn btn--outline btn--sm" (click)="copy(url)"><tk-icon name="copy" /> {{ 'panel.access.copy' | transloco }}</button>
+                </div>
+              } @else {
+                <p class="hint">{{ 'panel.access.botNotConfigured' | transloco }}</p>
+              }
+            </div>
+          </section>
+
+          <section class="card acc">
+            <span class="acc__icon"><tk-icon name="smartphone" /></span>
+            <div class="acc__body">
+              <h2 class="card__title">{{ 'panel.access.miniAppTitle' | transloco }}</h2>
+              @if (d.telegramAppUrl; as url) {
+                <p class="muted">{{ 'panel.access.miniAppHint' | transloco }}</p>
+                <div class="copy-row">
+                  <code class="code">{{ url }}</code>
+                  <button type="button" class="btn btn--outline btn--sm" (click)="copy(url)"><tk-icon name="copy" /> {{ 'panel.access.copy' | transloco }}</button>
+                </div>
+                @if (!d.config.rsvp.telegramOnly) {
+                  <p class="hint">{{ 'panel.access.miniAppOptional' | transloco }}</p>
+                }
+              } @else {
+                <p class="hint">{{ 'panel.access.miniAppNotConfigured' | transloco }}</p>
+              }
+            </div>
+          </section>
+
+          <section class="card danger-zone">
+            <div class="acc__body">
+              <h2 class="card__title">{{ 'panel.delete.zoneTitle' | transloco }}</h2>
+              <p class="muted">{{ 'panel.delete.zoneText' | transloco }}</p>
+            </div>
+            <button type="button" class="btn btn--danger" (click)="remove()" [disabled]="busy()">
+              <tk-icon name="trash" /> {{ 'panel.detail.delete' | transloco }}
+            </button>
           </section>
         </div>
       }
     }
   } @else if (!loadError()) {
-    <p class="loading">{{ 'admin.loading' | transloco }}</p>
+    <div class="head-skeleton" aria-hidden="true">
+      <span class="skeleton sk sk--sm"></span>
+      <span class="skeleton sk sk--lg"></span>
+      <span class="skeleton sk sk--md"></span>
+    </div>
   }
 </div>
