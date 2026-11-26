@@ -1,0 +1,71 @@
+# Render Blueprint: bepul deploy (web + api bitta servisda).
+# Yo'riqnoma: docs/DEPLOY-FREE.md
+#   DB: Neon (PostgreSQL), fayllar: Supabase Storage (S3). Ikkalasi ham bepul va kartasiz.
+services:
+  - type: web
+    name: taklifnoma
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    buildCommand: >-
+      npm ci --include=dev &&
+      npm run build:shared &&
+      npm run build -w @taklifnoma/api &&
+      npm run build -w @taklifnoma/web
+    startCommand: node deploy/render-start.mjs
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      # PUBLIC_WEB_URL / CORS_ORIGINS / TELEGRAM_WEBHOOK_URL: berilmasa RENDER_EXTERNAL_URL dan olinadi.
+      # API'gacha hop'lar: Render proksi + ichki web proksi.
+      - key: TRUST_PROXY
+        value: "2"
+      - key: COOKIE_SECURE
+        value: "true"
+
+      # --- Neon ---
+      - key: DATABASE_URL
+        sync: false
+
+      # --- Sirlar (Render o'zi generatsiya qiladi) ---
+      - key: OWNER_JWT_SECRET
+        generateValue: true
+      - key: COUPLE_JWT_SECRET
+        generateValue: true
+      - key: RSVP_SECRET
+        generateValue: true
+
+      # --- Birinchi owner akkaunti (har ishga tushganda yaratiladi/yangilanadi) ---
+      - key: OWNER_EMAIL
+        sync: false
+      - key: OWNER_PASSWORD
+        sync: false
+      - key: SEED_DEMO
+        value: "false"
+
+      # --- Supabase Storage (S3) ---
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_BUCKET
+        value: taklifnoma
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: S3_FORCE_PATH_STYLE
+        value: "true"
+      - key: S3_PUBLIC_URL
+        sync: false
+
+      # --- Telegram (ixtiyoriy: bo'sh qoldirsangiz bot o'chiq) ---
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      - key: TELEGRAM_MINIAPP_NAME
+        sync: false
